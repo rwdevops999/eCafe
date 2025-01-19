@@ -1,0 +1,64 @@
+{
+    "title": "Welkom by eCAFé",
+
+    "services": "Diensten",
+    "managemenent": "Beheer",
+    "tools": "Instrumenten",
+
+    "Dashboard": "Instrumentenbord",
+
+    "stock": "Voorraad",
+    "overview": "Overzicht",
+    "orders": "Bestellingen",
+    "deliveries": "Leveringen",
+    "collects": "Ophalingen",
+    "import": "Invoer",
+    "export": "Uitvoer",
+
+    "contacts": "Contacten",
+    "providers": "Leveranciers",
+    "customers": "Klanten",
+    "employees": "Personeel",
+    "others": "Andere",
+
+    "messages": "Boodschappen",
+    "notifications": "Berichten",
+    "mails": "Mails",
+    "chat": "Chat",
+
+    "documents": "Documenten",
+    "upload": "Opladen",
+    "download": "Afhalen",
+    "tickets": "Tiketten",
+    "search": "Opzoeken",
+
+    "logistics": "Logistiek",
+    "website": "Website",
+    "leaflets": "Boekjes",
+    "promos": "Promoties",
+    "materials": "Materialen",
+
+    "history": "Historiek",
+    "meetings": "Vergadering",
+
+    "access": "Toegang (IAM)",
+    "groups": "Groepen",
+    "users": "Gebruikers",
+    "roles": "Rollen",
+    "policies": "Beleidslijnen",
+    "statements": "Verklaringen",
+
+    "settings": "Instellingen",
+    "general": "Algemeen",
+    "storage": "Opslag",
+    "limits": "Limieten",
+
+    "theme": "Thema",
+    "time": "Tijd",
+    "languages": "Taal",
+
+    "profile": "Profiel",
+    "logout": "Uitloggen",
+
+    "test": "Testen"
+}   

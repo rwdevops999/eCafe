@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Action {
+  id Int @id @default(autoincrement())
+  name String
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  service Service? @relation(fields: [serviceId], references: [id])
+  serviceId Int?
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  name String
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  actions Action[]
+  statements ServiceStatement[]
+}
+
+model ServiceStatement {
+  id Int @id @default(autoincrement())
+  sid String
+  description String
+  permission String @default("Allow")
+  managed Boolean @default(false)
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  service Service? @relation(fields: [serviceId], references: [id])
+  serviceId Int
+  actions StatementAction[]
+  policies Policy[]
+}
+
+model StatementAction {
+  id Int @id @default(autoincrement())
+  name String
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  statement ServiceStatement? @relation(fields: [statementId], references: [id])
+  statementId Int?
+  actionId Int
+}
+
+model Policy {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  managed Boolean @default(false)
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  statements ServiceStatement[]
+  roles Role[]
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  managed Boolean @default(false)
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  policies Policy[]
+}
+
+// model UserGroup {
+//   id Int @id @default(autoincrement())
+// }
+
+model Country {
+  id Int @id @default(autoincrement())
+  name String?
+  dialCode String?
+  code String?
+  addresses Address[]
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  street String
+  number  String
+  box String
+  city String
+  postalcode String
+  county String
+  country Country @relation(fields: [countryId], references: [id])
+  countryId Int
+  user User? @relation(fields: [userId], references: [id])
+  userId Int? @unique
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  firstname String
+  phone String
+  email String
+  password String
+  address Address?
+}

@@ -1,0 +1,109 @@
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-e0f6c5c2-060a-44db-9e2a-c90163a0117b", "Stock", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-a57a796d-93f2-4669-a75b-93bab66b53ff", "Contacts", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-f5592048-53f4-4994-9643-e067acb8e70e", "Messages", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-ff17a516-1a23-4e60-acc7-4dce4d496a86", "Documents", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-cc4322b6-a45b-4005-8a74-9163180a19b4", "Logistics", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-cbdcffa4-faf3-4558-ad9b-2e7fb9a112b4", "History", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-61be10d4-0e25-4cf6-8518-60ae446771d9", "Meetings", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-2ddfb06e-9030-49cd-aaf2-03306f7cf278", "Access", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-452a2e20-6cc9-4b67-8430-2b1b3a131d9f", "Settings", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-b9ae7151-ad77-4fb5-be97-0faa90b53b34", "User", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-dbcc31a6-e21f-413a-8c0b-86cc535dc741", "Ecafe", new Date(), "admin", new Data(), "admin");
+
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (List", new Date(), "admin", new Date(), "admin", "Show");
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (Create", new Date(), "admin", new Date(), "admin", "Create");
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (Get", new Date(), "admin", new Date(), "admin", "Get");
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (Update", new Date(), "admin", new Date(), "admin", "Change");
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (Delete", new Date(), "admin", new Date(), "admin", "Remove");
+insert into Action (name,createData,createUser,updateDate,updateUser,description)
+  values (Execute", new Date(), "admin", new Date(), "admin", "Execute");
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-02e1cd67-e569-4871-8419-a697e2b31dac", "Overview", new Date(), "admin", new Date(), "admin", "overviews", "overview");
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-aa99c86d-8976-49c1-8a33-f677bc528ad1", "Orders", new Date(), "admin", new Date(), "admin", "orders", "order");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-48baf711-9a53-494a-a01f-bd45954dd003", "Deliveries", new Date(), "admin", new Date(), "admin", "deliveries", "delivery");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-d5cb7bad-72c7-43cb-8be8-0563009eda20", "Collects", new Date(), "admin", new Date(), "admin", "collects", "collect");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-dc6bf0f7-71c4-46c9-ba19-52ebcc6581df", "Import", new Date(), "admin", new Date(), "admin", "imports", "import");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-ef66cce4-ae17-4924-a704-b8645dff2d4c", "Export", new Date(), "admin", new Date(), "admin", "exports", "export");
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-9d901635-7a61-4729-9025-82421a35d1a0", "Providers", new Date(), "admin", new Date(), "admin", "providers", "provider");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-f3b37d7b-3c69-40aa-9a37-c79d11a54679", "Customers", new Date(), "admin", new Date(), "admin", "customers", "customer");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-f52af1e1-b697-4951-95fe-33007b5a84b7", "Employees", new Date(), "admin", new Date(), "admin", "employees", "employee");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-31302b4f-62af-49f6-a2e6-9f7b37fdb6ff", "Others", new Date(), "admin", new Date(), "admin", "other contacts", "other contact");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-c416d672-2c40-400e-9ffc-6f9329a3840f", "Notifications", new Date(), "admin", new Date(), "admin", "notifications", "notification");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-25fb92b2-fe1d-4636-a7c7-61b6d32ef8dd", "Mails", new Date(), "admin", new Date(), "admin", "mails", "mail");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-adf920d7-03f7-4da8-a28b-ed5ce6d797ff", "Chat", new Date(), "admin", new Date(), "admin", "chats", "chat");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-c9de0345-b0c3-454b-837c-00302fee83fa", "Upload", new Date(), "admin", new Date(), "admin", "uploads", "upload");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-f17452b3-7871-44a3-977c-6c47cc7da8ac", "Download", new Date(), "admin", new Date(), "admin", "downloads", "download");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-145df9ac-6ed0-4846-8b7a-f64e538e9953", "Tickets", new Date(), "admin", new Date(), "admin", "tickets", "ticket");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-7916f079-089d-4bd9-8846-c1dcd61bfa71", "Search", new Date(), "admin", new Date(), "admin", "search all", "search");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-7ab1c1b8-4d55-431b-a0d0-cba5ad171352", "Website", new Date(), "admin", new Date(), "admin", "websites", "website");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-885598c5-c917-480a-950e-3e13b126ae65", "Leaflets", new Date(), "admin", new Date(), "admin", "leaflets", "leaflet");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-e03a6b24-d4ca-4edf-81bd-7e23bd78f184", "Promotions", new Date(), "admin", new Date(), "admin", "promotions", "promotion");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-88be2472-a444-49dc-8e02-0981d067f5d7", "Materials", new Date(), "admin", new Date(), "admin", "materials", "material");	
+
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-c54238d3-0d05-4c6c-a2ea-06a2d320e199", "User Groups", new Date(), "admin", new Date(), "admin", "groups", "groups");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-2e3bb96d-3c5c-4d60-bccb-6e842762b44b", "Users", new Date(), "admin", new Date(), "admin", "users", "user");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-7c414cb7-62f6-4b21-b9ac-739c2366b685", "Roles", new Date(), "admin", new Date(), "admin", "roles", "role");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-56d197aa-9ede-49ce-a71b-331134e8cc1d", "Policies", new Date(), "admin", new Date(), "admin", "policies", "policy");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-e50c3966-be3e-48bf-a1cf-782ee69cd8e7", "Statements", new Date(), "admin", new Date(), "admin", "statements", "statement");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-0c9a2b62-e163-496e-886f-9f49edf919d6", "Services", new Date(), "admin", new Date(), "admin", "services", "service");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-e479ad57-4e7a-4164-a0ee-c7facf72d9bb", "General", new Date(), "admin", new Date(), "admin", "general settings", "general setting");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-4d4dfa45-ec92-44eb-977c-30838fd895b4", "Storage", new Date(), "admin", new Date(), "admin", "storage settings", "storage setting");	
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-cae0f37f-9de9-406f-80d7-54effe6f2423", "Limits", new Date(), "admin", new Date(), "admin", "limits", "limit");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-ac222a80-2347-4bd0-a143-22242a60e7c0", "Profile", new Date(), "admin", new Date(), "admin", "profiles", "profile");	
+
+insert into Resource (uuid,name,createDate,createUser,updateDate,updateUser,mdescription,sdecription) 
+	values ("res-0e863477-cdf0-44d7-bfe1-127f61c8c372", "Dashboard", new Date(), "admin", new Date(), "admin", "dashboards", "dashboard");	

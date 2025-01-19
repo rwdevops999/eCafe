@@ -1,0 +1,64 @@
+{
+    "title": "Bienvenue au eCAFé",
+
+    "services": "Services",
+    "managemenent": "Gestion",
+    "tools": "Utils",
+
+    "Dashboard": "Tableau",
+
+    "stock": "Stock",
+    "overview": "Vue d'ensemble",
+    "orders": "Commandes",
+    "deliveries": "Livraisons",
+    "collects": "Collects",
+    "import": "Importation",
+    "export": "Exportation",
+
+    "contacts": "Contacts",
+    "providers": "Fournisseur",
+    "customers": "Clients",
+    "employees": "Employees",
+    "others": "Autres",
+
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "mails": "Mails",
+    "chat": "Chat",
+
+    "documents": "Documents",
+    "upload": "Téléchargement ⬆️",
+    "download": "Téléchargement ⬇️",
+    "tickets": "Billets",
+    "search": "Recherche",
+
+    "logistics": "Logistique",
+    "website": "Site Web",
+    "leaflets": "Livres",
+    "promos": "Promotions",
+    "materials": "Materiaux",
+
+    "history": "Histoire",
+    "meetings": "Réunions",
+
+    "access": "Accès (IAM)",
+    "groups": "Groupes",
+    "users": "Utilisateurs",
+    "roles": "Rôles",
+    "policies": "Politiques",
+    "statements": "Déclarations",
+
+    "settings": "Paramètres",
+    "general": "Général",
+    "storage": "Stockage",
+    "limits": "Limites",
+
+    "theme": "Lumière",
+    "time": "Temps",
+    "languages": "Langue",
+
+    "profile": "Profil",
+    "logout": "Déconnexion",
+
+    "test": "Testing"
+}   

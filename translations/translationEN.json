@@ -1,0 +1,64 @@
+{
+    "title": "Welcome by eCAFé",
+
+    "services": "Services",
+    "managemenent": "Management",
+    "tools": "Tools",
+
+    "Dashboard": "Dashboard",
+
+    "stock": "Stock",
+    "overview": "Overview",
+    "orders": "Orders",
+    "deliveries": "Deliveries",
+    "collects": "Collects",
+    "import": "Import",
+    "export": "Export",
+
+    "contacts": "Contacts",
+    "providers": "Providers",
+    "customers": "Customers",
+    "employees": "Employees",
+    "others": "Others",
+
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "mails": "Mails",
+    "chat": "Chat",
+
+    "documents": "Documents",
+    "upload": "Upload",
+    "download": "Download",
+    "tickets": "Tickets",
+    "search": "Search",
+
+    "logistics": "Logistics",
+    "website": "Website",
+    "leaflets": "Leaflets",
+    "promos": "Promotions",
+    "materials": "Materials",
+
+    "history": "History",
+    "meetings": "Meetings",
+
+    "access": "Access (IAM)",
+    "groups": "User Groups",
+    "users": "Users",
+    "roles": "Roles",
+    "policies": "Policies",
+    "statements": "Statements",
+    
+    "settings": "Settings",
+    "general": "General",
+    "storage": "Storage",
+    "limits": "Limits",
+
+    "theme": "Theme",
+    "time": "Time",
+    "languages": "Language",
+
+    "profile": "Profile",
+    "logout": "Logout",
+
+    "test": "Testing"
+}   
