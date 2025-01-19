@@ -210,7 +210,7 @@ data.Resources.push(
             {
                 tkey: 'groups',
                 icon: Users,
-                url: "#",
+                url: "/iam/groups",
             },
             {
                 tkey: 'users',
