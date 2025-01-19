@@ -64,6 +64,7 @@ model Policy {
   updateDate DateTime @updatedAt
   statements ServiceStatement[]
   roles Role[]
+  groups Group[]
 }
 
 model Role {
@@ -74,6 +75,7 @@ model Role {
   createDate DateTime @default(now())
   updateDate DateTime @updatedAt
   policies Policy[]
+  groups Group[]
 }
 
 // model UserGroup {
@@ -110,4 +112,14 @@ model User {
   email String
   password String
   address Address?
+  groups Group[]
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  roles Role[]
+  policies Policy[]
+  users User[]
 }
