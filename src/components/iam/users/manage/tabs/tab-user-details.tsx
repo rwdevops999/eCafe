@@ -15,7 +15,6 @@ import LoginSectionDetails from "../components/login-section-details";
 
 
 const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType|undefined; updateCountry(country: CountryType): void;}) => {
-  log(true, "TabUserDetails", "IN", user, true);
   const {
     register,
     handleSubmit,
@@ -46,8 +45,13 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
   } else {
     _meta.buttons = [okButton, cancelButton]
   }
-  _meta.form.register = register
-  _meta.form.errors = errors
+
+  const metaform = {
+      register: register,
+      errors: errors
+  }
+
+  _meta.form = metaform;
 
   const [phoneCode, setPhoneCode] = useState<string>();
   
@@ -62,7 +66,7 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
   }, [user])
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    _meta.manageUser(data);
+    _meta.manageSubject(data);
   }
 
   const updateUserCountry = (country: CountryType) => {
@@ -72,7 +76,11 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
     updateCountry(country);
   }
 
-  _meta.userData.updateData = updateUserCountry;
+  const metaUserData = {
+    updateData: updateUserCountry
+}
+
+  _meta.userData = metaUserData;
 
   const renderComponent = () => {
     return (

@@ -92,3 +92,10 @@ const userScheme = z.object({
     address: addressScheme
 });
 export type UserType = z.infer<typeof userScheme>
+
+const groupScheme = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string(),
+});
+export type GroupType = z.infer<typeof groupScheme>

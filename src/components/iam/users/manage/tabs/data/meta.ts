@@ -29,14 +29,14 @@ export type FormSchemaType = z.infer<typeof FormSchema>;
 export interface Meta {
     buttons?: ButtonConfig[]
     closeDialog?: () => void
-    form: {
+    form?: {
         register: UseFormRegister<FormSchemaType>
         errors?: FieldErrors<FormSchemaType>
     }
-    userData: {
+    userData?: {
         updateData: (data: any) => void
     }
-    manageUser: (data: any) => void,
-    renderAll: (data: boolean) => void
+    manageSubject: (data: any) => void,
+    renderAll?: (data: boolean) => void
 }
 

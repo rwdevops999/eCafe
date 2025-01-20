@@ -151,7 +151,7 @@ const ManageUserDialog = ({_enabled, user, handleReset, setReload}:{_enabled:boo
     userData: {
       updateData: (data: any): void => {}
     },
-    manageUser: handleManageUser,
+    manageSubject: handleManageUser,
     renderAll: () => {}
   };
  

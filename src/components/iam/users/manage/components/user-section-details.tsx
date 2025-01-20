@@ -37,11 +37,11 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailFirstName}
                   placeholder={`${detailFirstName}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form.register(detailFirstName)}
+                  {..._meta.form!.register(detailFirstName)}
                   />
               </div>
-              {_meta.form.errors?.firstname && 
-                <span className="text-red-500">{_meta.form.errors.firstname.message}</span>
+              {_meta.form!.errors?.firstname && 
+                <span className="text-red-500">{_meta.form!.errors.firstname.message}</span>
               }
             </div>
             <div className="col-span-6">
@@ -51,11 +51,11 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailName}
                   placeholder={`${detailName}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form.register("name")}
+                  {..._meta.form!.register("name")}
                 />
               </div>
-              {_meta.form.errors?.name && 
-                <span className="text-red-500">{_meta.form.errors.name.message}</span>
+              {_meta.form!.errors?.name && 
+                <span className="text-red-500">{_meta.form!.errors.name.message}</span>
               }
             </div>
           </div>
@@ -69,7 +69,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailPhonecode}
                   placeholder={`${detailPhonecode}...`}
                   className="h-8 col-span-1"
-                  {..._meta.form.register(detailPhonecode)}
+                  {..._meta.form!.register(detailPhonecode)}
                   onChange={()=>{}}
                   value={dialCode}
                   />
@@ -77,7 +77,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailPhone}
                   placeholder={`${detailPhone}...`}
                   className="h-8 col-span-3"
-                  {..._meta.form.register(detailPhone)}
+                  {..._meta.form!.register(detailPhone)}
                   />
               </div>
             </div>
