@@ -14,8 +14,6 @@ const detailPhone = "phone";
 const detailPhonecode = "code";
 
 const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string|undefined}) => {
-  log(true, "User Section Details", "IN",phonecode);
-  
   const [dialCode, setDialCode] = useState<string>("");
 
   useEffect(() => {

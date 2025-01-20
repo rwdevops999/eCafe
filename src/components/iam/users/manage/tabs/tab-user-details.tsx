@@ -57,10 +57,8 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
   
   useEffect(() => {
     if (user) {
-      log(true, "TabUserDetails", "SetPhoneCode(1)", user.address.country.dialCode);
       setPhoneCode(user.address.country.dialCode);
     } else {
-      log(true, "TabUserDetails", "SetPhoneCode(2)", defaultCountry.dialCode);
       setPhoneCode(defaultCountry.dialCode);
     }
   }, [user])
@@ -70,7 +68,6 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
   }
 
   const updateUserCountry = (country: CountryType) => {
-    log(true, "TabUserDetails", "SetPhoneCode(3)", country.dialCode);
     setPhoneCode(country.dialCode);
     setReRender((x: any) => x+1);
     updateCountry(country);

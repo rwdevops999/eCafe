@@ -26,11 +26,11 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
   const countriesLoadedCallback = (data: CountryType[]) => {
     setCountries(data.sort((a, b) => a.name!.localeCompare(b.name!)));
     const country: CountryType | undefined = data.find((country) => country.name === defaultCountry.name);
+    log(true, "AddressSectionDetails", "countriesLoadedCallback: setCountry", country, true)
     if  (country) {
       if (user === undefined) {
-        log(true, "AddressSecctionDetails", "setCountry(1)", country.name, true);
         setCountry(country.name);
-        _meta.userData.updateData(country);
+        _meta.userData?.updateData(country);
       }
     }
   }
@@ -47,25 +47,24 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
 
   useEffect(() => {
     // setCountry(defaultCountry);
+    log(true, "AddressSectionDetails", "useEffect: load countries");
     handleLoadCountries(countriesLoadedCallback); 
   }, []);
 
   useEffect(() => {
     if  (user) {
-      log(true, "AddressSecctionDetails", "setCountry(2)", user.address.country.name, true);
+      log(true, "AddressSectionDetails", "useEffect: setCountry", user.address.country, true)
       setCountry(user.address.country.name);
     }
   });
 
   const handleCountryChange = (_country: string) => {
-    log(true, "AddressSectionDetails", "handleCountryChange", _country, true);
-    log(true, "AddressSectionDetails", "handleCountryChange", user, true);
     const country: CountryType | undefined = countries.find((country) => country.name === _country);
     if (country) {
-      log(true, "AddressSecctionDetails", "setCountry(3)", country.name, true);
+      log(true, "AddressSectionDetails", "handleCountryChange: setCountry", country, true)
       setCountry(country.name);
       if (user !== undefined) {
-        _meta.userData.updateData(country);
+        _meta.userData?.updateData(country);
       }
     }
   };
@@ -93,7 +92,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressStreet}
                   placeholder={`${addressStreet}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form.register(addressStreet)}
+                  {..._meta.form?.register(addressStreet)}
                   />
               </div>
             </div>
@@ -105,7 +104,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressNumber}
                   placeholder={`Nr...`}
                   className="col-span-1 h-8"
-                  {..._meta.form.register(addressNumber)}
+                  {..._meta.form?.register(addressNumber)}
                 />
               </div>
             </div>
@@ -117,7 +116,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressBox}
                   placeholder={`${addressBox}...`}
                   className="col-span-1 h-8"
-                  {..._meta.form.register(addressBox)}
+                  {..._meta.form?.register(addressBox)}
                 />
               </div>
             </div>
@@ -131,7 +130,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressCity}
                   placeholder={`${addressCity}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form.register(addressCity)}
+                  {..._meta.form?.register(addressCity)}
                 />
               </div>
             </div>
@@ -142,7 +141,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressPostal}
                   placeholder={`${addressPostal}...`}
                   className="h-8 col-span-1"
-                  {..._meta.form.register("postalcode")}
+                  {..._meta.form?.register("postalcode")}
                 />
               </div>
             </div>
@@ -179,7 +178,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressCounty}
                   placeholder={`${addressCounty}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form.register(addressCounty)}
+                  {..._meta.form?.register(addressCounty)}
                 />
               </div>
             </div>

@@ -25,7 +25,7 @@ const  setUserForCreate = (data: UserType) => {
             id: data.address.country.id,
           }
         }
-      }
+      },
     }
   });
 }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     log(true, "API", "POST", data, true);
     
-      const user: Prisma.UserCreateInput = setUserForCreate(data);
+    const user: Prisma.UserCreateInput = setUserForCreate(data);
 
     const createdUser = await prisma.user.create({data: user});
 
