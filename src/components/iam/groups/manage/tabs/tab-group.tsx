@@ -9,6 +9,7 @@ import ActionButtons from "@/components/iam/users/manage/components/action-butto
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
 const groupName = "name";
 const groupDescription = "description";
@@ -32,7 +33,14 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
     console.log("SUBMIT");
     meta.manageSubject(data);
   }
-   
+  
+  useEffect(() => {
+    console.log("RESET");
+    if (group === undefined) {
+      reset();
+    }
+  }, []);
+
   const GroupDetails = () => {
     return (
       <Card className="border-stone-500">

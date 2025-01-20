@@ -2,7 +2,7 @@ import { GroupType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
 import { log } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const data: GroupType = await req.json();
@@ -74,5 +74,19 @@ export async function DELETE(request: NextRequest) {
   });
 }
   
-  
+export async function PUT(req: NextRequest) {
+  const data: GroupType = await req.json();
 
+  const  updatedGroup = await prisma.group.update({
+    where: {
+      id: data.id
+    },
+    data: {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+    }
+  });
+
+  return NextResponse.json(updatedGroup);
+}

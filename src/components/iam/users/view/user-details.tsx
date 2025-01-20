@@ -89,7 +89,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleReset = () => {
-    setUser(undefined);
+    setUser(undefined);   
   }
 
   const handleAction = (action: string, user: Data) => {

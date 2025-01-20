@@ -76,13 +76,23 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     }).then((response: Response) => callback());
   }
 
+  const updateGroup = (group: Data) => {
+    setGroup(groups.current.find((_group) => _group.id === group.id));
+    
+    const button = document.getElementById("groupDialogButton");
+    if (button !== null) {
+      console.log("Button Click");
+      button.click();
+    }
+  }
+
   const handleAction = (action: string, group: Data) => {
     if (action === action_delete) {
       console.log("Delete Group");
       handleDeleteGroup(group.id, groupDeletedCallback);
     } else {
       console.log("Update Group");
-      // updateUser(user);
+      updateGroup(group);
     }
   }
 
@@ -97,7 +107,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
         <PageTitle className="m-2" title={`Overview user groups`} />
 
         <div className="flex items-center justify-end">
-          <ManageGroupDialog _enabled={true} group={group} handleReset={handleReset} setReload={setReload}/>
+          <ManageGroupDialog _enabled={groupsLoaded.current} group={group} handleReset={handleReset} setReload={setReload}/>
           {/* _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/>  */}
         </div>
         <div className="block space-y-5">

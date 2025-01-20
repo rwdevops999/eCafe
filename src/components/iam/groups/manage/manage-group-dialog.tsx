@@ -20,6 +20,7 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
   }
 
   const closeDialog = () => {
+    handleReset();
     handleDialogState(false);
   }
 
@@ -51,6 +52,17 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
     setReload((x: any) => x+1);
   }
 
+  const updateGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
+    await fetch('http://localhost:3000/api/iam/groups',
+      {
+        method: 'PUT',
+        body: JSON.stringify(_data),
+        headers: {
+          'content-type': 'application/json'
+        }
+    }).then(response => callback());
+  }
+  
   const handleManageGroup = (data: any): void => {
     console.log("handleManageGroup");
     const group: GroupType = prepareGroup(data);
@@ -58,7 +70,7 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
       console.log("handleManageGroup: group set");
       if  (selectedGroup) {
         console.log("handleManageGroup: in selected group");
-        // updateGroup(group, groupChangedCallback);
+        updateGroup(group, groupChangedCallback);
       } else {
         console.log("createGroup");
         createGroup(group, groupChangedCallback);
@@ -79,7 +91,7 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
       return (
         <Dialog open={open}>
           <DialogTrigger asChild>
-            <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage group" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
+            <EcafeButton id="groupDialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage group" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
           </DialogTrigger>
           <DialogContent className="min-w-[75%]" aria-describedby="">
             <DialogHeader className="mb-2">
