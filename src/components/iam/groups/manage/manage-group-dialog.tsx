@@ -9,7 +9,7 @@ import { GroupType } from "@/data/iam-scheme";
 import { Meta } from "../../users/manage/tabs/data/meta";
 import { CallbackFunctionDefault } from "@/data/types";
 
-const ManageGroupDialog = ({_enabled, group, handleReset}:{_enabled:boolean; group: GroupType|undefined; handleReset(): void}) => {
+const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:boolean; group: GroupType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   console.log("ManageGroupDialog IN");
   const [selectedGroup, setSelectedGroup] = useState<GroupType>();
   
@@ -48,7 +48,7 @@ const ManageGroupDialog = ({_enabled, group, handleReset}:{_enabled:boolean; gro
 
   const groupChangedCallback = () => {
     handleDialogState(false);
-    // setReload((x: any) => x+1);
+    setReload((x: any) => x+1);
   }
 
   const handleManageGroup = (data: any): void => {

@@ -23,21 +23,56 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams
+  const searchParams = request.nextUrl.searchParams
 
-    const groups = await prisma.group.findMany({});
+  const groups = await prisma.group.findMany({});
 
-    const _groups: GroupType[] = groups.map((_group) => {
-      let group: GroupType = {
-        id: _group.id,
-        name: _group.name,
-        description: _group.description,
-      };
+  const _groups: GroupType[] = groups.map((_group) => {
+    let group: GroupType = {
+      id: _group.id,
+      name: _group.name,
+      description: _group.description,
+    };
 
-      return group;
-    });
+    return group;
+  });
 
-    return Response.json(_groups);
-  }
+  return Response.json(_groups);
+}
 
+const deleteGroup = async (groupId: number) => {
+  let group: any;
+  
+  await prisma.group.delete(
+    {
+      where: {id: groupId},
+    }
+  ).then((response) => {
+    group = response;
+  });
+  
+  return group;
+}
+  
+
+export async function DELETE(request: NextRequest) {
+  const urlParams = request.nextUrl.searchParams
+  const groupId = urlParams.get('groupId');
+  
+    if  (groupId) {
+      const group = await deleteGroup(parseInt(groupId));
+  
+      return new Response(JSON.stringify(`deleted ${group}`), {
+        headers: { "content-type": "application/json" },
+        status: 200,
+     });
+    }
+  
+  return new Response(JSON.stringify(`not deleted: group id undefined`), {
+    headers: { "content-type": "application/json" },
+    status: 400,
+  });
+}
+  
+  
 
