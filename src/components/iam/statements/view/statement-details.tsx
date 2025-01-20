@@ -14,7 +14,7 @@ import { TableMeta } from "@tanstack/react-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Button } from "@/components/ui/button";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionServicesLoaded, CallbackFunctionStatementsLoaded } from "@/data/types";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 
@@ -41,7 +41,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     toastId = id;
   }
 
-  const loadServices = async (callback: CallbackFunctionServicesLoaded) => {
+  const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
       if (services.current.length === 0) {
         await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
           .then((response) => response.json())
@@ -54,7 +54,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
   const serviceName = useRef<string>(all);
 
-  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionStatementsLoaded) => {
+  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
       await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
         .then((response) => response.json())
         .then((response) => {
@@ -63,7 +63,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         });
   }
 
-  const handleLoadStatements = async (_service: number | string, _sid: string, callback: CallbackFunctionStatementsLoaded) => {
+  const handleLoadStatements = async (_service: number | string, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
     let serviceId: number = 0;
 
     if (typeof _service === 'number') {
@@ -87,7 +87,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     await loadStatements(serviceId, _sid, callback);
   }
   
-  const handleLoadServices = async (callback: CallbackFunctionServicesLoaded) => {
+  const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
       renderToast();
       await loadServices(callback);
   }

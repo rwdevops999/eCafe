@@ -5,17 +5,7 @@ import { Data } from "@/lib/mapping";
 import { log } from "@/lib/utils";
 import { ColumnDef, RowData, Table } from "@tanstack/react-table";
 
-declare module '@tanstack/table-core' {
-    export interface TableMeta<TData extends RowData> {
-        handleAction: (action: string, id: any) => void
-    }
-
-  export interface DataTableToolbarProps<TData> {
-    table: Table<TData>
-  }
-}
-
-  export const columns: ColumnDef<Data>[] = [
+export const columns: ColumnDef<Data>[] = [
     {
         id: "select",
 

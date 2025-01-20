@@ -9,9 +9,9 @@ import { memo, useEffect, useState } from "react";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { ServiceType } from "@/data/iam-scheme";
-import { CallbackFunctionServicesLoaded } from "@/data/types";
 import { Data, mapServicesToData } from "@/lib/mapping";
 import { log } from "@/lib/utils";
+import { CallbackFunctionSubjectLoaded } from "@/data/types";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
     const { toast, dismiss } = useToast()
@@ -19,7 +19,7 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
 
     const [servicesData, setServicesData] = useState<Data[]>([]);
     
-    const loadServices = async (_service: string, callback: CallbackFunctionServicesLoaded) => {
+    const loadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
           await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
             .then((response) => response.json())
             .then((response) => {
@@ -27,7 +27,7 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
             });
       }
     
-      const handleLoadServices = async (_service: string, callback: CallbackFunctionServicesLoaded) => {
+      const handleLoadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
           await loadServices(_service, callback);
       }
       

@@ -23,7 +23,7 @@ import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionServicesLoaded, CallbackFunctionStatementsLoaded } from "@/data/types";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapStatementsToData } from "@/lib/mapping";
@@ -121,7 +121,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     handleLoadStatements(all, '*', statementsLoadedCallback);
   }
 
-  const loadServices = async (callback: CallbackFunctionServicesLoaded) => {
+  const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
         if (services.current.length === 0) {
           await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
             .then((response) => response.json())
@@ -132,11 +132,11 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
         }
   };
 
-  const handleLoadServices = async (callback: CallbackFunctionServicesLoaded) => {
+  const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
       await loadServices(callback);
   }
 
-  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionStatementsLoaded) => {
+  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
       .then((response) => response.json())
       .then((response) => {
@@ -144,7 +144,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       });
   }
 
-  const handleLoadStatements = async (_service: string, _sid: string, callback: CallbackFunctionStatementsLoaded) => {
+  const handleLoadStatements = async (_service: string, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
     let serviceId: number = 0;
     if (_service !== all) {
       let service = services.current.find((service) => service.name === _service);

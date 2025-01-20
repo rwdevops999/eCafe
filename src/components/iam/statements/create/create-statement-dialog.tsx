@@ -21,7 +21,7 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@/components/ui/separator";
-import { CallbackFunctionDefault, CallbackFunctionServicesLoaded } from "@/data/types";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { Data, mapActionsToData, mapServiceActionsToData } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table"
 
@@ -75,7 +75,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     setActionsData(mapServiceActionsToData(services.current));
   }
 
-  const loadServices = async (_service: string, callback: CallbackFunctionServicesLoaded) => {
+  const loadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
     await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
       .then((response) => response.json())
       .then((response) => {
@@ -83,7 +83,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
       });
   }
 
-  const handleLoadServices = async (_service: string, callback: CallbackFunctionServicesLoaded) => {
+  const handleLoadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
     loadServices(_service, callback);
   }
 

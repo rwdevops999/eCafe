@@ -6,8 +6,9 @@ export const okButton = "ok";
 export const updateButton = "update";
 export const cancelButton = "cancel";
 export const validateButton = "validate";
+export const assignButton = "assign";
 
-export type ButtonConfig = "ok" | "cancel" | "validate" | "update";
+export type ButtonConfig = "ok" | "cancel" | "validate" | "update" | "assign";
 
 export const FormSchema = z.object({
     name: z.string().min(1, "Name must contain at least 1 character").max(50, "Name can't contain more than 50 characters"),
@@ -27,6 +28,7 @@ export const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
   
 export interface Meta {
+    updateItems?: (type: string, itels: any[]) => void
     buttons?: ButtonConfig[]
     closeDialog?: () => void
     form?: {
@@ -36,7 +38,11 @@ export interface Meta {
     userData?: {
         updateData: (data: any) => void
     }
-    manageSubject: (data: any) => void,
-    renderAll?: (data: boolean) => void
+    manageSubject?: (data: any) => void,
+    items?: {
+        title: string
+        columnname: string
+        data: any[]
+    }
 }
 

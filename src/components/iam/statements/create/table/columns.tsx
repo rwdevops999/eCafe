@@ -4,11 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Data } from "@/lib/mapping";
 import { ColumnDef, RowData } from "@tanstack/react-table";
 
-declare module '@tanstack/table-core' {
-  export interface TableMeta<TData extends RowData> {
-  }
-}
-
 export const initialTableState = {
   pagination: {
     pageIndex: 0, //custom initial page index

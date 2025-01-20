@@ -1,6 +1,8 @@
+import TabItems from "@/components/iam/components/tab-items"
+
 const TabGroups = () => {
   return (
-    <div>tab groups</div>
+    <TabItems />
   )
 }
 

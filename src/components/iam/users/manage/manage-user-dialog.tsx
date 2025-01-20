@@ -14,23 +14,13 @@ import TabGroups from "./tabs/tab-groups";
 import { Meta } from "./tabs/data/meta";
 import { log } from "@/lib/utils";
 import { DialogDataType, GroupDataType, PolicyDataType, RoleDataType, UserDataType } from "./tabs/data/data";
-import { CallbackFunctionCountriesLoaded, CallbackFunctionDefault } from "@/data/types";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 
-const ManageUserDialog = ({_enabled, user, handleReset, setReload}:{_enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
+const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
 
   const country = useRef<CountryType|undefined>(undefined);
-
-
-  const updateRoleData = (_roleData: RoleDataType[]) => {
-  };
-
-  const updatePolicyData  = (_policyData: PolicyDataType[]) => {
-  };
-
-  const updateGroupData = (_groupData: GroupDataType[]) => {
-  };
 
   /**
    * state of the dialog
@@ -123,13 +113,13 @@ const ManageUserDialog = ({_enabled, user, handleReset, setReload}:{_enabled:boo
     }
   }
 
-  const loadCountries = async (callback: CallbackFunctionCountriesLoaded) => {
+  const loadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
       await fetch("http://localhost:3000/api/db?table=country")
         .then((response) => response.json())
         .then((response) => callback(response));
     }
   
-    const handleLoadCountries = async (callback: CallbackFunctionCountriesLoaded) => {
+    const handleLoadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
       await loadCountries(callback);
     }
   
@@ -143,17 +133,10 @@ const ManageUserDialog = ({_enabled, user, handleReset, setReload}:{_enabled:boo
     }
   }, [user]);
 
-  const meta: Meta = {
-    closeDialog: closeDialog,
-    form: {
-      register: (name: any, options?: any): any => {}
-    },
-    userData: {
-      updateData: (data: any): void => {}
-    },
-    manageSubject: handleManageUser,
-    renderAll: () => {}
-  };
+  meta.closeDialog = closeDialog;
+  meta.form = {register: (name: any, options?: any): any => {}};
+  meta.userData = {updateData: (data: any): void => {}},
+  meta.manageSubject = handleManageUser;
  
   const updateCountry = (_country: CountryType) => {
     country.current = _country;
@@ -185,17 +168,17 @@ const ManageUserDialog = ({_enabled, user, handleReset, setReload}:{_enabled:boo
              <TabUserDetails _meta={meta} user={selectedUser} updateCountry={updateCountry}/>
              </div>
            </TabsContent>
-           {/* <TabsContent value="roles">
+           <TabsContent value="roles">
             <div className="m-1 container w-[99%]">
-             <TabRoles />
+             <TabRoles meta={meta}/>
              </div>
            </TabsContent>
            <TabsContent value="policies">
             <div className="m-1 container w-[99%]">
-             <TabPolicies />
+             <TabPolicies meta={meta} />
              </div>
            </TabsContent>
-           <TabsContent value="groups">
+           {/* <TabsContent value="groups">
             <div className="m-1 container w-[99%]">
              <TabGroups />
              </div>

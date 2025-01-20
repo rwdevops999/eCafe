@@ -11,7 +11,7 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionPoliciesLoaded } from "@/data/types";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType } from "@/data/iam-scheme";
@@ -44,7 +44,7 @@ import { PolicyType } from "@/data/iam-scheme";
         dismiss(toastId);
     }
 
-    const loadPolicies = async (_policy: string, callback: CallbackFunctionPoliciesLoaded) => {
+    const loadPolicies = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
           await fetch("http://localhost:3000/api/iam/policies?policy=" + _policy)
             .then((response) => response.json())
             .then((response) => {
@@ -52,7 +52,7 @@ import { PolicyType } from "@/data/iam-scheme";
             });
     }
     
-    const handleLoadPolicies = async (_policy: string, callback: CallbackFunctionPoliciesLoaded) => {
+    const handleLoadPolicies = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
         await loadPolicies(_policy, callback);
     }
 

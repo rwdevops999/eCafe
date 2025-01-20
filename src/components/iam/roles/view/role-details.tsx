@@ -2,7 +2,7 @@
 
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionRolesLoaded } from "@/data/types";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { useToast } from "@/hooks/use-toast";
 import { log } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
@@ -40,7 +40,7 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
         dismiss(toastId);
     }
 
-    const loadRoles = async (callback: CallbackFunctionRolesLoaded) => {
+    const loadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
         await fetch("http://localhost:3000/api/iam/roles")
             .then((response) => response.json())
             .then((response) => {
@@ -48,7 +48,7 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
             });
     }
     
-    const handleLoadRoles = async (callback: CallbackFunctionRolesLoaded) => {
+    const handleLoadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
         await loadRoles(callback);
     }
     

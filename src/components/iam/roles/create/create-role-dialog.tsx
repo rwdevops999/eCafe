@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionPoliciesLoaded } from "@/data/types";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@radix-ui/react-separator";
@@ -64,7 +64,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setPolicyData(mappedPolicies);
   }
 
-  const loadPolicies = async (callback: CallbackFunctionPoliciesLoaded) => {
+  const loadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/policies")
       .then((response) => response.json())
       .then((response) => {
@@ -72,7 +72,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       });
   }
 
-  const handleLoadPolicies = async (callback: CallbackFunctionPoliciesLoaded) => {
+  const handleLoadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadPolicies(callback);
   }
   

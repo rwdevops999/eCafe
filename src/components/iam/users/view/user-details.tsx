@@ -4,7 +4,7 @@ import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import ManageUserDialog from "../manage/manage-user-dialog";
 import { useEffect, useRef, useState } from "react";
-import { UserType } from "@/data/iam-scheme";
+import { RoleType, UserType } from "@/data/iam-scheme";
 import { useToast } from "@/hooks/use-toast";
 import { Data, mapUsersToData } from "@/lib/mapping";
 import { DataTable } from "@/components/datatable/data-table";
@@ -12,8 +12,9 @@ import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
-import { CallbackFunctionDefault, CallbackFunctionUsersLoaded } from "@/data/types";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { log } from "@/lib/utils";
+import { Meta } from "../manage/tabs/data/meta";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -39,7 +40,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     usersLoaded.current = true;
   }
 
-  const loadUsers = async (callback: CallbackFunctionUsersLoaded) => {
+  const loadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
       await fetch("http://localhost:3000/api/iam/users")
         .then((response) => response.json())
         .then((response) => {
@@ -47,7 +48,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
         });
   }
 
-  const handleLoadUsers = async (callback: CallbackFunctionUsersLoaded) => {
+  const handleLoadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadUsers(callback);
   }
   
@@ -100,7 +101,21 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     }
   }
 
-  const meta: TableMeta<Data[]> = {
+  const setupRoles = (roles: RoleType[]) => {
+
+  }
+
+  const updateItems = (type: string, items: any[]) => {
+    if (type === "roles") {
+      setupRoles(items);
+    }
+  }
+
+  const meta: Meta = {
+    updateItems: updateItems,
+  };
+
+  const tablemeta: TableMeta<Data[]> = {
     handleAction: handleAction,
   };
 
@@ -112,10 +127,10 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
             <PageTitle className="m-2" title={`Overview users`} />
 
             <div className="flex items-center justify-end">
-            <ManageUserDialog _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/> 
+            <ManageUserDialog meta={meta} _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/> 
             </div>
             <div className="block space-y-5">
-              <DataTable data={usersData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+              <DataTable data={usersData} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
             </div>
         </div>
       );

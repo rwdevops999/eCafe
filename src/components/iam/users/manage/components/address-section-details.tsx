@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { Meta } from "../tabs/data/meta";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
-import { CallbackFunctionCountriesLoaded } from "@/data/types";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { log } from "@/lib/utils";
+import { CallbackFunctionSubjectLoaded } from "@/data/types";
 
 const addressStreet = "street";
 const addressNumber = "number";
@@ -35,13 +35,13 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
     }
   }
 
-  const loadCountries = async (callback: CallbackFunctionCountriesLoaded) => {
+  const loadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/db?table=country")
       .then((response) => response.json())
       .then((response) => callback(response));
   }
 
-  const handleLoadCountries = async (callback: CallbackFunctionCountriesLoaded) => {
+  const handleLoadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadCountries(callback);
   }
 

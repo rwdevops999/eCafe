@@ -4,11 +4,6 @@ import { DataTableColumnHeader } from "@/components/datatable/data-table-column-
 import { Data } from "@/lib/mapping";
 import { log } from "@/lib/utils";
 
-declare module '@tanstack/table-core' {
-  export interface TableMeta<TData extends RowData> {
-  }
-}
-
 export const columns: ColumnDef<Data>[] = [
     {
         accessorKey: "name",
