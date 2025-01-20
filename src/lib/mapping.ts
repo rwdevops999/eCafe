@@ -1,4 +1,4 @@
-import { ActionType, PolicyType, RoleType, ServiceStatementType, ServiceType, UserType } from "@/data/iam-scheme";
+import { ActionType, GroupType, PolicyType, RoleType, ServiceStatementType, ServiceType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 import { z } from "zod";
 
@@ -173,6 +173,21 @@ export const mapUsersToData = (users:  UserType[], level: number): Data[] => {
             id: user.id,
             name: user.name,
             description: user.firstname,
+            children: []
+        }
+    })
+
+    return data;
+}
+
+export const mapGroupsToData = (groups:  GroupType[], level: number): Data[] => {
+    let data: Data[] = [];
+
+    data = groups.map(group => {
+        return {
+            id: group.id,
+            name: group.name,
+            description: group.description,
             children: []
         }
     })

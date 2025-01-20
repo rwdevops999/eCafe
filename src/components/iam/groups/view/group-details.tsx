@@ -3,17 +3,76 @@
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import ManageGroupDialog from "../manage/manage-group-dialog";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GroupType } from "@/data/iam-scheme";
+import { useToast } from "@/hooks/use-toast";
+import { Data, mapGroupsToData } from "@/lib/mapping";
+import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { columns } from "./table/colums";
+import { action_delete } from "@/data/constants";
+import { TableMeta } from "@tanstack/react-table";
+import { DataTable } from "@/components/datatable/data-table";
+import { DataTableToolbar } from "./table/data-table-toolbar";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
-  console.log("GroupDetails IN");
+  const { toast, dismiss } = useToast();
+  let toastId: string;
 
+  const renderToast = () => {
+    let {id} = toast({title: "Loading...", description: "Groups"})
+    toastId = id;
+  }
+
+  const groups = useRef<GroupType[]>([]);
+  const groupsLoaded = useRef<boolean>(false);
+  const [groupsData, setGroupsData] = useState<Data[]>([]);
+  
   const [group, setGroup] = useState<GroupType|undefined>();
+  const [reload, setReload] = useState<number>(0);
+
+  const groupsLoadedCallback = (data: GroupType[]) => {
+    dismiss(toastId);
+
+    groups.current = data;
+    setGroupsData(mapGroupsToData(data, 2));
+    groupsLoaded.current = true;
+  }
+  
+   const loadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
+      await fetch("http://localhost:3000/api/iam/groups")
+        .then((response) => response.json())
+        .then((response) => {
+          callback(response);
+        });
+  }
+
+  const handleLoadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
+    await loadGroups(callback);
+  }
+    
+  useEffect(() => {
+    setGroup(undefined);
+    renderToast();
+    handleLoadGroups(groupsLoadedCallback);
+  }, []);
   
   const handleReset = () => {
     setGroup(undefined);
   }
+
+  const handleAction = (action: string, user: Data) => {
+    if (action === action_delete) {
+      console.log("Delete Group");
+      // deleteUser(user);
+    } else {
+      console.log("Update Group");
+      // updateUser(user);
+    }
+  }
+
+  const meta: TableMeta<Data[]> = {
+    handleAction: handleAction,
+  };
 
   const renderComponent = () => {
     return (
@@ -25,9 +84,9 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
           <ManageGroupDialog _enabled={true} group={group} handleReset={handleReset}/>
           {/* _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/>  */}
         </div>
-        {/* <div className="block space-y-5">
-          <DataTable data={usersData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
-        </div> */}
+        <div className="block space-y-5">
+          <DataTable data={groupsData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+        </div>
         </div>
       );
   }

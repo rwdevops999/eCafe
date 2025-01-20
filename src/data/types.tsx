@@ -21,4 +21,5 @@ export type CallbackFunctionPoliciesLoaded = (data: PolicyType[]) => void;
 export type CallbackFunctionRolesLoaded = (data: RoleType[]) => void;
 export type CallbackFunctionCountriesLoaded = (data: CountryType[]) => void;
 export type CallbackFunctionUsersLoaded = (data: UserType[]) => void;
+export type CallbackFunctionSubjectLoaded = (data: any[]) => void;
 

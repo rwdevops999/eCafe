@@ -22,4 +22,22 @@ export async function POST(req: NextRequest) {
   });
 }
 
+export async function GET(request: NextRequest) {
+    const searchParams = request.nextUrl.searchParams
+
+    const groups = await prisma.group.findMany({});
+
+    const _groups: GroupType[] = groups.map((_group) => {
+      let group: GroupType = {
+        id: _group.id,
+        name: _group.name,
+        description: _group.description,
+      };
+
+      return group;
+    });
+
+    return Response.json(_groups);
+  }
+
 
