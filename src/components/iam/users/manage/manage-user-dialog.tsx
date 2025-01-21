@@ -21,6 +21,7 @@ import { Data } from "@/lib/mapping";
 import { getPolicyStatements, getRoleStatements, validateData2, ValidationType } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
+import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -67,28 +68,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
   }
 
-  const createUser = async (_data: UserType, callback: CallbackFunctionDefault) => {
-    await fetch('http://localhost:3000/api/iam/users',
-        {
-          method: 'POST',
-          body: JSON.stringify(_data),
-          headers: {
-            'content-type': 'application/json'
-          }
-      }).then(response => callback());
-  }
-
-  const updateUser = async (_data: UserType, callback: CallbackFunctionDefault) => {
-    await fetch('http://localhost:3000/api/iam/users',
-        {
-          method: 'PUT',
-          body: JSON.stringify(_data),
-          headers: {
-            'content-type': 'application/json'
-          }
-      }).then(response => callback());
-  }
-
   const userChangedCallback = () => {
     handleDialogState(false);
     setReload((x: any) => x+1);
@@ -118,17 +97,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
   }
 
-  const loadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
-      await fetch("http://localhost:3000/api/db?table=country")
-        .then((response) => response.json())
-        .then((response) => callback(response));
-    }
-  
-    const handleLoadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
-      await loadCountries(callback);
-    }
-  
-  
   useEffect(() => {
     setSelectedUser(user);
     if (user) {

@@ -15,6 +15,7 @@ import { TableMeta } from "@tanstack/react-table";
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { log } from "@/lib/utils";
 import { Meta } from "../manage/tabs/data/meta";
+import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -40,18 +41,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     usersLoaded.current = true;
   }
 
-  const loadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
-      await fetch("http://localhost:3000/api/iam/users")
-        .then((response) => response.json())
-        .then((response) => {
-          callback(response);
-        });
-  }
-
-  const handleLoadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
-    await loadUsers(callback);
-  }
-  
   useEffect(() => {
     setUser(undefined);
     renderToast();
@@ -64,18 +53,12 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }, [reload, setReload]);
 
   const userDeletedCallback = () => {
+    setUser(undefined);
     setReload((x:any) => x+1);
-  }
-
-  const handleDeleteUser = async (id: number, callback: CallbackFunctionDefault) => {
-    const res = await fetch("http://localhost:3000/api/iam/users?userId="+id,{
-        method: 'DELETE',
-    }).then((response: Response) => callback());
   }
 
   const deleteUser = (user: Data) => {
     handleDeleteUser(user.id, userDeletedCallback);
-    setUser(undefined);
   }
   
   const updateUser = (user: Data) => {
@@ -102,7 +85,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const setupRoles = (roles: RoleType[]) => {
-
   }
 
   const updateItems = (type: string, items: any[]) => {

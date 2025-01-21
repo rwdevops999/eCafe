@@ -9,6 +9,7 @@ import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { log } from "@/lib/utils";
 import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { handleLoadCountries } from "@/lib/db";
 
 const addressStreet = "street";
 const addressNumber = "number";
@@ -34,16 +35,6 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
     }
   }
 
-  const loadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
-    await fetch("http://localhost:3000/api/db?table=country")
-      .then((response) => response.json())
-      .then((response) => callback(response));
-  }
-
-  const handleLoadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
-    await loadCountries(callback);
-  }
-
   useEffect(() => {
     handleLoadCountries(countriesLoadedCallback); 
   }, []);
@@ -63,14 +54,6 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
       }
     }
   };
-
-  const getCountry = (c: string|undefined): string => {
-    if (country) {
-      return country;
-    }
-
-    return defaultCountry.name;
-  }
 
   const renderComponent = () => {
       return (

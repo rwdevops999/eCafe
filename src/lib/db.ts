@@ -14,7 +14,7 @@ export const initDB = async (table: string) => {
   })        
 }
 
-/**
+ /**
  * LANGUAGES
  */
 const loadLanguages = async (callback: CallbackFunctionSubjectLoaded) => {
@@ -27,12 +27,21 @@ const loadLanguages = async (callback: CallbackFunctionSubjectLoaded) => {
   return data;
 }
 
-/**
-* load the languages
-* set the languages is a state
-*/
 export const handleLoadLanguages = async (callback: CallbackFunctionSubjectLoaded) => {
   await loadLanguages(callback);
+}
+
+/**
+ * COUNTRIES
+ */
+const loadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/db?table=country")
+    .then((response) => response.json())
+    .then((response) => callback(response));
+}
+
+export const handleLoadCountries = async (callback: CallbackFunctionSubjectLoaded) => {
+  await loadCountries(callback);
 }
 
 /**
@@ -182,3 +191,47 @@ const loadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
 export const handleLoadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadGroups(callback);
 }
+
+/**
+ * USERS
+ */
+const loadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/users")
+    .then((response) => response.json())
+    .then((response) => {
+      callback(response);
+    });
+}
+
+export const handleLoadUsers = async (callback: CallbackFunctionSubjectLoaded) => {
+  await loadUsers(callback);
+}
+
+export const handleDeleteUser = async (id: number, callback: CallbackFunctionDefault) => {
+  const res = await fetch("http://localhost:3000/api/iam/users?userId="+id,{
+    method: 'DELETE',
+  }).then((response: Response) => callback());
+}
+
+export const createUser = async (_data: UserType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/users',
+    {
+      method: 'POST',
+      body: JSON.stringify(_data),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => callback());
+}
+
+export const updateUser = async (_data: UserType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/users',
+    {
+      method: 'PUT',
+      body: JSON.stringify(_data),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => callback());
+}
+
