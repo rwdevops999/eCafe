@@ -37,11 +37,11 @@ export default function RootLayout({
               </div>
               <div className="w-svw h-svw rounded-lg">
                 {children}
-              </div>
+                <Toaster />
+                </div>
             </Theme>
           </SidebarProvider>
         </I18nextProvider>
-        <Toaster />
         </body>
     </html>
   );

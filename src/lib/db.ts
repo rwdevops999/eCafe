@@ -17,6 +17,19 @@ export const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded
   await loadServices(callback);
 }
 
+const loadServicesWithService = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
+  await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
+    .then((response) => response.json())
+    .then((response) => {
+      callback(response);
+    });
+}
+
+export const handleLoadServicesWithService = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
+  await loadServicesWithService(_service, callback);
+}
+
+
 /**
  * ROLES
  */

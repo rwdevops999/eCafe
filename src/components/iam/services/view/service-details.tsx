@@ -12,64 +12,51 @@ import { ServiceType } from "@/data/iam-scheme";
 import { Data, mapServicesToData } from "@/lib/mapping";
 import { log } from "@/lib/utils";
 import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { handleLoadServicesWithService } from "@/lib/db";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
-    const { toast, dismiss } = useToast()
-    let toastId: string;
+  const { toast, dismiss } = useToast()
+  let toastId: string;
 
-    const [servicesData, setServicesData] = useState<Data[]>([]);
+  const [servicesData, setServicesData] = useState<Data[]>([]);
     
-    const loadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
-          await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
-            .then((response) => response.json())
-            .then((response) => {
-              callback(response);
-            });
-      }
+  const renderToast = () => {
+    let {id} = toast({title: "Services", description: "loading ..."})
+    toastId = id;
+  }
+
+  const servicesLoadedCallback = (data: ServiceType[]) => {
+    dismiss(toastId);
+    setServicesData(mapServicesToData(data));
+  }
     
-      const handleLoadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
-          await loadServices(_service, callback);
-      }
-      
-      const renderToast = () => {
-        let {id} = toast({title: "Services", description: "loading ..."})
-        toastId = id;
-    }
+  useEffect(() => {
+    renderToast();
+    handleLoadServicesWithService(selectedService!, servicesLoadedCallback);
+  }, []);
 
-    const servicesLoadedCallback = (data: ServiceType[]) => {
-      dismiss(toastId);
-      setServicesData(mapServicesToData(data));
-    }
-    
-    useEffect(() => {
-      renderToast();
-      handleLoadServices(selectedService!, servicesLoadedCallback);
-    }, []);
+  const handleChangeService = (_service: string) =>  {
+    renderToast();
+    handleLoadServicesWithService(_service, servicesLoadedCallback);
+  }
 
-    const handleChangeService = (_service: string) =>  {
-      renderToast();
-      handleLoadServices(_service, servicesLoadedCallback);
-    }
-
-    const renderComponent = () => {
-        return (
-            <div>
-            <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "services", url: "/iam/services/service=*"}]} />
-            <PageTitle className="m-2" title={`Services`} />
-
-            <div className="block space-y-5">
-                <div className="ml-5">
-                    <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
-                </div>
-                <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>
-            </div>
-        </div>
-        )
-    };
-
+  const renderComponent = () => {
     return (
-        <>{renderComponent()}</>
+        <div>
+        <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "services", url: "/iam/services/service=*"}]} />
+        <PageTitle className="m-2" title={`Services`} />
+
+        <div className="block space-y-5">
+            <div className="ml-5">
+                <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
+            </div>
+            <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>
+        </div>
+    </div>
     )
+  };
+
+  return (<>{renderComponent()}</>);
 }
 
 export default ServiceDetails;
