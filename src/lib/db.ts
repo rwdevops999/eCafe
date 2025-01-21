@@ -50,6 +50,16 @@ export const handleDeleteStatement = async (id: number, callback: CallbackFuncti
   }).then((response: Response) => callback());
 }
 
+export const createStatement = async (_statement: ServiceStatementType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/statements',
+    {
+      method: 'POST',
+      body: JSON.stringify(_statement),
+      headers: {
+        'content-type': 'application/json'
+        }
+    }).then(response => callback());
+}
 
 /**
  * ROLES

@@ -8,10 +8,8 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { all } from "@/data/constants";
 import { ActionType, defaultAccess, defaultService, ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { useToast } from "@/hooks/use-toast";
-import { log } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -21,9 +19,10 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@/components/ui/separator";
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
-import { Data, mapActionsToData, mapServiceActionsToData } from "@/lib/mapping";
+import { CallbackFunctionDefault } from "@/data/types";
+import { Data, mapServiceActionsToData } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table"
+import { createStatement, handleLoadServicesWithService } from "@/lib/db";
 
 const FormSchema = z.object({
   sid: z.string().min(3).max(25),
@@ -75,18 +74,6 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     setActionsData(mapServiceActionsToData(services.current));
   }
 
-  const loadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
-    await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
-      .then((response) => response.json())
-      .then((response) => {
-          callback(response);
-      });
-  }
-
-  const handleLoadServices = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
-    loadServices(_service, callback);
-  }
-
   const renderToast = () => {
     let {id} = toast({title: "Services", description: "loading ..."})
     toastId = id;
@@ -96,7 +83,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     access.current = defaultAccess;
     reset();
     renderToast();
-    handleLoadServices(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
@@ -106,7 +93,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
 
   useEffect(() => {
     renderToast();
-    handleLoadServices(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, []);
 
@@ -123,17 +110,6 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
 
     const handleDialogState = (state: boolean) => {
         setOpen(state);
-    }
-
-    const createStatement = async (_statement: ServiceStatementType, callback: CallbackFunctionDefault) => {
-      await fetch('http://localhost:3000/api/iam/statements',
-          {
-            method: 'POST',
-            body: JSON.stringify(_statement),
-            headers: {
-              'content-type': 'application/json'
-            }
-        }).then(response => callback());
     }
 
     const prepareCreateStatement = (data: any): ServiceStatementType | undefined => {
@@ -200,7 +176,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     const handleChangeService = (_service: string) => {
       setSelectedService(_service);
       renderToast();
-      handleLoadServices(_service, servicesLoadedCallback);
+      handleLoadServicesWithService(_service, servicesLoadedCallback);
     }
 
     const renderDialog = () => {
