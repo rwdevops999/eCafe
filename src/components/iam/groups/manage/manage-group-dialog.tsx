@@ -8,6 +8,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import { GroupType } from "@/data/iam-scheme";
 import { Meta } from "../../users/manage/tabs/data/meta";
 import { CallbackFunctionDefault } from "@/data/types";
+import { createGroup, updateGroup } from "@/lib/db";
 
 const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:boolean; group: GroupType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedGroup, setSelectedGroup] = useState<GroupType>();
@@ -35,33 +36,11 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
     }
   }
 
-  const createGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
-    await fetch('http://localhost:3000/api/iam/groups',
-        {
-          method: 'POST',
-          body: JSON.stringify(_data),
-          headers: {
-            'content-type': 'application/json'
-          }
-      }).then(response => callback());
-  }
-
   const groupChangedCallback = () => {
     handleDialogState(false);
     setReload((x: any) => x+1);
   }
 
-  const updateGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
-    await fetch('http://localhost:3000/api/iam/groups',
-      {
-        method: 'PUT',
-        body: JSON.stringify(_data),
-        headers: {
-          'content-type': 'application/json'
-        }
-    }).then(response => callback());
-  }
-  
   const handleManageGroup = (data: any): void => {
     const group: GroupType = prepareGroup(data);
     if (group) {

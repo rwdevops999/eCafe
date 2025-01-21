@@ -192,6 +192,34 @@ export const handleLoadGroups = async (callback: CallbackFunctionSubjectLoaded) 
     await loadGroups(callback);
 }
 
+export const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
+  const res = await fetch("http://localhost:3000/api/iam/groups?groupId="+id,{
+    method: 'DELETE',
+  }).then((response: Response) => callback());
+}
+
+export const createGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/groups',
+    {
+      method: 'POST',
+      body: JSON.stringify(_data),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => callback());
+}
+
+export const updateGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/groups',
+    {
+      method: 'PUT',
+      body: JSON.stringify(_data),
+      headers: {
+        'content-type': 'application/json'
+      }
+  }).then(response => callback());
+}
+
 /**
  * USERS
  */

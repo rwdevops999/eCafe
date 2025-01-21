@@ -13,6 +13,7 @@ import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
+import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -38,18 +39,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     groupsLoaded.current = true;
   }
   
-   const loadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
-      await fetch("http://localhost:3000/api/iam/groups")
-        .then((response) => response.json())
-        .then((response) => {
-          callback(response);
-        });
-  }
-
-  const handleLoadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
-    await loadGroups(callback);
-  }
-    
   useEffect(() => {
     setGroup(undefined);
     renderToast();
@@ -68,12 +57,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   const groupDeletedCallback = () => {
     setGroup(undefined);
     setReload((x:any) => x+1);
-  }
-
-  const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
-    const res = await fetch("http://localhost:3000/api/iam/groups?groupId="+id,{
-        method: 'DELETE',
-    }).then((response: Response) => callback());
   }
 
   const updateGroup = (group: Data) => {
