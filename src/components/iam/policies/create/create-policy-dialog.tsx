@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { noValidation, validateData, ValidationType } from "@/lib/validate";
+import { getPolicyStatements, getStatements, noValidation, validateData, validateData2, ValidationType } from "@/lib/validate";
 import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
@@ -91,15 +91,15 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   }
 
   const handleValidate = (value: boolean): void => {
-    let _statements: Data[] = selectedStatements.map((_statement: Row<Data>) =>  _statement.original);
+    const statements: Data[] = getStatements(selectedStatements);
 
-    let validation: ValidationType = validateData(_statements);
+    let validationResult: ValidationType = validateData2(statements);
 
-    if (validation.result === "error") {
-      showAlert("Validation Error", validation.message!);
+    if (validationResult.result === "error") {
+      showAlert("Validation Error", validationResult.message!);
     }
 
-    setValid(validation);
+    setValid(validationResult);
   }
 
   const prepareStatementsLoad = (_service: number | string, _sid: string): number => {

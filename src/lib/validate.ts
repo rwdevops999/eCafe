@@ -3,6 +3,23 @@ import { z } from "zod";
 import { Data } from "./mapping";
 import { Row } from "@tanstack/react-table";
 
+export const getStatements = (data: Row<Data>[]): Data[] => {
+    let statements: Data[] = [];
+
+    statements = data.map((row) => {
+      let validationType: Data = {
+        name: row.original.name,
+        children: row.original.children,
+        id: row.original.id,
+        description: row.original.description,
+      }
+
+      return validationType;
+    })
+
+    return statements;
+}
+
 export const getPolicyStatements = (data: Row<Data>[]): Data[] => {
     let statements: Data[] = [];
 
