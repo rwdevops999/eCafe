@@ -170,7 +170,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No data.
                   </TableCell>
                 </TableRow>
                 )}

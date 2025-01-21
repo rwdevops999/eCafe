@@ -25,21 +25,25 @@ const TabItems = ({meta}:{meta:Meta}) => {
     }
   }
 
-  return (
-    <>
-        <PageTitle className="m-2" title={meta.items?.title!} />
-        <Separator />
+  const renderComponent = () => {
+    return (
+      <>
+          <PageTitle className="m-2" title={meta.items?.title!} />
+          <Separator />
+  
+          <div className="grid grid-cols-12">
+              <div className="col-span-11 space-y-1">
+                  <DataTable columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection}/>
+              </div>
+              <div className=" flex justify-end">
+              <ActionButtons _meta={(meta)} itemCount={itemCount}/>
+              </div>
+          </div>
+      </>
+    )
+  };
 
-        <div className="grid grid-cols-12">
-            <div className="col-span-11 space-y-1">
-                <DataTable columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection}/>
-            </div>
-            <div className=" flex justify-end">
-            <ActionButtons _meta={(meta)} itemCount={itemCount}/>
-            </div>
-        </div>
-    </>
-  )
+  return (<>{renderComponent()}</>);
 }
 
 export default TabItems
