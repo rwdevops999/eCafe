@@ -1,9 +1,26 @@
+import { CallbackFunctionSubjectLoaded } from "@/data/types";
+
+/**
+ * SERVICES
+ */
+const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
+    .then((response) => response.json())
+    .then((response) => callback(response));
+}
+
+/**
+ * load the services
+  * set  the services is the Services state
+  */
+export const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
+  await loadServices(callback);
+}
 
 /**
  * ROLES
  */
 
-import { CallbackFunctionSubjectLoaded } from "@/data/types";
 
 const loadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/roles")

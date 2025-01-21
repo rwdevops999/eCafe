@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { all } from "@/data/constants";
-import { ServiceTypeN } from "@/data/iam-scheme";
+import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { ServiceType } from "@/data/iam-scheme";
+import { handleLoadServices } from "@/lib/db";
+import { useToast } from "@/hooks/use-toast";
 
 /**
  * Loads the services from API and let us select a service through a combo
@@ -18,44 +21,39 @@ import { ServiceTypeN } from "@/data/iam-scheme";
  * @param service: the default selected service
  */
 const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
+  const { toast, dismiss } = useToast()
+  let toastId: string;
+
+  const renderToast = () => {
+    let {id} = toast({title: "Services", description: "loading ..."})
+    toastId = id;
+  }
 
   const serviceToDisplay = useRef<string>(defaultService === all ? 'All' : defaultService);
 
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
-  const loadServices = async () => {
-    let data: ServiceTypeN[]= [];
-      
-    await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
-      .then((response) => response.json())
-      .then((response) => data = response);
-      
-    return data;
-  }
-
-  /**
-   * load the services
-    * set  the services is the Services state
-    */
-  const handleLoadServices = async () => {
-    const data: ServiceTypeN[] = await loadServices();
-
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     if (defaultService === all || forceAll) {
       setServices(["All", ...data.map(service => service.name)]);
     } else {
       setServices(data.map(service => service.name));
     }
+
+    dismiss(toastId);
   }
 
   useEffect(() => {
-    handleLoadServices(); 
+    renderToast();
+    handleLoadServices(servicesLoadedCallback); 
   }, []);
 
   useEffect(() => {
+    renderToast();
     serviceToDisplay.current = (defaultService === all ? 'All' : defaultService);
 
-    handleLoadServices(); 
+    handleLoadServices(servicesLoadedCallback); 
   }, [defaultService]);
 
   return (
