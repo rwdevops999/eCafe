@@ -13,7 +13,7 @@ export const columns: ColumnDef<Data>[] = [
 
         header: ({ column, header, table }) => (
             // <DataTableColumnHeader column={column} title={table.options.meta?.title!}/>
-            <div className="flex w-1">
+            <div className="flex w-[300px]">
                 <IndeterminateCheckbox
                     {...{
                         checked: table.getIsAllRowsSelected(),
@@ -28,7 +28,7 @@ export const columns: ColumnDef<Data>[] = [
         cell: ({row, getValue}) => {
             return (
                 <div
-                className="w-[400px]"
+                className="w-[300px]"
                 style={{
                   paddingLeft: `${row.depth * 4}rem`,
                 }}

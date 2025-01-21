@@ -16,6 +16,8 @@ import { log } from "@/lib/utils";
 import { DialogDataType, GroupDataType, PolicyDataType, RoleDataType, UserDataType } from "./tabs/data/data";
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
+import { Row } from "@tanstack/react-table";
+import { Data } from "@/lib/mapping";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -142,6 +144,23 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     country.current = _country;
   }
 
+  const setSelection = (type: string, data: Row<Data>[]) => {
+    console.log("SetSelection", type);
+  }
+
+  const validateItems = (): boolean => {
+    console.log("ValidateItems");
+    
+    let validationResult: boolean = true;
+
+    return validationResult;
+  }
+
+  meta.items = {
+    setSelection: setSelection,
+    validateItems: validateItems
+  }
+
   const renderComponent = () => {
     return (
       <Dialog open={open}>
@@ -178,11 +197,11 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
              <TabPolicies meta={meta} />
              </div>
            </TabsContent>
-           {/* <TabsContent value="groups">
+           <TabsContent value="groups">
             <div className="m-1 container w-[99%]">
-             <TabGroups />
+             <TabGroups meta={meta}/>
              </div>
-           </TabsContent> */}
+           </TabsContent>
           </Tabs>
         </DialogContent>
       </Dialog>

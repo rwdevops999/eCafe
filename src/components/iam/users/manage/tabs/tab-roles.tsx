@@ -1,7 +1,7 @@
 'use client'
 
 import TabItems from "@/components/iam/components/tab-items"
-import { assignButton, cancelButton, Meta, validateButton } from "./data/meta"
+import { assignButton, cancelButton, issuer_roles, Meta, validateButton } from "./data/meta"
 import { ColumnMeta, RowData } from "@tanstack/react-table"
 import { RoleType } from "@/data/iam-scheme"
 import { Data, mapRolesToData } from "@/lib/mapping"
@@ -13,7 +13,7 @@ const TabRoles = ({meta}:{meta: Meta}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaRoles, setMetaRoles] = useState<Meta>();
+  const [metaForRoles, setMetaForRoles] = useState<Meta>();
 
   const renderToast = () => {
       let {id} = toast({title: "Roles", description: "loading ..."})
@@ -25,11 +25,14 @@ const TabRoles = ({meta}:{meta: Meta}) => {
 
     meta.buttons = [validateButton, assignButton, cancelButton]
     meta.items = {
+      issuer: issuer_roles,
       title: "Assign roles to user",
       columnname: "Roles",
-      data: mappedRoles
+      data: mappedRoles,
+      setSelection: meta.items?.setSelection,
+      validateItems: meta.items?.validateItems
     }
-    setMetaRoles(meta);
+    setMetaForRoles(meta);
 
     dismiss(toastId);
   }
@@ -44,9 +47,9 @@ const TabRoles = ({meta}:{meta: Meta}) => {
   }, [])
 
   const renderComponent = () => {
-    if (metaRoles) {
+    if (metaForRoles) {
       return (
-        <TabItems meta={metaRoles}/>
+        <TabItems meta={metaForRoles}/>
       );
     }
 

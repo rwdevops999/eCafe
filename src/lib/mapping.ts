@@ -180,7 +180,7 @@ export const mapUsersToData = (users:  UserType[], level: number): Data[] => {
     return data;
 }
 
-export const mapGroupsToData = (groups:  GroupType[], level: number): Data[] => {
+export const mapGroupsToData = (groups:  GroupType[]): Data[] => {
     let data: Data[] = [];
 
     data = groups.map(group => {

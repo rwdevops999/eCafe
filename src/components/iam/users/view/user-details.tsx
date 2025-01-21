@@ -127,7 +127,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
             <PageTitle className="m-2" title={`Overview users`} />
 
             <div className="flex items-center justify-end">
-            <ManageUserDialog meta={meta} _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/> 
+            <ManageUserDialog meta={meta} _enabled={usersLoaded.current} user={user} handleReset={handleReset} setReload={setReload}/> 
             </div>
             <div className="block space-y-5">
               <DataTable data={usersData} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>

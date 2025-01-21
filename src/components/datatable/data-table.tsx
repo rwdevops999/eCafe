@@ -119,7 +119,10 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
           row.toggleSelected();
         } else {
           const meta = table.options.meta;
-          meta?.handleAction(action_update, row.original);        }
+          if (meta && meta.handleAction) {
+            meta.handleAction(action_update, row.original);
+          }
+        }
     
         return { row, event };
   };
@@ -145,7 +148,8 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
               ))}
             </TableHeader>
               <TableBody>
-                {table.getRowModel().rows.map((row) => {
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => {
                   return (
                     <TableRow 
                       key={row.id}
@@ -158,7 +162,17 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
                       })}
                     </TableRow>
                   )
-                })}
+                }))
+                : (
+                  <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+                )}
               </TableBody>
           </Table>
         </div>

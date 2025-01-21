@@ -1,4 +1,6 @@
 import { countryScheme } from "@/data/iam-scheme";
+import { Data } from "@/lib/mapping";
+import { Row } from "@tanstack/react-table";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
@@ -27,6 +29,11 @@ export const FormSchema = z.object({
   });
 export type FormSchemaType = z.infer<typeof FormSchema>;
   
+export const issuer_roles = "Roles";
+export const issuer_policies = "Policies";
+export const issuer_groups = "Groups";
+export const issuer_users = "Users";
+
 export interface Meta {
     updateItems?: (type: string, itels: any[]) => void
     buttons?: ButtonConfig[]
@@ -40,9 +47,12 @@ export interface Meta {
     }
     manageSubject?: (data: any) => void,
     items?: {
-        title: string
-        columnname: string
-        data: any[]
+        issuer?: string
+        title?: string
+        columnname?: string
+        data?: any[]
+        setSelection?: (type: string, data: Row<Data>[]) => void
+        validateItems?: () => boolean
     }
 }
 
