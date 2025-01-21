@@ -31,7 +31,8 @@ const TabRoles = ({meta}:{meta: Meta}) => {
       columnname: "Roles",
       data: mappedRoles,
       setSelection: meta.items?.setSelection,
-      validateItems: meta.items?.validateItems
+      validateItems: meta.items?.validateItems,
+      showPrimeTab: meta.items?.showPrimeTab
     }
     setMetaForRoles(meta);
 

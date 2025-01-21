@@ -28,7 +28,8 @@ const TabGroups = ({meta}:{meta: Meta}) => {
       columnname: "Groups",
       data: mappedGroups,
       setSelection: meta.items?.setSelection,
-      validateItems: meta.items?.validateItems
+      validateItems: meta.items?.validateItems,
+      showPrimeTab: meta.items?.showPrimeTab
     }
     setMetaForGroups(meta);
 

@@ -29,7 +29,8 @@ const TabPolicies = ({meta}:{meta: Meta}) => {
       columnname: "Policies",
       data: mappedPolicies,
       setSelection: meta.items?.setSelection,
-      validateItems: meta.items?.validateItems
+      validateItems: meta.items?.validateItems,
+      showPrimeTab: meta.items?.showPrimeTab
     }
     setMetaForPolicies(meta);
 

@@ -53,6 +53,7 @@ export interface Meta {
         data?: any[]
         setSelection?: (type: string, data: Row<Data>[]) => void
         validateItems?: () => boolean
+        showPrimeTab?: () => void
     }
 }
 

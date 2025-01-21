@@ -21,6 +21,7 @@ import { getPolicyStatements, getRoleStatements, validateData, ValidationType } 
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
+import { useSignal } from "@preact/signals-react";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -39,6 +40,20 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const closeDialog = () => {
     handleReset();
     handleDialogState(false);
+    tab.value = "userdetails";
+  }
+
+  const tab = useSignal('userdetails');
+  const [reRender, setRerender] = useState<number>(0);
+
+  const onTabChange = (value: string) => {
+    tab.value = value;
+    setRerender((x:number)=> x+1);
+  };
+
+  const showPrimeTab = () => {
+    console.log("SHOW USER TAB");
+    onTabChange("userdetails");
   }
 
   const prepareUser = (data: any): UserType => {
@@ -173,13 +188,16 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
 
   meta.items = {
     setSelection: setSelection,
-    validateItems: validateItems
+    validateItems: validateItems,
+    showPrimeTab: showPrimeTab
   }
 
   const renderComponent = () => {
     if (alert && alert.open) {
       return (<AlertMessage alert={alert}></AlertMessage>)
     }
+
+    console.log("RENDER: " + tab.value);
 
     return (
       <Dialog open={open}>
@@ -194,7 +212,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
             </DialogTitle>
           </DialogHeader>
   
-          <Tabs defaultValue="userdetails" className="w-[100%]">
+          <Tabs value={tab.value} className="w-[100%]" onValueChange={onTabChange}>
            <TabsList className="grid grid-cols-4">
              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
              <TabsTrigger value="roles">🔖 Roles</TabsTrigger>
