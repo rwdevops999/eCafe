@@ -6,6 +6,7 @@ import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { ColumnMeta, RowData } from "@tanstack/react-table"
 import { handleLoadPolicies } from "@/lib/db";
 import { PolicyType } from "@/data/iam-scheme";
+import { log } from "@/lib/utils";
 
 const TabPolicies = ({meta}:{meta: Meta}) => {
   const { toast, dismiss } = useToast();
@@ -19,7 +20,7 @@ const TabPolicies = ({meta}:{meta: Meta}) => {
   }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
-    let mappedPolicies = mapPoliciesToData(_data, 0);
+    let mappedPolicies = mapPoliciesToData(_data, 2);
 
     meta.buttons = [validateButton, assignButton, cancelButton]
     meta.items = {

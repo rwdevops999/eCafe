@@ -4,14 +4,26 @@ import { log } from "@/lib/utils";
 import { NextRequest } from "next/server";
 
 const findAllRoles = async () => {
-  const roles = await prisma.role.findMany({include: {policies: true}});
+  const roles = await prisma.role.findMany(
+    {
+      include: {
+       policies: {
+        include: {
+          statements: {
+            include: {
+              actions: true
+            }
+          }
+        }
+       }
+      }
+    });
 
   return roles;
 }
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    // const policyId = searchParams.get('policy');
 
     const roles = await findAllRoles();
 

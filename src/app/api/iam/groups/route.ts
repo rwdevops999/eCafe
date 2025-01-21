@@ -7,8 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const data: GroupType = await req.json();
 
-  log(true, "API", "POST", data, true);
-    
   const group: Prisma.GroupCreateInput = {
     name: data.name,
     description: data.description,

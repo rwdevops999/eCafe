@@ -4,7 +4,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import { assignButton, cancelButton, Meta, okButton, updateButton, validateButton } from "../tabs/data/meta";
 import { useState } from "react";
 
-const ActionButtons = ({_meta, itemCount}:{_meta:Meta; itemCount: number}) => {
+const ActionButtons = ({_meta, itemCount = 0}:{_meta:Meta; itemCount?: number}) => {
     const [valid, setValid] = useState<boolean>(false);
 
     const closeDialog = (value: boolean) => {
@@ -14,9 +14,7 @@ const ActionButtons = ({_meta, itemCount}:{_meta:Meta; itemCount: number}) => {
     }
 
     const handleValidate = (value: boolean) => {
-        console.log("Validate1")
         if (_meta.items && _meta.items.validateItems) {
-            console.log("Validate2")
             setValid(_meta.items.validateItems());
         }
     }

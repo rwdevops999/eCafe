@@ -81,17 +81,14 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     
     const button = document.getElementById("groupDialogButton");
     if (button !== null) {
-      console.log("Button Click");
       button.click();
     }
   }
 
   const handleAction = (action: string, group: Data) => {
     if (action === action_delete) {
-      console.log("Delete Group");
       handleDeleteGroup(group.id, groupDeletedCallback);
     } else {
-      console.log("Update Group");
       updateGroup(group);
     }
   }

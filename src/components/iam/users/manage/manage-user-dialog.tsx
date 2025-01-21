@@ -11,13 +11,16 @@ import TabUserDetails from "./tabs/tab-user-details";
 import TabRoles from "./tabs/tab-roles";
 import TabPolicies from "./tabs/tab-policies";
 import TabGroups from "./tabs/tab-groups";
-import { Meta } from "./tabs/data/meta";
+import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { log } from "@/lib/utils";
 import { DialogDataType, GroupDataType, PolicyDataType, RoleDataType, UserDataType } from "./tabs/data/data";
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
-import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
+import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { CountryType, defaultCountry, PolicyType, UserType } from "@/data/iam-scheme";
 import { Row } from "@tanstack/react-table";
 import { Data } from "@/lib/mapping";
+import { getPolicyStatements, getRoleStatements, validateData2, ValidationType } from "@/lib/validate";
+import { Button } from "@/components/ui/button";
+import AlertMessage from "@/app/(routing)/testing/alert-message";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -144,16 +147,61 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     country.current = _country;
   }
 
+  const selectedRoles = useRef<Row<Data>[]>([]);
+  const selectedPolicies = useRef<Row<Data>[]>([]);
+  const selectedGroups = useRef<Row<Data>[]>([]);
+
   const setSelection = (type: string, data: Row<Data>[]) => {
-    console.log("SetSelection", type);
+    log(true, "ManageUserDialog", `SetSelection: ${type}`, data, true);
+
+    switch (type) {
+      case issuer_roles:
+        selectedRoles.current = data;
+        break;
+      case issuer_policies:
+        selectedPolicies.current = data;
+        break;
+      case issuer_groups:
+        selectedGroups.current = data;
+        break
+    }
+  }
+
+  const [alert, setAlert] = useState<AlertType>();
+  
+  const handleRemoveAlert = () => {
+    setAlert(undefined);
+  }
+
+  const showAlert = (_title: string, _message: string) => {
+    const alert = {
+      open: true,
+      error: true,
+      title: _title,
+      message: _message,
+      child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+    };
+  
+    setAlert(alert);
   }
 
   const validateItems = (): boolean => {
     console.log("ValidateItems");
-    
-    let validationResult: boolean = true;
 
-    return validationResult;
+    const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
+    const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
+
+    const validationData: Data[] = [...policyStatements, ...roleStatements];
+
+    log(true, "ManageUserDialog", "validateItems", validationData, true);
+    
+    let validationResult: ValidationType = validateData2(validationData);
+
+    if (validationResult.result === "error") {
+      showAlert("Validation Error", validationResult.message!);
+    }
+
+    return (validationResult.result === "ok");
   }
 
   meta.items = {
@@ -162,6 +210,10 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const renderComponent = () => {
+    if (alert && alert.open) {
+      return (<AlertMessage alert={alert}></AlertMessage>)
+    }
+
     return (
       <Dialog open={open}>
         <DialogTrigger asChild>

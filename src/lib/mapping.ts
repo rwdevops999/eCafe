@@ -158,7 +158,7 @@ export const mapRolesToData = (roles: RoleType[] ): Data[] => {
             name: role.name,
             description: role.description,
             managed: role.managed,
-            children: mapPoliciesToData(role.policies)
+            children: mapPoliciesToData(role.policies, 2)
         }
     })
 

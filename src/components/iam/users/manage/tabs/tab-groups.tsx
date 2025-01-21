@@ -21,7 +21,6 @@ const TabGroups = ({meta}:{meta: Meta}) => {
 
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
-    log(true, "TabGroups", "groupsLoadedCallback", _data, true)
     meta.buttons = [validateButton, assignButton, cancelButton]
     meta.items = {
       issuer: issuer_groups,

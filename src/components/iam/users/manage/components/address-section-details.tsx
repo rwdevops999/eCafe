@@ -26,7 +26,6 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
   const countriesLoadedCallback = (data: CountryType[]) => {
     setCountries(data.sort((a, b) => a.name!.localeCompare(b.name!)));
     const country: CountryType | undefined = data.find((country) => country.name === defaultCountry.name);
-    log(true, "AddressSectionDetails", "countriesLoadedCallback: setCountry", country, true)
     if  (country) {
       if (user === undefined) {
         setCountry(country.name);
@@ -46,14 +45,11 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
   }
 
   useEffect(() => {
-    // setCountry(defaultCountry);
-    log(true, "AddressSectionDetails", "useEffect: load countries");
     handleLoadCountries(countriesLoadedCallback); 
   }, []);
 
   useEffect(() => {
     if  (user) {
-      log(true, "AddressSectionDetails", "useEffect: setCountry", user.address.country, true)
       setCountry(user.address.country.name);
     }
   });
@@ -61,7 +57,6 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
   const handleCountryChange = (_country: string) => {
     const country: CountryType | undefined = countries.find((country) => country.name === _country);
     if (country) {
-      log(true, "AddressSectionDetails", "handleCountryChange: setCountry", country, true)
       setCountry(country.name);
       if (user !== undefined) {
         _meta.userData?.updateData(country);

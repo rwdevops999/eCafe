@@ -15,7 +15,6 @@ const groupName = "name";
 const groupDescription = "description";
 
 const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
-  console.log("TabGroup IN");
   const {
     register,
     handleSubmit,
@@ -30,12 +29,12 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
    });
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    console.log("SUBMIT");
-    meta.manageSubject(data);
+    if (meta.manageSubject) {
+      meta.manageSubject(data);
+    }
   }
   
   useEffect(() => {
-    console.log("RESET");
     if (group === undefined) {
       reset();
     }

@@ -10,7 +10,6 @@ import { Meta } from "../../users/manage/tabs/data/meta";
 import { CallbackFunctionDefault } from "@/data/types";
 
 const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:boolean; group: GroupType|undefined; handleReset(): void; setReload(x:any):void;}) => {
-  console.log("ManageGroupDialog IN");
   const [selectedGroup, setSelectedGroup] = useState<GroupType>();
   
   const [open, setOpen] = useState<boolean>(false);
@@ -64,15 +63,11 @@ const ManageGroupDialog = ({_enabled, group, handleReset, setReload}:{_enabled:b
   }
   
   const handleManageGroup = (data: any): void => {
-    console.log("handleManageGroup");
     const group: GroupType = prepareGroup(data);
     if (group) {
-      console.log("handleManageGroup: group set");
       if  (selectedGroup) {
-        console.log("handleManageGroup: in selected group");
         updateGroup(group, groupChangedCallback);
       } else {
-        console.log("createGroup");
         createGroup(group, groupChangedCallback);
       }
       handleReset();

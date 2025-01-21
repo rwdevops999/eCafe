@@ -8,6 +8,7 @@ import { Data, mapRolesToData } from "@/lib/mapping"
 import { useEffect, useState } from "react"
 import { handleLoadRoles } from "@/lib/db"
 import { useToast } from "@/hooks/use-toast"
+import { log } from "@/lib/utils"
 
 const TabRoles = ({meta}:{meta: Meta}) => {
   const { toast, dismiss } = useToast();
