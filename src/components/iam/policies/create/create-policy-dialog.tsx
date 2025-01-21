@@ -92,7 +92,6 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const handleValidate = (value: boolean): void => {
     const statements: Data[] = getStatements(selectedStatements);
-
     let validationResult: ValidationType = validateData2(statements);
 
     if (validationResult.result === "error") {
@@ -127,8 +126,9 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   const statementsLoadedCallback = (data: ServiceStatementType[]) => {
     setStatements(data);
 
-    const sd: Data[] = mapStatementsToData(data, 0, services.current);
-    setStatementData(mapStatementsToData(data, 0, services.current));
+    const sd: Data[] = mapStatementsToData(data, 1, services.current);
+    log(true, "CreatePolicyDialog", "mapped statements", sd, true);
+    setStatementData(sd);
   }
 
   const servicesLoadedCallback = (data: ServiceType[]) => {

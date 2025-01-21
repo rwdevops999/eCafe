@@ -150,7 +150,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const handleValidate = (_value: boolean): void => {
     const policyStatements: Data[] = getPolicyStatements(selectedPolicies);
     
-    let _policies: Data[] = selectedPolicies.map((policy) => policy.original);
+    // let _policies: Data[] = selectedPolicies.map((policy) => policy.original);
 
     let validationResult: ValidationType = validateData2(policyStatements);
 

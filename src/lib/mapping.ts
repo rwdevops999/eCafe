@@ -18,7 +18,7 @@ const dataScheme = z.object({
 });
 export type Data = z.infer<typeof dataScheme>
 
-const debug: boolean = false;
+const debug: boolean = true;
 
 export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
     let result: Data[] = [];

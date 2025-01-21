@@ -7,14 +7,7 @@ export const getStatements = (data: Row<Data>[]): Data[] => {
     let statements: Data[] = [];
 
     statements = data.map((row) => {
-      let validationType: Data = {
-        name: row.original.name,
-        children: row.original.children,
-        id: row.original.id,
-        description: row.original.description,
-      }
-
-      return validationType;
+        return row.original;
     })
 
     return statements;
@@ -146,12 +139,22 @@ export const validateData = (_data: Data[], _originator?: string, _access?: stri
 }
 
 export const validateData2 = (_data: Data[], _originator?: string, _access?: string, _validation?: ValidationType | undefined, _level?: number): ValidationType => {
+    log(debug, "Validation", "data", _data, true);
     if (_level === undefined) {
         _level = 0;
     }
 
     if (_validation === undefined) {
-        _validation = resetValidation();
+        log(debug, "Validation", "reset validation");
+        // _validation = resetValidation();
+        allowedActions = [];
+        deniedActions = [];
+    
+        _validation = {
+            result: "ok"
+        };
+        
+        log(debug, "VALIDATE", "_validation1", _validation, true);
     }
 
     if (_data.length > 0) {
@@ -185,12 +188,16 @@ export const validateData2 = (_data: Data[], _originator?: string, _access?: str
         const intersect: PushResultType[] = intersection(allowedActions, deniedActions);
 
         log(debug, "VALIDATE", "INTERSECT", intersect, true);
+        log(debug, "VALIDATE", "_validation2", _validation, true);
 
         if (intersect.length > 0) {
+            log(debug, "VALIDATE", "SET ERROR");
             _validation.result = "error";
             _validation.message = `${intersect[0].name} conflicts in ${intersect[0].originator1} and ${intersect[0].originator2}`;
         }
     }
+
+    log(debug, "VALIDATE", "RESULT", _validation, true);
 
     return _validation;
 }
