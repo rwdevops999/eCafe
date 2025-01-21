@@ -17,7 +17,7 @@ import { AlertType } from "@/data/types";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 import { Row } from "@tanstack/react-table";
 import { Data } from "@/lib/mapping";
-import { getPolicyStatements, getRoleStatements, validateData2, ValidationType } from "@/lib/validate";
+import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
@@ -162,7 +162,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
 
     log(true, "ManageUserDialog", "validateItems", validationData, true);
     
-    let validationResult: ValidationType = validateData2(validationData);
+    let validationResult: ValidationType = validateData(validationData);
 
     if (validationResult.result === "error") {
       showAlert("Validation Error", validationResult.message!);

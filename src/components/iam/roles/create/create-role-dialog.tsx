@@ -16,7 +16,7 @@ import { z } from "zod";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { Row } from "@tanstack/react-table";
-import { getPolicyStatements, noValidation, okValidation, validateData, validateData2, ValidationType } from "@/lib/validate";
+import { getPolicyStatements, noValidation, validateData, ValidationType } from "@/lib/validate";
 import { log } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -150,7 +150,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const handleValidate = (_value: boolean): void => {
     const policyStatements: Data[] = getPolicyStatements(selectedPolicies);
     
-    let validationResult: ValidationType = validateData2(policyStatements);
+    let validationResult: ValidationType = validateData(policyStatements);
 
     if (validationResult.result === "error") {
       showAlert("Validation Error", validationResult.message!);
