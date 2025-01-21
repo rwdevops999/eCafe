@@ -2,18 +2,8 @@
 
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
+import { initDB } from "@/lib/db";
 import { log } from "@/lib/utils";
-
-const initDB = async (table: string) => {
-  const res = await fetch('http://localhost:3000/api/db?table='+table,{
-      method: 'POST',
-      body: JSON.stringify("initialise DB?"),
-      headers: {
-        'content-type': 'application/json'
-      }
-    })        
-}
-
 
 const Dashboard = () => {
   const initializeDB = () => {

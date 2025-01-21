@@ -1,4 +1,18 @@
+import { LanguageType } from "@/app/api/languages/data/scheme";
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+
+/**
+ * DB
+ */
+export const initDB = async (table: string) => {
+  const res = await fetch('http://localhost:3000/api/db?table='+table,{
+    method: 'POST',
+    body: JSON.stringify("initialise DB?"),
+    headers: {
+      'content-type': 'application/json'
+    }
+  })        
+}
 
 /**
  * LANGUAGES

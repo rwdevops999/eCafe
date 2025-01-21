@@ -3,6 +3,7 @@ import { defaultLanguage } from "@/app/api/languages/route";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
+import { handleLoadLanguages } from "@/lib/db";
 import { log } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -15,28 +16,12 @@ const ToolsLanguage = () => {
     const [languages, setLanguages] = useState<LanguageType[]>([]);
     const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage);
 
-    const loadLanguages = async () => {
-        let data: LanguageType[]= [];
-        
-        await fetch("http://localhost:3000/api/languages")
-          .then((response) => response.json())
-          .then((response) => data = response);
-        
-        return data;
-    }
-    
-    /**
-     * load the languages
-     * set the languages is a state
-     */
-    const handleLoadLanguages = async () => {
-        const data: LanguageType[] = await loadLanguages();
-
+    const languagesLoadedCallback = (data: LanguageType[]) => {
         setLanguages(data);
     }
 
     useEffect(() => {
-        handleLoadLanguages(); 
+        handleLoadLanguages(languagesLoadedCallback); 
     }, []);
 
     useEffect(() => {
