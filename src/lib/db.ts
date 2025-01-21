@@ -1,4 +1,4 @@
-import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 
 /**
  * SERVICES
@@ -27,6 +27,27 @@ const loadServicesWithService = async (_service: string, callback: CallbackFunct
 
 export const handleLoadServicesWithService = async (_service: string, callback: CallbackFunctionSubjectLoaded) => {
   await loadServicesWithService(_service, callback);
+}
+
+/**
+ * STATEMENTS
+ */
+const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
+    await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
+      .then((response) => response.json())
+      .then((response) => {
+        callback(response);
+      });
+}
+
+export const handleLoadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
+  await loadStatements(_serviceId, _sid, callback);
+}
+
+export const handleDeleteStatement = async (id: number, callback: CallbackFunctionDefault) => {
+  await fetch("http://localhost:3000/api/iam/statements?statementId="+id,{
+      method: 'DELETE',
+  }).then((response: Response) => callback());
 }
 
 

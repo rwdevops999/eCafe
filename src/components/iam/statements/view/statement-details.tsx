@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { Data, mapStatementsToData } from "@/lib/mapping";
+import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
   const { toast, dismiss } = useToast();
@@ -41,29 +42,9 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     toastId = id;
   }
 
-  const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
-      if (services.current.length === 0) {
-        await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
-          .then((response) => response.json())
-          .then((response) => {
-            callback(response);
-          }
-        );
-      }
-  }
-
   const serviceName = useRef<string>(all);
 
-  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
-      await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
-        .then((response) => response.json())
-        .then((response) => {
-          callback(response);
-          dismiss(toastId);
-        });
-  }
-
-  const handleLoadStatements = async (_service: number | string, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
+  const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
     let serviceId: number = 0;
 
     if (typeof _service === 'number') {
@@ -84,15 +65,11 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
       }
     }
 
-    await loadStatements(serviceId, _sid, callback);
-  }
-  
-  const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
-      renderToast();
-      await loadServices(callback);
+    return serviceId;
   }
 
   const statementsLoadedCallback = (data: ServiceStatementType[]) => {
+    dismiss(toastId);
     setStatements(data);
     setStatementData(mapStatementsToData(data, 2, services.current));
     statementsLoaded.current = true;
@@ -105,29 +82,27 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
     setSelectedSid(_sid);
 
-    handleLoadStatements(_service, _sid, statementsLoadedCallback);
+    const serviceId: number = prepareStatementsLoad(_service, _sid);
+    handleLoadStatements(serviceId, _sid, statementsLoadedCallback);
   }
 
   useEffect(() => {
     if (_service && _sid) {
+      renderToast();
       handleLoadServices(servicesLoadedCallback);
     }
   }, []);
 
   useEffect(() => {
-    handleLoadStatements(selectedService, selectedSid, statementsLoadedCallback);
+    const serviceId: number = prepareStatementsLoad(selectedService, selectedSid);
+    handleLoadStatements(serviceId, selectedSid, statementsLoadedCallback);
   }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
-    handleLoadStatements(_service, '*', statementsLoadedCallback);
+    const serviceId: number = prepareStatementsLoad(_service, '*');
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
     setSelectedService(_service);
     serviceName.current = _service === all ? 'All' : _service;
-  }
-
-  const handleDeleteStatement = async (id: number, callback: CallbackFunctionDefault) => {
-      await fetch("http://localhost:3000/api/iam/statements?statementId="+id,{
-          method: 'DELETE',
-      }).then((response: Response) => callback());
   }
 
   const statementDeletedCallback = () => {
