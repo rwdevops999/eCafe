@@ -2,9 +2,8 @@
 
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { AlertType } from "@/data/types";
 import { useToast } from "@/hooks/use-toast";
-import { log } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
@@ -14,6 +13,7 @@ import { Data, mapRolesToData } from "@/lib/mapping";
 import { TableMeta } from "@tanstack/react-table";
 import { action_delete } from "@/data/constants";
 import { Button } from "@/components/ui/button";
+import { handleDeleteRole, handleLoadRoles } from "@/lib/db";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const { toast, dismiss } = useToast();
@@ -40,18 +40,6 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
         dismiss(toastId);
     }
 
-    const loadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
-        await fetch("http://localhost:3000/api/iam/roles")
-            .then((response) => response.json())
-            .then((response) => {
-                callback(response);
-            });
-    }
-    
-    const handleLoadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
-        await loadRoles(callback);
-    }
-    
     useEffect(() => {
         renderToast();
         handleLoadRoles(rolesLoadedCallback);
@@ -68,12 +56,6 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
   
     const roleDeletedCallback = () => {
         setReload((x:any) => x+1);
-    }
-
-    const handleDeleteRole = async (id: number, callback: CallbackFunctionDefault) => {
-        const res = await fetch("http://localhost:3000/api/iam/roles?roleId="+id,{
-            method: 'DELETE',
-        }).then((response: Response) => callback());
     }
 
     const handleAction = (action: string, role: Data) => {

@@ -27,6 +27,7 @@ import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } fro
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapStatementsToData } from "@/lib/mapping";
+import { createPolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -101,9 +102,24 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     setValid(validation);
   }
 
+  const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
+    let serviceId: number = 0;
+
+    if (_service !== all) {
+      let service = services.current.find((service) => service.name === _service);
+      if (service) {
+        serviceId = service.id;
+      }
+    }
+
+    return serviceId;
+  }
+
   const handleChangeService = (_service: string): void => {
     setSelectedService(_service);
-    handleLoadStatements(_service, '*', statementsLoadedCallback);
+    
+    const serviceId = prepareStatementsLoad(_service, '*');
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
   }
 
   const services = useRef<ServiceType[]>([]);
@@ -118,42 +134,8 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   const servicesLoadedCallback = (data: ServiceType[]) => {
     services.current = data;
     setSelectedService(all);
-    handleLoadStatements(all, '*', statementsLoadedCallback);
-  }
-
-  const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
-        if (services.current.length === 0) {
-          await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
-            .then((response) => response.json())
-            .then((response) => {
-              callback(response)
-            }
-          );
-        }
-  };
-
-  const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
-      await loadServices(callback);
-  }
-
-  const loadStatements = async (_serviceId: number, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
-    await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
-      .then((response) => response.json())
-      .then((response) => {
-        callback(response);
-      });
-  }
-
-  const handleLoadStatements = async (_service: string, _sid: string, callback: CallbackFunctionSubjectLoaded) => {
-    let serviceId: number = 0;
-    if (_service !== all) {
-      let service = services.current.find((service) => service.name === _service);
-      if (service) {
-        serviceId = service.id;
-      }
-    }
-
-    await loadStatements(serviceId, _sid, callback);
+    const serviceId = prepareStatementsLoad(all, '*');
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
   }
 
   useEffect(() => {
@@ -175,17 +157,6 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
         });
 
       return res as ServiceStatementType[];
-    }
-
-    const createPolicy = async (_policy: PolicyType, callback: CallbackFunctionDefault) => {
-      await fetch('http://localhost:3000/api/iam/policies',
-        {
-          method: 'POST',
-          body: JSON.stringify(_policy),
-          headers: {
-            'content-type': 'application/json'
-          }
-        }).then((response) => callback());
     }
 
     const prepareCreatePolicy = (data: FormSchemaType): PolicyType => {

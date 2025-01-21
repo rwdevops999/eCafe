@@ -1,6 +1,27 @@
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 
 /**
+ * LANGUAGES
+ */
+const loadLanguages = async (callback: CallbackFunctionSubjectLoaded) => {
+  let data: LanguageType[]= [];
+  
+  await fetch("http://localhost:3000/api/languages")
+    .then((response) => response.json())
+    .then((response) =>callback(response));
+  
+  return data;
+}
+
+/**
+* load the languages
+* set the languages is a state
+*/
+export const handleLoadLanguages = async (callback: CallbackFunctionSubjectLoaded) => {
+  await loadLanguages(callback);
+}
+
+/**
  * SERVICES
  */
 const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
@@ -9,10 +30,6 @@ const loadServices = async (callback: CallbackFunctionSubjectLoaded) => {
     .then((response) => callback(response));
 }
 
-/**
- * load the services
-  * set  the services is the Services state
-  */
 export const handleLoadServices = async (callback: CallbackFunctionSubjectLoaded) => {
   await loadServices(callback);
 }
@@ -62,23 +79,6 @@ export const createStatement = async (_statement: ServiceStatementType, callback
 }
 
 /**
- * ROLES
- */
-
-
-const loadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
-    await fetch("http://localhost:3000/api/iam/roles")
-        .then((response) => response.json())
-        .then((response) => {
-            callback(response);
-        });
-}
-
-export const handleLoadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
-    await loadRoles(callback);
-}
-
-/**
  * POLICIES
  */
 const loadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
@@ -92,7 +92,68 @@ const loadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
 export const handleLoadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadPolicies(callback);
 }
-  
+
+const loadPoliciesWithName = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/policies?policy=" + _policy)
+    .then((response) => response.json())
+    .then((response) => {
+        callback(response);
+    });
+}
+
+export const handleLoadPoliciesWithName = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
+  await loadPoliciesWithName(_policy, callback);
+}
+
+export const handleDeletePolicy = async (id: number, callback: CallbackFunctionDefault) => {
+  const res = await fetch("http://localhost:3000/api/iam/policies?policyId="+id,{
+      method: 'DELETE',
+  }).then((response: Response) => callback());
+}
+
+export const createPolicy = async (_policy: PolicyType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/policies',
+    {
+      method: 'POST',
+      body: JSON.stringify(_policy),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then((response) => callback());
+}
+
+/**
+ * ROLES
+ */
+const loadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/roles")
+      .then((response) => response.json())
+      .then((response) => {
+          callback(response);
+      });
+}
+
+export const handleLoadRoles = async (callback: CallbackFunctionSubjectLoaded) => {
+  await loadRoles(callback);
+}
+
+export const handleDeleteRole = async (id: number, callback: CallbackFunctionDefault) => {
+  const res = await fetch("http://localhost:3000/api/iam/roles?roleId="+id,{
+    method: 'DELETE',
+  }).then((response: Response) => callback());
+}
+
+export const createRole = async (_role: RoleType, callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/roles',
+    {
+      method: 'POST',
+      body: JSON.stringify(_role),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then((response) => callback());
+}
+
 /**
  * GROUPS
  */
@@ -107,5 +168,3 @@ const loadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
 export const handleLoadGroups = async (callback: CallbackFunctionSubjectLoaded) => {
     await loadGroups(callback);
 }
-  
-

@@ -24,6 +24,7 @@ import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType, RoleType } from "@/data/iam-scheme";
 import { DataTableToolbar } from "./table/data-table-toolbar";
+import { createRole, handleLoadPolicies } from "@/lib/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -64,18 +65,6 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setPolicyData(mappedPolicies);
   }
 
-  const loadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
-    await fetch("http://localhost:3000/api/iam/policies")
-      .then((response) => response.json())
-      .then((response) => {
-        callback(response);
-      });
-  }
-
-  const handleLoadPolicies = async (callback: CallbackFunctionSubjectLoaded) => {
-    await loadPolicies(callback);
-  }
-  
   useEffect(() => {
     if (open) {
       resetAll();
@@ -120,17 +109,6 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       managed: managed.current,
       policies: mapPoliciesToRole(prep),
     }
-  }
-
-  const createRole = async (_role: RoleType, callback: CallbackFunctionDefault) => {
-      await fetch('http://localhost:3000/api/iam/roles',
-        {
-          method: 'POST',
-          body: JSON.stringify(_role),
-          headers: {
-            'content-type': 'application/json'
-          }
-        }).then((response) => callback());
   }
 
   const roleCreatedCallback = () => {

@@ -11,10 +11,11 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { AlertType } from "@/data/types";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType } from "@/data/iam-scheme";
+import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const { toast, dismiss } = useToast()
@@ -44,30 +45,18 @@ import { PolicyType } from "@/data/iam-scheme";
         dismiss(toastId);
     }
 
-    const loadPolicies = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
-          await fetch("http://localhost:3000/api/iam/policies?policy=" + _policy)
-            .then((response) => response.json())
-            .then((response) => {
-                callback(response);
-            });
-    }
-    
-    const handleLoadPolicies = async (_policy: string, callback: CallbackFunctionSubjectLoaded) => {
-        await loadPolicies(_policy, callback);
-    }
-
     useEffect(() => {
         if (_policy) {
           setSelectedPolicy(_policy);
 
           renderToast();
-          handleLoadPolicies(_policy, policiesLoadedCallback);
+          handleLoadPoliciesWithName(_policy, policiesLoadedCallback);
         }
     }, []);
 
     useEffect(() => {
         renderToast();
-        handleLoadPolicies(selectedPolicy, policiesLoadedCallback);
+        handleLoadPoliciesWithName(selectedPolicy, policiesLoadedCallback);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {
@@ -76,12 +65,6 @@ import { PolicyType } from "@/data/iam-scheme";
   
     const policyDeletedCallback = () => {
         setReload((x:any) => x+1);
-    }
-
-    const handleDeletePolicy = async (id: number, callback: CallbackFunctionDefault) => {
-        const res = await fetch("http://localhost:3000/api/iam/policies?policyId="+id,{
-            method: 'DELETE',
-        }).then((response: Response) => callback());
     }
 
     const handleAction = (action: string, policy: Data) => {
