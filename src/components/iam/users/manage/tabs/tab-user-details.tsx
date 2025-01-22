@@ -6,7 +6,7 @@ import ActionButtons from "../components/action-buttons";
 import { Separator } from "@/components/ui/separator";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 import UserSectionDetails from "../components/user-section-details";
@@ -19,7 +19,8 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    getValues
   } = useForm<FormSchemaType>({ 
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -48,7 +49,8 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
 
   const metaform = {
       register: register,
-      errors: errors
+      errors: errors,
+      getValues: getValues
   }
 
   _meta.form = metaform;
@@ -64,7 +66,9 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
   }, [user])
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    _meta.manageSubject(data);
+    if (_meta.manageSubject) {
+      _meta.manageSubject(data);
+    }
   }
 
   const updateUserCountry = (country: CountryType) => {

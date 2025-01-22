@@ -95,8 +95,10 @@ const findAllUsers = async () => {
         address: {
           include: {
             country: true
-          }
-        }
+          },
+        },
+        roles: true,
+        policies: true,
       }
     }
   );
@@ -137,7 +139,9 @@ export async function GET(request: NextRequest) {
             dialCode: (_user.address ? (_user.address.country.dialCode ? _user.address.country.dialCode : "") : ""),
             code: (_user.address ? (_user.address.country.code ? _user.address.country.code : "") : "")
           }
-        }
+        },
+        roles: _user.roles,
+        policies: _user.policies
       };
 
       return user;

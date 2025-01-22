@@ -1,7 +1,7 @@
 import { countryScheme } from "@/data/iam-scheme";
 import { Data } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormGetValues, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
 export const okButton = "ok";
@@ -40,7 +40,8 @@ export interface Meta {
     closeDialog?: () => void
     form?: {
         register: UseFormRegister<FormSchemaType>
-        errors?: FieldErrors<FormSchemaType>
+        errors?: FieldErrors<FormSchemaType>,
+        getValues?: UseFormGetValues<FormSchemaType>
     }
     userData?: {
         updateData: (data: any) => void

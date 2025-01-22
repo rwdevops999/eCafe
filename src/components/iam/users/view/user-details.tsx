@@ -34,6 +34,8 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const [reload, setReload] = useState<number>(0);
 
   const usersLoadedCallback = (data: UserType[]) => {
+    log(true, "UserDetails", "usesLoadedCallback",data, true);
+    
     dismiss(toastId);
 
     users.current = data;

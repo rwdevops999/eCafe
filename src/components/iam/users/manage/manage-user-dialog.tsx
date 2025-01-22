@@ -15,13 +15,11 @@ import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/
 import { log } from "@/lib/utils";
 import { AlertType } from "@/data/types";
 import { CountryType, defaultCountry, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
-import { Row } from "@tanstack/react-table";
-import { Data } from "@/lib/mapping";
+import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
 import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
-import { useSignal } from "@preact/signals-react";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -127,7 +125,24 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
   }
 
+  const setRelations = (user: UserType|undefined): void => {
+    if (user) {
+      if (user.roles.length > 0) {
+        selectedRoles.current = mapRolesToData(user.roles);
+      }
+
+      if (user.policies.length > 0) {
+        selectedPolicies.current = mapPoliciesToData(user.policies);
+      }
+    } else {
+      selectedRoles.current = [];
+      selectedPolicies.current = [];
+    }
+  }
+
   useEffect(() => {
+    console.log("UseEffect[user]: " + JSON.stringify(user));
+    setRelations(user);
     setSelectedUser(user);
     if (user) {
       country.current = user.address.country;
@@ -213,6 +228,8 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const renderComponent = () => {
+    console.log("RENDER: user = " + JSON.stringify(user));
+    
     if (alert && alert.open) {
       return (<AlertMessage alert={alert}></AlertMessage>)
     }
@@ -233,9 +250,9 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
           <Tabs value={tab} className="w-[100%]" onValueChange={onTabChange}>
            <TabsList className="grid grid-cols-4">
              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
-             <TabsTrigger value="roles">🔖 Roles</TabsTrigger>
-             <TabsTrigger value="policies">📜 Policies</TabsTrigger>
-             <TabsTrigger value="groups">👨‍👦‍👦 Groups</TabsTrigger>
+             <TabsTrigger value="roles" disabled={selectedUser === undefined}>🔖 Roles</TabsTrigger>
+             <TabsTrigger value="policies" disabled={selectedUser === undefined}>📜 Policies</TabsTrigger>
+             <TabsTrigger value="groups" disabled={selectedUser === undefined}>👨‍👦‍👦 Groups</TabsTrigger>
            </TabsList>
            <TabsContent value="userdetails">
             <div className="m-1 container w-[99%]">
