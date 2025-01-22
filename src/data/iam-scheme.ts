@@ -90,8 +90,8 @@ const userScheme = z.object({
     email: z.string(),
     password: z.string(),
     address: addressScheme,
-    roles: z.array(roleScheme).optional(),
-    policies: z.array(policyScheme).optional(),
+    roles: z.array(roleScheme),
+    policies: z.array(policyScheme),
 });
 export type UserType = z.infer<typeof userScheme>
 

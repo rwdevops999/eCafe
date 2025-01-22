@@ -1,4 +1,5 @@
 import { LanguageType } from "@/app/api/languages/data/scheme";
+import { GroupType, PolicyType, RoleType, ServiceStatementType, UserType } from "@/data/iam-scheme";
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 
 /**
