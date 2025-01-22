@@ -51,7 +51,7 @@ export interface Meta {
         title?: string
         columnname?: string
         data?: any[]
-        setSelection?: (type: string, data: Row<Data>[]) => void
+        setSelection?: (type: string, data: Data[]) => void
         validateItems?: () => boolean
         showPrimeTab?: () => void
     }

@@ -18,12 +18,12 @@ import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { getPolicyStatements, getStatements, noValidation, validateData, ValidationType } from "@/lib/validate";
+import { noValidation, validateData, ValidationType } from "@/lib/validate";
 import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { AlertType } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapStatementsToData } from "@/lib/mapping";
@@ -61,7 +61,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   const [selectedService, setSelectedService] = useState<string>();
 
   const [statements, setStatements] = useState<ServiceStatementType[]>([]);
-  const [selectedStatements, setSelectedStatements] = useState<Row<Data>[]>([]);
+  const [selectedStatements, setSelectedStatements] = useState<Data[]>([]);
   const [statementData, setStatementData] = useState<Data[]>([]);
   /**
    * managed (true or false)
@@ -84,15 +84,15 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       error: true,
       title: _title,
       message: _message,
-      child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
     setAlert(alert);
   }
 
   const handleValidate = (value: boolean): void => {
-    const statements: Data[] = getStatements(selectedStatements);
-    let validationResult: ValidationType = validateData(statements);
+    // const statements: Data[] = getStatements(selectedStatements);
+    let validationResult: ValidationType = validateData(selectedStatements);
 
     if (validationResult.result === "error") {
       showAlert("Validation Error", validationResult.message!);
@@ -149,11 +149,10 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       reset
     } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const mapStatementsToPolicy = (_statements: Row<Data>[]): ServiceStatementType[] => {
+    const mapStatementsToPolicy = (_statements: Data[]): ServiceStatementType[] => {
       let res = _statements.map((_statement) => 
         {
-          let id = _statement.original.id;
-          return statements.find((s) => s.id === _statement.original.id)
+          return statements.find((s) => s.id === _statement.id)
         });
 
       return res as ServiceStatementType[];
@@ -185,7 +184,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     }
 
     const handleChangeSelection = (selection: Row<Data>[]) => {
-      setSelectedStatements(selection);
+      setSelectedStatements(selection.map((row) => row.original));
     }
 
   const resetAll = () => {

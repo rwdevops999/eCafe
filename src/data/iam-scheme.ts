@@ -39,20 +39,20 @@ export type ServiceStatementType = z.infer<typeof serviceStatementScheme>
 // POLICY
 const policyScheme = z.object({
     id: z.number(),
-    name: z.string(),
-    description: z.string(),
-    managed: z.boolean(),
-    statements: z.array(serviceStatementScheme),
-    roles: z.array(z.any()),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    managed: z.boolean().optional(),
+    statements: z.array(serviceStatementScheme).optional(),
+    roles: z.array(z.any()).optional(),
 });
 export type PolicyType = z.infer<typeof policyScheme>
 
 const roleScheme = z.object({
     id: z.number(),
-    name: z.string(),
-    description: z.string(),
-    managed: z.boolean(),
-    policies: z.array(policyScheme)
+    name: z.string().optional(),
+    description: z.string().optional(),
+    managed: z.boolean().optional(),
+    policies: z.array(policyScheme).optional(),
 });
 export  type RoleType = z.infer<typeof roleScheme>
 
@@ -89,7 +89,9 @@ const userScheme = z.object({
     phonecode: z.string().optional(),
     email: z.string(),
     password: z.string(),
-    address: addressScheme
+    address: addressScheme,
+    roles: z.array(roleScheme).optional(),
+    policies: z.array(policyScheme).optional(),
 });
 export type UserType = z.infer<typeof userScheme>
 

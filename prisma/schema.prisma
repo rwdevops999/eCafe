@@ -65,17 +65,19 @@ model Policy {
   statements ServiceStatement[]
   roles Role[]
   groups Group[]
+  users User[]
 }
 
 model Role {
   id Int @id @default(autoincrement())
-  name String
-  description String
-  managed Boolean @default(false)
+  name String?
+  description String?
+  managed Boolean? @default(false)
   createDate DateTime @default(now())
   updateDate DateTime @updatedAt
   policies Policy[]
   groups Group[]
+  users User[]
 }
 
 // model UserGroup {
@@ -112,6 +114,8 @@ model User {
   email String
   password String
   address Address?
+  roles Role[]
+  policies Policy[]
   groups Group[]
 }
 

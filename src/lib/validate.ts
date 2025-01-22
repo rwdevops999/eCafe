@@ -3,25 +3,42 @@ import { z } from "zod";
 import { Data } from "./mapping";
 import { Row } from "@tanstack/react-table";
 
-export const getStatements = (data: Row<Data>[]): Data[] => {
+// export const getStatements = (data: Row<Data>[]): Data[] => {
+//     let statements: Data[] = [];
+
+//     statements = data.map((row) => {
+//         return row.original;
+//     })
+
+//     return statements;
+// }
+
+// export const getPolicyStatements = (data: Row<Data>[]): Data[] => {
+//     let statements: Data[] = [];
+
+//     statements = data.map((row) => {
+//       let validationType: Data = {
+//         name: row.original.name,
+//         children: row.original.children,
+//         id: row.original.id,
+//         description: row.original.description,
+//       }
+
+//       return validationType;
+//     })
+
+//     return statements;
+// }
+
+export const getPolicyStatements = (data: Data[]): Data[] => {
     let statements: Data[] = [];
 
-    statements = data.map((row) => {
-        return row.original;
-    })
-
-    return statements;
-}
-
-export const getPolicyStatements = (data: Row<Data>[]): Data[] => {
-    let statements: Data[] = [];
-
-    statements = data.map((row) => {
+    statements = data.map((policy) => {
       let validationType: Data = {
-        name: row.original.name,
-        children: row.original.children,
-        id: row.original.id,
-        description: row.original.description,
+        name: policy.name,
+        children: policy.children,
+        id: policy.id,
+        description: policy.description,
       }
 
       return validationType;
@@ -30,23 +47,44 @@ export const getPolicyStatements = (data: Row<Data>[]): Data[] => {
     return statements;
 }
 
-export const getRoleStatements = (data: Row<Data>[]): Data[] => {
-    let roleStatements: Data[] = data.flatMap((row) => {
-      let roleOriginator: string = row.original.name;
-      let statementTypes: Data[] = row.original.children.map((policy) => { 
-        let policyOriginator = `${roleOriginator}[${policy.name}]`;
-            let statementType: Data = {
-                name: policyOriginator,
-                children: policy.children,
-                id: policy.id,
-                description: policy.description,
-            }
-            return statementType;
+// export const getRoleStatements = (data: Row<Data>[]): Data[] => {
+//     let roleStatements: Data[] = data.flatMap((row) => {
+//       let roleOriginator: string = row.original.name;
+//       let statementTypes: Data[] = row.original.children.map((policy) => { 
+//         let policyOriginator = `${roleOriginator}[${policy.name}]`;
+//             let statementType: Data = {
+//                 name: policyOriginator,
+//                 children: policy.children,
+//                 id: policy.id,
+//                 description: policy.description,
+//             }
+//             return statementType;
     
-      })
+//       })
 
-      return statementTypes;
-    })
+//       return statementTypes;
+//     })
+
+//     return roleStatements;
+// }
+
+export const getRoleStatements = (data: Data[]): Data[] => {
+    let roleStatements: Data[] = data.flatMap((role) => {
+        let roleOriginator: string = role.name;
+        let statementTypes: Data[] = role.children.map((policy) => { 
+            let policyOriginator = `${roleOriginator}[${policy.name}]`;
+                let statementType: Data = {
+                    name: policyOriginator,
+                    children: policy.children,
+                    id: policy.id,
+                    description: policy.description,
+                }
+                return statementType;
+        
+          })
+
+          return statementTypes;
+    });
 
     return roleStatements;
 }

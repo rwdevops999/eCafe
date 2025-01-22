@@ -26,6 +26,12 @@ const  setUserForCreate = (data: UserType) => {
           }
         }
       },
+    },
+    roles: {
+      connect: data.roles
+    },
+    policies: {
+      connect: data.policies
     }
   });
 }
@@ -60,6 +66,7 @@ const  setUserForUpdate = (data: UserType) => {
 export async function POST(req: NextRequest) {
     const data: UserType = await req.json();
 
+    log(true, "API", "createUser", data, true);
     const user: Prisma.UserCreateInput = setUserForCreate(data);
 
     const createdUser = await prisma.user.create({data: user});
@@ -68,7 +75,12 @@ export async function POST(req: NextRequest) {
         headers: { "content-type": "application/json" },
         status: 201,
      });
-}
+
+    // return new Response(JSON.stringify("OK"), {
+    //     headers: { "content-type": "application/json" },
+    //     status: 201,
+    //  });
+  }
 
 const findAllUsers = async () => {
   const users = await prisma.user.findMany(

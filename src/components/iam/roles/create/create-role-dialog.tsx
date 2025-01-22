@@ -51,7 +51,8 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const [alert, setAlert] = useState<AlertType>();
 
   const [policies, setPolicies] = useState<PolicyType[]>([]);
-  const [selectedPolicies, setSelectedPolicies] = useState<Row<Data>[]>([]);
+  // const [selectedPolicies, setSelectedPolicies] = useState<Row<Data>[]>([]);
+  const [selectedPolicies, setSelectedPolicies] = useState<Data[]>([]);
   const [policyData, setPolicyData] = useState<Data[]>([]);
     
   const handleDialogState = (state: boolean) => {
@@ -86,28 +87,27 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       reset
     } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const mapPoliciesToRole = (_policies: Row<Data>[]): PolicyType[] => {
+    const mapPoliciesToRole = (_policies: Data[]): PolicyType[] => {
       let res = _policies.map((_policy) => 
         {
-          let id = _policy.original.id;
-          return policies.find((p) => p.id === _policy.original.id)
+          return policies.find((p) => p.id === _policy.id)
         });
 
       return res as PolicyType[];
     }
 
   const prepareCreateRole = (data: FormSchemaType): RoleType => {
-    let prep: Row<Data>[] = selectedPolicies.flatMap((policy) => {
-      return (policy.depth === 0 ? policy : []);
-      }
-    ) as Row<Data>[];
+    // let prep: Data[] = selectedPolicies.flatMap((policy) => {
+    //   return (policy.depth === 0 ? policy : []);
+    //   }
+    // ) as Row<Data>[];
 
     return {
       id: 0,
       name: data.name,
       description: data.description,
       managed: managed.current,
-      policies: mapPoliciesToRole(prep),
+      policies: mapPoliciesToRole(selectedPolicies),
     }
   }
 
@@ -141,7 +141,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       error: true,
       title: _title,
       message: _message,
-      child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
     setAlert(alert);
@@ -160,7 +160,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   }
 
   const handleChangeSelection = (selection: Row<Data>[]) => {
-      setSelectedPolicies(selection);
+      setSelectedPolicies(selection.map((row) => row.original));
   }
 
   const renderDialog = () => {

@@ -65,7 +65,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
    * selected rows in format
    * [{"id":"3","data":{"id":13,"name":"CreateOrder","createDate":"2025-01-08T13:09:23.744Z","updateDate":"2025-01-08T13:09:23.744Z","serviceId":6,"statementActionId":null}}]
    */
-  const [selectedActions, setSelectedActions] = useState<Row<Data>[]>([]);
+  const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
     dismiss(toastId);
@@ -118,8 +118,8 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
         const _service = services.current.find(service => service.name === selectedService)!;
         const _actions = selectedActions.map(action => {
           const act: ActionType = {
-            id: action.original.id,
-            name: action.original.name,
+            id: action.id,
+            name: action.name,
           }
 
           return act;
@@ -159,8 +159,8 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
       }
     }
 
-    const handleChangeSelection = (selection: any[]) => {
-      setSelectedActions(selection);
+    const handleChangeSelection = (selection: Row<Data>[]) => {
+      setSelectedActions(selection.map((row) => row.original));
     }
 
     const changeAccessValue = (value: string) => {

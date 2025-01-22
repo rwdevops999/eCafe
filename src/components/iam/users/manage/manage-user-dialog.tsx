@@ -14,7 +14,7 @@ import TabGroups from "./tabs/tab-groups";
 import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { log } from "@/lib/utils";
 import { AlertType } from "@/data/types";
-import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
+import { CountryType, defaultCountry, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
 import { Row } from "@tanstack/react-table";
 import { Data } from "@/lib/mapping";
 import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
@@ -40,15 +40,13 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const closeDialog = () => {
     handleReset();
     handleDialogState(false);
-    tab.value = "userdetails";
+    setTab("userdetails");
   }
 
-  const tab = useSignal('userdetails');
-  const [reRender, setRerender] = useState<number>(0);
+  const [tab, setTab] = useState<string>('userdetails');
 
   const onTabChange = (value: string) => {
-    tab.value = value;
-    setRerender((x:number)=> x+1);
+    setTab(value);
   };
 
   const showPrimeTab = () => {
@@ -57,6 +55,22 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const prepareUser = (data: any): UserType => {
+    const roles: RoleType[] = selectedRoles.current.map(_role => {
+      let role: RoleType = {
+        id: _role.id,
+      }
+
+      return role;
+    });
+
+    const policies: PolicyType[] = selectedPolicies.current.map(_policy => {
+      let policy: PolicyType = {
+        id: _policy.id,
+      }
+
+      return policy;
+    });
+
     return {
       id: (selectedUser ? selectedUser.id : 0),
       name: data.name,
@@ -78,7 +92,9 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
           name: (country.current ? country.current.name : ""),
           dialCode: (country.current ? country.current.dialCode : "")
         }
-      }
+      },
+      roles: roles,
+      policies: policies,
     }
   }
 
@@ -129,15 +145,19 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     country.current = _country;
   }
 
-  const selectedRoles = useRef<Row<Data>[]>([]);
-  const selectedPolicies = useRef<Row<Data>[]>([]);
-  const selectedGroups = useRef<Row<Data>[]>([]);
+  const selectedRoles = useRef<Data[]>([]);
+  // const selectedRoles = useRef<Row<Data>[]>([]);
+  // const selectedPolicies = useRef<Row<Data>[]>([]);
+  const selectedPolicies = useRef<Data[]>([]);
+  // const selectedGroups = useRef<Row<Data>[]>([]);
+  const selectedGroups = useRef<Data[]>([]);
 
-  const setSelection = (type: string, data: Row<Data>[]) => {
+  const setSelection = (type: string, data: Data[]) => {
     log(true, "ManageUserDialog", `SetSelection: ${type}`, data, true);
 
     switch (type) {
       case issuer_roles:
+        // selectedRoles.current = data;
         selectedRoles.current = data;
         break;
       case issuer_policies:
@@ -161,7 +181,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
       error: true,
       title: _title,
       message: _message,
-      child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
     setAlert(alert);
@@ -197,8 +217,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
       return (<AlertMessage alert={alert}></AlertMessage>)
     }
 
-    console.log("RENDER: " + tab.value);
-
     return (
       <Dialog open={open}>
         <DialogTrigger asChild>
@@ -212,7 +230,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
             </DialogTitle>
           </DialogHeader>
   
-          <Tabs value={tab.value} className="w-[100%]" onValueChange={onTabChange}>
+          <Tabs value={tab} className="w-[100%]" onValueChange={onTabChange}>
            <TabsList className="grid grid-cols-4">
              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
              <TabsTrigger value="roles">🔖 Roles</TabsTrigger>

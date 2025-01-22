@@ -6,7 +6,7 @@ import { Meta } from "../users/manage/tabs/data/meta"
 import ActionButtons from "../users/manage/components/action-buttons"
 import { DataTable } from "@/components/datatable/data-table"
 
-import { ColumnMeta, RowData, TableMeta } from "@tanstack/react-table"
+import { ColumnMeta, Row, RowData, TableMeta } from "@tanstack/react-table"
 import { columns } from "./table/colums"
 import { Data } from "@/lib/mapping"
 import { useEffect, useState } from "react"
@@ -18,9 +18,9 @@ const TabItems = ({meta}:{meta:Meta}) => {
     title: meta.items?.columnname
   };
 
-  const handleChangeSelection = (selection: any[]) => {
+  const handleChangeSelection = (selection: Row<Data>[]) => {
     if (meta.items && meta.items.setSelection) {
-      meta.items.setSelection(meta.items.issuer!, selection);
+      meta.items.setSelection(meta.items.issuer!, selection.map((row) => row.original));
       setItemCount(selection.length);
     }
   }
