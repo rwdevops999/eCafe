@@ -135,6 +135,7 @@ export const isNumber = (n: string | Number): boolean =>
 
 
 import crypto from 'crypto';
+import { Data } from "./mapping";
 
 const ALGORITHM = 'aes-256-cbc';
 const ENCODING = 'hex';
@@ -155,3 +156,11 @@ export const decrypt = (data: string) => {
 
   return Buffer.concat([decipher.update(encryptedData), decipher.final()]).toString();
 }
+
+export const difference = (original: Data[], selected: Data[]): number[] => {
+  const originalIds: number[] = original.map((original) => original.id);
+  const selectedIds: number[] = selected.map((selected) => selected.id);
+
+  return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
+}
+

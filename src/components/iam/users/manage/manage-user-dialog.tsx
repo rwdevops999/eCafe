@@ -12,7 +12,7 @@ import TabRoles from "./tabs/tab-roles";
 import TabPolicies from "./tabs/tab-policies";
 import TabGroups from "./tabs/tab-groups";
 import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
-import { log } from "@/lib/utils";
+import { difference, log } from "@/lib/utils";
 import { AlertType } from "@/data/types";
 import { CountryType, defaultCountry, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
 import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
@@ -23,6 +23,14 @@ import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
+
+  const originalRoles = useRef<Data[]>([]);
+  const selectedRoles = useRef<Data[]>([]);
+
+  const originalPolicies = useRef<Data[]>([]);
+  const selectedPolicies = useRef<Data[]>([]);
+
+  const selectedGroups = useRef<Data[]>([]);
 
   const country = useRef<CountryType|undefined>(undefined);
 
@@ -48,11 +56,14 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   };
 
   const showPrimeTab = () => {
-    console.log("SHOW USER TAB");
     onTabChange("userdetails");
   }
 
   const prepareUser = (data: any): UserType => {
+    log(true, "ManageUserDialog", "prepareUser[originalRoles]", originalRoles.current, true);
+    log(true, "ManageUserDialog", "prepareUser[selectedRoles]", selectedRoles.current, true);
+    log(true, "ManageUserDialog", "prepareUser[originalPolicies]", originalPolicies.current, true);
+    log(true, "ManageUserDialog", "prepareUser[selectedPolicies]", selectedPolicies.current, true);
     const roles: RoleType[] = selectedRoles.current.map(_role => {
       let role: RoleType = {
         id: _role.id,
@@ -61,6 +72,17 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
       return role;
     });
 
+    const diffRoles: number[] = difference(originalRoles.current, selectedRoles.current);
+    log(true, "ManageUserDialog", "prepareUser[diffRoles]", diffRoles, true);
+    const removedRoles: PolicyType[] = diffRoles.map(_id => {
+      let role: RoleType = {
+        id: _id
+      }
+
+      return role;
+    });
+    log(true, "ManageUserDialog", "prepareUser[removedRoles]", removedRoles, true);
+
     const policies: PolicyType[] = selectedPolicies.current.map(_policy => {
       let policy: PolicyType = {
         id: _policy.id,
@@ -68,6 +90,17 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
 
       return policy;
     });
+
+    const diffPolicies: number[] = difference(originalPolicies.current, selectedPolicies.current);
+    log(true, "ManageUserDialog", "prepareUser[diffPolicies]", diffPolicies, true);
+    const removedPolicies: PolicyType[] = diffPolicies.map(_id => {
+      let policy: PolicyType = {
+        id: _id
+      }
+
+      return policy;
+    });
+    log(true, "ManageUserDialog", "prepareUser[removedPolicies]", removedPolicies, true);
 
     return {
       id: (selectedUser ? selectedUser.id : 0),
@@ -91,8 +124,16 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
           dialCode: (country.current ? country.current.dialCode : "")
         }
       },
-      roles: roles,
-      policies: policies,
+      roles: {
+        original: [],
+        selected: roles,
+        removed: removedRoles
+      },
+      policies: {
+        original: [],
+        selected: policies,
+        removed: removedPolicies
+      }
     }
   }
 
@@ -126,13 +167,20 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const setRelations = (user: UserType|undefined): void => {
+    log(true, "ManageUserDialog", "setRelations[user]", user, true);
     if (user) {
-      if (user.roles.length > 0) {
-        selectedRoles.current = mapRolesToData(user.roles);
+      if (user.roles.original.length > 0) {
+        const mappedRoles: Data[] = mapRolesToData(user.roles.original);
+        selectedRoles.current = mappedRoles
+        originalRoles.current = mappedRoles;
       }
 
-      if (user.policies.length > 0) {
-        selectedPolicies.current = mapPoliciesToData(user.policies);
+      if (user.policies.original.length > 0) {
+        log(true, "ManageUserDialog", "setRelations[user.policies]", user.policies, true);
+        const mappedPolicies: Data[] = mapPoliciesToData(user.policies.original);
+        log(true, "ManageUserDialog", "setRelations[mapped.policies]", mappedPolicies, true);
+        selectedPolicies.current = mappedPolicies;
+        originalPolicies.current = mappedPolicies;
       }
     } else {
       selectedRoles.current = [];
@@ -141,12 +189,16 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   useEffect(() => {
-    console.log("UseEffect[user]: " + JSON.stringify(user));
-    setRelations(user);
     setSelectedUser(user);
+
     if (user) {
+      setRelations(user);
       country.current = user.address.country;
     } else {
+      log(true, "ManageUserDialog", "reset selectedPolicies");
+      selectedRoles.current = [];
+      selectedPolicies.current = [];
+      selectedGroups.current = [];
       handleLoadCountries(countriesLoadedCallback);
     }
   }, [user]);
@@ -160,28 +212,35 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     country.current = _country;
   }
 
-  const selectedRoles = useRef<Data[]>([]);
-  // const selectedRoles = useRef<Row<Data>[]>([]);
-  // const selectedPolicies = useRef<Row<Data>[]>([]);
-  const selectedPolicies = useRef<Data[]>([]);
-  // const selectedGroups = useRef<Row<Data>[]>([]);
-  const selectedGroups = useRef<Data[]>([]);
-
   const setSelection = (type: string, data: Data[]) => {
-    log(true, "ManageUserDialog", `SetSelection: ${type}`, data, true);
-
     switch (type) {
       case issuer_roles:
-        // selectedRoles.current = data;
         selectedRoles.current = data;
         break;
       case issuer_policies:
+        log(true, "ManageUserDialog", "policicy setSelection[data]", data, true);
         selectedPolicies.current = data;
         break;
       case issuer_groups:
         selectedGroups.current = data;
         break
     }
+  }
+
+  const getSelection = (type: string): Data[] => {
+    if (type === issuer_roles) {
+      return selectedRoles.current
+    }
+
+    if (type === issuer_policies) {
+      return selectedPolicies.current
+    }
+
+    if (type === issuer_groups) {
+      return selectedGroups.current
+    }
+
+    return [];
   }
 
   const [alert, setAlert] = useState<AlertType>();
@@ -203,15 +262,11 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const validateItems = (): boolean => {
-    console.log("ValidateItems");
-
     const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
     const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
 
     const validationData: Data[] = [...policyStatements, ...roleStatements];
 
-    log(true, "ManageUserDialog", "validateItems", validationData, true);
-    
     let validationResult: ValidationType = validateData(validationData);
 
     if (validationResult.result === "error") {
@@ -223,13 +278,12 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
 
   meta.items = {
     setSelection: setSelection,
+    getSelection: getSelection,
     validateItems: validateItems,
     showPrimeTab: showPrimeTab
   }
 
   const renderComponent = () => {
-    console.log("RENDER: user = " + JSON.stringify(user));
-    
     if (alert && alert.open) {
       return (<AlertMessage alert={alert}></AlertMessage>)
     }
@@ -239,7 +293,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
         <DialogTrigger asChild>
           <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
         </DialogTrigger>
-        <DialogContent className="min-w-[75%]" aria-describedby="">
+        {open && <DialogContent className="min-w-[75%]" aria-describedby="">
           <DialogHeader className="mb-2">
             <DialogTitle>
               <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
@@ -275,7 +329,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
              </div>
            </TabsContent>
           </Tabs>
-        </DialogContent>
+        </DialogContent>}
       </Dialog>
     )
   }

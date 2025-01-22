@@ -20,7 +20,7 @@ const TabPolicies = ({meta}:{meta: Meta}) => {
   }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
-    let mappedPolicies = mapPoliciesToData(_data, 2);
+    let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
 
     meta.buttons = [validateButton, assignButton, cancelButton]
     meta.items = {
@@ -29,6 +29,7 @@ const TabPolicies = ({meta}:{meta: Meta}) => {
       columnname: "Policies",
       data: mappedPolicies,
       setSelection: meta.items?.setSelection,
+      getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
       showPrimeTab: meta.items?.showPrimeTab
     }

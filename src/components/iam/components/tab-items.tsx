@@ -10,9 +10,10 @@ import { ColumnMeta, Row, RowData, TableMeta } from "@tanstack/react-table"
 import { columns } from "./table/colums"
 import { Data } from "@/lib/mapping"
 import { useEffect, useState } from "react"
+import { log } from "@/lib/utils"
 
 const TabItems = ({meta}:{meta:Meta}) => {
-  const [itemCount, setItemCount] = useState<number>(0);
+  const [validateEnabled, setValidateEnabled] = useState<boolean>(false);
 
   const tableMeta: TableMeta<Data[]> = {
     title: meta.items?.columnname
@@ -21,8 +22,20 @@ const TabItems = ({meta}:{meta:Meta}) => {
   const handleChangeSelection = (selection: Row<Data>[]) => {
     if (meta.items && meta.items.setSelection) {
       meta.items.setSelection(meta.items.issuer!, selection.map((row) => row.original));
-      setItemCount(selection.length);
+      setValidateEnabled(selection.length > 0);
     }
+  }
+
+  const handleGetSelection = (): number[] => {
+    if (meta.items && meta.items.getSelection) {
+      log(true, "TabItems", "handleGetSelection");
+      const selected: Data[] = meta.items.getSelection(meta.items.issuer!);
+      const ids: number[] = selected.map((_select: Data) => _select.id);
+      log(true, "TabItems", "selected", ids, true);
+      return ids;
+    }
+
+    return [];
   }
 
   const renderComponent = () => {
@@ -33,10 +46,10 @@ const TabItems = ({meta}:{meta:Meta}) => {
   
           <div className="grid grid-cols-12">
               <div className="col-span-11 space-y-1">
-                  <DataTable columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection}/>
+                  <DataTable id="TabItemTable" columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={handleGetSelection()} />
               </div>
               <div className=" flex justify-end">
-              <ActionButtons _meta={(meta)} itemCount={itemCount}/>
+              <ActionButtons _meta={(meta)} validateEnabled={validateEnabled}/>
               </div>
           </div>
       </>

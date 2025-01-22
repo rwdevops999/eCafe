@@ -9,6 +9,17 @@ import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
 
 export const columns: ColumnDef<Data>[] = [
     {
+        accessorKey: 'id',
+
+        header: ({ column, header, table }) => (
+            <>ID</>
+        ),
+
+        cell: ({row, getValue}) => {
+            {row.original.id}
+        },
+    },
+    {
         accessorKey: 'name',
 
         header: ({ column, header, table }) => (

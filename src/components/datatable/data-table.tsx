@@ -29,6 +29,7 @@ import { log } from "@/lib/utils"
 import { ComponentType, Fragment, useEffect, useState } from "react"
 import { DataTablePagination } from "@/components/datatable/data-table-pagination"
 import { action_update } from "@/data/constants"
+import { Data } from "@/lib/mapping"
 
 export interface IDataSubRows<TData> {
   children?: any[]
@@ -44,6 +45,8 @@ interface DataTableProps<TData, TValue> {
   readonly initialTableState?: InitialTableState;
   expandAll?: boolean;
   enableRowSelection?: boolean;
+  selectedItems?: number[]
+  id?: string
 }
 
 export function DataTable<TData extends IDataSubRows<TData>, TValue>({
@@ -55,13 +58,17 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   handleChangeSelection = (selection: Row<TData>[]) => {},
   initialTableState,
   expandAll = false,
-  enableRowSelection = true
+  enableRowSelection = true,
+  selectedItems = [],
+  id = ""
 }: DataTableProps<TData, TValue>) {
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
-
+  const [columnVisibility, setColumnVisibility] = useState({
+    "id": false,
+  });
   /**
    * TABLE INSTANCE
    */
@@ -73,6 +80,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
       columnFilters,
       rowSelection,
       sorting,
+      columnVisibility,
     },
     initialState: initialTableState ? initialTableState : {
       pagination: {
@@ -103,7 +111,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
     if (handleChangeSelection && data && data.length > 0) {
       const selectedAction: Row<TData>[] = table.getSelectedRowModel().flatRows.map(row => row);
 
-          handleChangeSelection(selectedAction);
+      handleChangeSelection(selectedAction);
     }
   }, [rowSelection, setRowSelection]);
 
@@ -112,6 +120,29 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
       setExpanded(true);
     }
   }, [expandAll]);
+
+  type MyObject = Record<string, boolean>;
+
+  const calculateRowSelect = () => {
+    
+    const idExists: any = table.getAllColumns().find(x => x.id === 'id');
+    let state: MyObject = {}
+
+    table.getRowModel().rows.map((row) => {
+      if (idExists) {
+        const itemId: number = row.getValue('id');
+        if (selectedItems.includes(itemId)) {
+          state[String(row.id)] = true;          
+        }
+      }
+    });
+
+    setRowSelection(state);
+  }
+
+  useEffect(() => {
+    calculateRowSelect();
+  }, []);
 
   const handleRowClick = (row: Row<TData>, event?: MouseEvent): { row: Row<TData>; event?: MouseEvent } => {
         event?.stopPropagation();

@@ -127,7 +127,6 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     setStatements(data);
 
     const sd: Data[] = mapStatementsToData(data, 1, services.current);
-    log(true, "CreatePolicyDialog", "mapped statements", sd, true);
     setStatementData(sd);
   }
 

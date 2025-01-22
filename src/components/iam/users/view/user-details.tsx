@@ -34,8 +34,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const [reload, setReload] = useState<number>(0);
 
   const usersLoadedCallback = (data: UserType[]) => {
-    log(true, "UserDetails", "usesLoadedCallback",data, true);
-    
+    log(true, "UserDetails", "usersLoadedCallback", data, true);
     dismiss(toastId);
 
     users.current = data;
@@ -114,7 +113,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
             <ManageUserDialog meta={meta} _enabled={usersLoaded.current} user={user} handleReset={handleReset} setReload={setReload}/> 
             </div>
             <div className="block space-y-5">
-              <DataTable data={usersData} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+              <DataTable id="UserDetailsTable" data={usersData} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
             </div>
         </div>
       );
