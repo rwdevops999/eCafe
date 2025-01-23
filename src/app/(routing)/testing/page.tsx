@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TestDialog from "./testcomponents/test-dialog";
 
 export type TestMetaType = {
@@ -16,28 +16,40 @@ const Test = () => {
   const [reload, setReload] = useState<number>(0);
 
   const changeMeta = (meta: TestMetaType) => {
-    console.log("TestPage: changeMeta");
-    testMeta = meta;
+    if (meta.data === undefined) {
+      console.log("META DATA UNDEFINED");
+    }
+    setMetaForPage(meta);
     setReload((x: number) => x+1);
   }
 
-  let testMeta: TestMetaType = {
-    data : "TestPage",
-    test: {
-      test: "TestPage"
-    },
-    changeMeta: changeMeta
-  }
+  const [metaForPage, setMetaForPage] = useState<TestMetaType>();
+
+  useEffect(() => {
+    let meta: TestMetaType = {
+      data : "TestPage",
+      test: {
+        test: "TestPage"
+      },
+      changeMeta: changeMeta
+    }
+  
+    setMetaForPage(meta);
+  }, [])
 
   const renderComponent = () => {
 
-  return (
-    <>
-      {testMeta.data} - {testMeta.test?.test}
+    if (metaForPage) {
+      return (
+        <>
+          {metaForPage.data} - {metaForPage.test?.test}
 
-      <TestDialog meta={testMeta} />
-    </>
-  );
+          <TestDialog meta={metaForPage} />
+        </>
+      );
+    }
+
+    return null;
 };
 
 

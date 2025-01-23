@@ -1,15 +1,18 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { TestMetaType } from "../page"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const Tab1 = ({meta}:{meta: TestMetaType}) => {
-    // const change1 = () => {
-    // }
+
+    const [metaForTab1, setMetaForTab1] = useState<TestMetaType>();
 
     const updateMeta = () => {
-        meta.data = "Hello From Tab1";
+        meta.data = meta.data ? "Hello From Tab1" : "Tab1: undefined";
         meta.test = meta.test ? {test: "Tab1"} : {test: "Tab1(undefined)"};
 
+        console.log("META(tab1): ", JSON.stringify(meta));
         meta.changeMeta ? meta.changeMeta(meta) : null;
         // if (meta.changeMeta) {
         //     meta.changeMeta(meta);
@@ -19,15 +22,24 @@ const Tab1 = ({meta}:{meta: TestMetaType}) => {
     }
     
     useEffect(() => {
+        setMetaForTab1(meta);
         updateMeta();
     }, [])
 
-    return (
-        <div>
-            Tab1: {meta.data}
-            {/* <Button onClick={change1}>Change1</Button> */}
-        </div>
-    )
+    const renderComponent = () => {
+        if (metaForTab1) {
+            return (
+                <div>
+                    Tab1: {metaForTab1.data} - {metaForTab1.test?.test}
+                    {/* <Button onClick={change1}>Change1</Button> */}
+                </div>
+            )
+        }
+
+        return null;
+    }
+
+    return (<>{renderComponent()}</>);
 }
 
 export default Tab1
