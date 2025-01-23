@@ -14,8 +14,8 @@ import TabGroups from "./tabs/tab-groups";
 import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { difference, log } from "@/lib/utils";
 import { AlertType } from "@/data/types";
-import { CountryType, defaultCountry, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
-import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
+import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
+import { Data, mapGroupsToData, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
 import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
@@ -30,6 +30,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const originalPolicies = useRef<Data[]>([]);
   const selectedPolicies = useRef<Data[]>([]);
 
+  const originalGroups = useRef<Data[]>([]);
   const selectedGroups = useRef<Data[]>([]);
 
   const country = useRef<CountryType|undefined>(undefined);
@@ -64,6 +65,9 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     log(true, "ManageUserDialog", "prepareUser[selectedRoles]", selectedRoles.current, true);
     log(true, "ManageUserDialog", "prepareUser[originalPolicies]", originalPolicies.current, true);
     log(true, "ManageUserDialog", "prepareUser[selectedPolicies]", selectedPolicies.current, true);
+    log(true, "ManageUserDialog", "prepareUser[originalGroups]", originalGroups.current, true);
+    log(true, "ManageUserDialog", "prepareUser[selectedGroups]", selectedGroups.current, true);
+
     const roles: RoleType[] = selectedRoles.current.map(_role => {
       let role: RoleType = {
         id: _role.id,
@@ -102,6 +106,25 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     });
     log(true, "ManageUserDialog", "prepareUser[removedPolicies]", removedPolicies, true);
 
+    const groups: GroupType[] = selectedGroups.current.map(_group => {
+      let group: GroupType = {
+        id: _group.id,
+      }
+
+      return group;
+    });
+
+    const diffGroups: number[] = difference(originalGroups.current, selectedGroups.current);
+    log(true, "ManageUserDialog", "prepareUser[diffGroups]", diffGroups, true);
+    const removedGroups: GroupType[] = diffGroups.map(_id => {
+      let group: GroupType = {
+        id: _id
+      }
+
+      return group;
+    });
+    log(true, "ManageUserDialog", "prepareUser[removedGroups]", removedGroups, true);
+
     return {
       id: (selectedUser ? selectedUser.id : 0),
       name: data.name,
@@ -133,6 +156,11 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
         original: [],
         selected: policies,
         removed: removedPolicies
+      },
+      groups: {
+        original: [],
+        selected: groups,
+        removed: removedGroups
       }
     }
   }
@@ -182,9 +210,18 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
         selectedPolicies.current = mappedPolicies;
         originalPolicies.current = mappedPolicies;
       }
+
+      if (user.groups.original.length > 0) {
+        log(true, "ManageUserDialog", "setRelations[user.groups]", user.groups, true);
+        const mappedGroups: Data[] = mapGroupsToData(user.groups.original);
+        log(true, "ManageUserDialog", "setRelations[mapped.groups]", mappedGroups, true);
+        selectedGroups.current = mappedGroups;
+        originalGroups.current = mappedGroups;
+      }
     } else {
       selectedRoles.current = [];
       selectedPolicies.current = [];
+      selectedGroups.current = [];
     }
   }
 
@@ -215,13 +252,15 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const setSelection = (type: string, data: Data[]) => {
     switch (type) {
       case issuer_roles:
+        log(true, "ManageUserDialog", "roles setSelection[data]", data, true);
         selectedRoles.current = data;
         break;
       case issuer_policies:
-        log(true, "ManageUserDialog", "policicy setSelection[data]", data, true);
+        log(true, "ManageUserDialog", "policies setSelection[data]", data, true);
         selectedPolicies.current = data;
         break;
       case issuer_groups:
+        log(true, "ManageUserDialog", "groups setSelection[data]", data, true);
         selectedGroups.current = data;
         break
     }

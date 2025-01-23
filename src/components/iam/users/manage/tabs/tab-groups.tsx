@@ -21,6 +21,7 @@ const TabGroups = ({meta}:{meta: Meta}) => {
 
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
+
     meta.buttons = [validateButton, assignButton, cancelButton]
     meta.items = {
       issuer: issuer_groups,
@@ -28,6 +29,7 @@ const TabGroups = ({meta}:{meta: Meta}) => {
       columnname: "Groups",
       data: mappedGroups,
       setSelection: meta.items?.setSelection,
+      getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
       showPrimeTab: meta.items?.showPrimeTab
     }

@@ -81,6 +81,13 @@ const addressScheme= z.object({
 });
 export type AddressType = z.infer<typeof addressScheme>
 
+const groupScheme = z.object({
+    id: z.number(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+});
+export type GroupType = z.infer<typeof groupScheme>
+
 const userScheme = z.object({
     id: z.number(),
     name: z.string(),
@@ -99,15 +106,14 @@ const userScheme = z.object({
         original: z.array(policyScheme),
         selected: z.array(policyScheme),
         removed: z.array(policyScheme),
+    }),
+    groups: z.object({
+        original: z.array(groupScheme),
+        selected: z.array(groupScheme),
+        removed: z.array(groupScheme),
+
     })
     // roles: z.array(roleScheme),
     // policies: z.array(policyScheme),
 });
 export type UserType = z.infer<typeof userScheme>
-
-const groupScheme = z.object({
-    id: z.number(),
-    name: z.string(),
-    description: z.string(),
-});
-export type GroupType = z.infer<typeof groupScheme>

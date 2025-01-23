@@ -3,6 +3,7 @@ import { PolicyType, UserType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
 import { decrypt, difference, encrypt, log } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
+import { group } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 const  setUserForCreate = (data: UserType) => {
@@ -34,6 +35,10 @@ const  setUserForCreate = (data: UserType) => {
     policies: {
       // disconnect: data.policies.removed,
       connect: data.policies.selected
+    },
+    groups: {
+      // disconnect: data.policies.removed,
+      connect: data.groups.selected
     }
   });
 }
@@ -69,6 +74,10 @@ const  setUserForUpdate = (data: UserType) => {
     policies: {
       disconnect: data.policies.removed,
       connect: data.policies.selected
+    },
+    groups: {
+      disconnect: data.groups.removed,
+      connect: data.groups.selected
     }
   });
 }
@@ -102,6 +111,7 @@ const findAllUsers = async () => {
         },
         roles: true,
         policies: true,
+        groups: true
       }
     }
   );
@@ -147,6 +157,9 @@ export async function GET(request: NextRequest) {
         },
         policies: {
           original: _user.policies
+        },
+        groups: {
+          original: _user.groups,
         }
       };
 
