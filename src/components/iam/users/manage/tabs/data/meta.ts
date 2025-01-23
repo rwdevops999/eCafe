@@ -4,13 +4,12 @@ import { Row } from "@tanstack/react-table";
 import { FieldErrors, UseFormGetValues, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
-export const okButton = "ok";
+export const createButton = "create";
 export const updateButton = "update";
 export const cancelButton = "cancel";
 export const validateButton = "validate";
-export const assignButton = "assign";
 
-export type ButtonConfig = "ok" | "cancel" | "validate" | "update" | "assign";
+export type ButtonConfig = "create" | "cancel" | "validate" | "update";
 
 export const FormSchema = z.object({
     name: z.string().min(1, "Name must contain at least 1 character").max(50, "Name can't contain more than 50 characters"),
@@ -55,7 +54,6 @@ export interface Meta {
         setSelection?: (type: string, data: Data[]) => void
         getSelection?: (type:string) => Data[]
         validateItems?: () => boolean
-        showPrimeTab?: () => void
     }
 }
 

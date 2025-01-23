@@ -47,17 +47,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const closeDialog = () => {
     handleReset();
     handleDialogState(false);
-    setTab("userdetails");
-  }
-
-  const [tab, setTab] = useState<string>('userdetails');
-
-  const onTabChange = (value: string) => {
-    setTab(value);
-  };
-
-  const showPrimeTab = () => {
-    onTabChange("userdetails");
   }
 
   const prepareUser = (data: any): UserType => {
@@ -319,7 +308,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     setSelection: setSelection,
     getSelection: getSelection,
     validateItems: validateItems,
-    showPrimeTab: showPrimeTab
   }
 
   const renderComponent = () => {
@@ -340,12 +328,12 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
             </DialogTitle>
           </DialogHeader>
   
-          <Tabs value={tab} className="w-[100%]" onValueChange={onTabChange}>
+          <Tabs className="w-[100%]" defaultValue="userdetails">
            <TabsList className="grid grid-cols-4">
              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
-             <TabsTrigger value="roles" disabled={selectedUser === undefined}>🔖 Roles</TabsTrigger>
-             <TabsTrigger value="policies" disabled={selectedUser === undefined}>📜 Policies</TabsTrigger>
-             <TabsTrigger value="groups" disabled={selectedUser === undefined}>👨‍👦‍👦 Groups</TabsTrigger>
+             <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
+             <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
+             <TabsTrigger value="groups" >👨‍👦‍👦 Groups</TabsTrigger>
            </TabsList>
            <TabsContent value="userdetails">
             <div className="m-1 container w-[99%]">
@@ -354,17 +342,17 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
            </TabsContent>
            <TabsContent value="roles">
             <div className="m-1 container w-[99%]">
-             <TabRoles meta={meta}/>
+             <TabRoles user= {selectedUser} meta={meta}/>
              </div>
            </TabsContent>
            <TabsContent value="policies">
             <div className="m-1 container w-[99%]">
-             <TabPolicies meta={meta} />
+             <TabPolicies user={selectedUser} meta={meta} />
              </div>
            </TabsContent>
            <TabsContent value="groups">
             <div className="m-1 container w-[99%]">
-             <TabGroups meta={meta}/>
+             <TabGroups user={selectedUser} meta={meta}/>
              </div>
            </TabsContent>
           </Tabs>

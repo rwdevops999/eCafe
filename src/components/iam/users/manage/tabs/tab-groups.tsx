@@ -1,14 +1,13 @@
 import TabItems from "@/components/iam/components/tab-items"
-import { assignButton, cancelButton, issuer_groups, Meta, validateButton } from "./data/meta"
+import { cancelButton, createButton, issuer_groups, Meta, updateButton, validateButton } from "./data/meta"
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { Data, mapGroupsToData } from "@/lib/mapping";
-import { ColumnMeta } from "@tanstack/react-table";
+import { mapGroupsToData } from "@/lib/mapping";
 import { handleLoadGroups } from "@/lib/db";
-import { GroupType } from "@/data/iam-scheme";
+import { GroupType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 
-const TabGroups = ({meta}:{meta: Meta}) => {
+const TabGroups = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
@@ -22,7 +21,7 @@ const TabGroups = ({meta}:{meta: Meta}) => {
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
 
-    meta.buttons = [validateButton, assignButton, cancelButton]
+    meta.buttons = [validateButton, (user ? updateButton : createButton), cancelButton]
     meta.items = {
       issuer: issuer_groups,
       title: "Assign user to groups",
@@ -31,7 +30,6 @@ const TabGroups = ({meta}:{meta: Meta}) => {
       setSelection: meta.items?.setSelection,
       getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
-      showPrimeTab: meta.items?.showPrimeTab
     }
     setMetaForGroups(meta);
 

@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from "@/components/ecafe/page-title";
-import { cancelButton, FormSchema, FormSchemaType, Meta, okButton, updateButton } from "./data/meta";
+import { cancelButton, createButton, FormSchema, FormSchemaType, Meta, updateButton } from "./data/meta";
 import ActionButtons from "../components/action-buttons";
 import { Separator } from "@/components/ui/separator";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -41,11 +41,7 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
 
   const [reRender, setReRender] = useState<number>(0);
 
-  if (user) {
-    _meta.buttons = [updateButton, cancelButton]
-  } else {
-    _meta.buttons = [okButton, cancelButton]
-  }
+  _meta.buttons = [(user ? updateButton : createButton), cancelButton]
 
   const metaform = {
       register: register,

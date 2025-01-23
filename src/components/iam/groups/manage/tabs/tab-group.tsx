@@ -2,7 +2,7 @@ import { GroupType } from "@/data/iam-scheme";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/data";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { cancelButton, Meta, okButton, updateButton } from "@/components/iam/users/manage/tabs/data/meta";
+import { cancelButton, createButton, Meta, updateButton } from "@/components/iam/users/manage/tabs/data/meta";
 import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@radix-ui/react-separator";
 import ActionButtons from "@/components/iam/users/manage/components/action-buttons";
@@ -85,11 +85,7 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
     )
   }
 
-  if (group) {
-    meta.buttons = [updateButton, cancelButton]
-  } else {
-    meta.buttons = [okButton, cancelButton]
-  }
+  meta.buttons = [(group ? updateButton : createButton), cancelButton]
   
   const renderComponent = () => {
     return (

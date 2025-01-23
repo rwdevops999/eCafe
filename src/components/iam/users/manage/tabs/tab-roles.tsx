@@ -1,16 +1,16 @@
 'use client'
 
 import TabItems from "@/components/iam/components/tab-items"
-import { assignButton, cancelButton, issuer_roles, Meta, validateButton } from "./data/meta"
+import { cancelButton, createButton, issuer_roles, Meta, updateButton, validateButton } from "./data/meta"
 import { ColumnMeta, RowData } from "@tanstack/react-table"
-import { RoleType } from "@/data/iam-scheme"
+import { RoleType, UserType } from "@/data/iam-scheme"
 import { Data, mapRolesToData } from "@/lib/mapping"
 import { useEffect, useState } from "react"
 import { handleLoadRoles } from "@/lib/db"
 import { useToast } from "@/hooks/use-toast"
 import { log } from "@/lib/utils"
 
-const TabRoles = ({meta}:{meta: Meta}) => {
+const TabRoles = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
@@ -24,7 +24,7 @@ const TabRoles = ({meta}:{meta: Meta}) => {
   const rolesLoadedCallback = (_data: RoleType[]) => {
     let mappedRoles = mapRolesToData(_data);
 
-    meta.buttons = [validateButton, assignButton, cancelButton]
+    meta.buttons = [validateButton, (user ? updateButton : createButton), cancelButton]
     meta.items = {
       issuer: issuer_roles,
       title: "Assign roles to user",
@@ -33,7 +33,6 @@ const TabRoles = ({meta}:{meta: Meta}) => {
       setSelection: meta.items?.setSelection,
       getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
-      showPrimeTab: meta.items?.showPrimeTab
     }
     setMetaForRoles(meta);
 
