@@ -12,10 +12,10 @@ import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { AlertType } from "@/data/types";
-import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType } from "@/data/iam-scheme";
 import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
+import AlertMessage from "@/components/ecafe/alert-message";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const { toast, dismiss } = useToast()

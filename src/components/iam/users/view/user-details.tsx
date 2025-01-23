@@ -97,6 +97,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const meta: Meta = {
     updateItems: updateItems,
   };
+  log(true, "UserDetails", "SET Meta", meta, true);
 
   const tablemeta: TableMeta<Data[]> = {
     handleAction: handleAction,

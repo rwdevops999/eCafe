@@ -25,9 +25,9 @@ import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertType } from "@/data/types";
 import { Button } from "@/components/ui/button";
-import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { createPolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),

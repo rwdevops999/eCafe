@@ -1,37 +1,42 @@
 'use client'
 
-import { intersection, log } from "@/lib/utils";
-import { Data } from "@/lib/mapping";
-import { loadCountries } from "@/lib/country";
-import { EmailInput } from "./email-input";
-import { PasswordInput } from "./password-input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import TestDialog from "./testcomponents/test-dialog";
+
+export type TestMetaType = {
+  data: string
+  test?: {
+    test: string
+  }
+  changeMeta?: (meta: TestMetaType) => void
+}
 
 const Test = () => {
 
-  type MyObject = Record<string, boolean>;
+  const [reload, setReload] = useState<number>(0);
 
-  const test = () => {
-    let originalIds: number[] = [1,2];
-    let selectedIds: number[] = [3,4];
-
-    const diff: number[] = originalIds.filter(id => selectedIds.indexOf(id) < 0); 
-    log(true, "UTILS", "difference[diff]", diff, true);
+  const changeMeta = (meta: TestMetaType) => {
+    console.log("TestPage: changeMeta");
+    testMeta = meta;
+    setReload((x: number) => x+1);
   }
 
-   test();
-// const testReadCsv = () => {
-//     let data: any[] = loadCountries();
+  let testMeta: TestMetaType = {
+    data : "TestPage",
+    test: {
+      test: "TestPage"
+    },
+    changeMeta: changeMeta
+  }
 
-//     log(true, "TEST", "Loaded Countries", data);
-// }
-
-// testReadCsv();
-
-const renderComponent = () => {
+  const renderComponent = () => {
 
   return (
-    <></>
+    <>
+      {testMeta.data} - {testMeta.test?.test}
+
+      <TestDialog meta={testMeta} />
+    </>
   );
 };
 

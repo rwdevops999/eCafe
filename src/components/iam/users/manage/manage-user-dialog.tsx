@@ -18,11 +18,11 @@ import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType 
 import { Data, mapGroupsToData, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
 import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
-import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
 import { FieldValues, UseFormGetValues } from "react-hook-form";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();

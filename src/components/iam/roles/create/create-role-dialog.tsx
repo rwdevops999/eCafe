@@ -20,11 +20,11 @@ import { getPolicyStatements, noValidation, validateData, ValidationType } from 
 import { log } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType, RoleType } from "@/data/iam-scheme";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { createRole, handleLoadPolicies } from "@/lib/db";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),

@@ -12,12 +12,12 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { Button } from "@/components/ui/button";
 import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
   const { toast, dismiss } = useToast();
