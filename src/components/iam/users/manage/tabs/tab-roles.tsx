@@ -14,6 +14,10 @@ const TabRoles = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
+  if (meta.submitForm) {
+    console.log("TabRoles: SF defined");
+  }
+
   const [metaForRoles, setMetaForRoles] = useState<Meta>();
 
   const renderToast = () => {
@@ -38,10 +42,6 @@ const TabRoles = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
 
     dismiss(toastId);
   }
-
-  const columnMeta: ColumnMeta<Data, string> = {
-    title: "Role"
-  };
 
   useEffect(() => {
     renderToast();

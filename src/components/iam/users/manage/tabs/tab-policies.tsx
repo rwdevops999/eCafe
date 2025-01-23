@@ -22,6 +22,10 @@ const TabPolicies = ({meta, user}:{meta: Meta; user: UserType|undefined}) => {
   const policiesLoadedCallback = (_data: PolicyType[]) => {
     let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
 
+    if (meta.form?.getValues) {
+      console.log("TabGroups: policiesLoadedCallback2: GetValues defined");
+    }
+
     meta.buttons = [validateButton, (user ? updateButton : createButton), cancelButton]
     meta.items = {
       issuer: issuer_policies,
@@ -32,10 +36,19 @@ const TabPolicies = ({meta, user}:{meta: Meta; user: UserType|undefined}) => {
       getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
     }
+
+    if (meta.form?.getValues) {
+      console.log("TabGroups: policiesLoadedCallback2: GetValues defined");
+    }
+
     setMetaForPolicies(meta);
 
     dismiss(toastId);
   }
+
+  useEffect(() => {
+    console.log("POLICIES UE: " + meta.form?.getValues);
+  }, [meta]);
 
   useEffect(() => {
     renderToast();

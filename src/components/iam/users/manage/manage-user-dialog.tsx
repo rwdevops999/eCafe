@@ -11,7 +11,7 @@ import TabUserDetails from "./tabs/tab-user-details";
 import TabRoles from "./tabs/tab-roles";
 import TabPolicies from "./tabs/tab-policies";
 import TabGroups from "./tabs/tab-groups";
-import { issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
+import { FormSchema, FormSchemaType, issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { difference, log } from "@/lib/utils";
 import { AlertType } from "@/data/types";
 import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
@@ -20,6 +20,9 @@ import { getPolicyStatements, getRoleStatements, validateData, ValidationType } 
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/app/(routing)/testing/alert-message";
 import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
+import { FieldValues, UseFormGetValues } from "react-hook-form";
+import { z } from "zod";
+import { Label } from "@/components/ui/label";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
@@ -214,6 +217,29 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
   }
 
+  const validateFormValues = (data: FormSchemaType) => {
+    try {
+      const parsedData = FormSchema.parse(data);
+      handleManageUser(data);
+
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+          showAlert("validation failed", "User data is not correct");
+        } else {
+        console.error("Unexpected error: ", error);
+      }
+    }
+  }
+
+  const handleSubmitForm = (_meta: Meta) => {
+    console.log("DIALOG SUBMIT");
+    if (_meta.form?.getValues) {
+      validateFormValues(_meta.form.getValues())
+    } else {
+      console.log("GetValues not defined");
+    }
+  }
+
   useEffect(() => {
     setSelectedUser(user);
 
@@ -230,10 +256,13 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }, [user]);
 
   meta.closeDialog = closeDialog;
-  meta.form = {register: (name: any, options?: any): any => {}};
+  meta.form = {
+    register: (name: any, options?: any): any => {},
+  };
   meta.userData = {updateData: (data: any): void => {}},
   meta.manageSubject = handleManageUser;
- 
+  meta.submitForm = handleSubmitForm;
+
   const updateCountry = (_country: CountryType) => {
     country.current = _country;
   }
@@ -316,48 +345,48 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
 
     return (
-      <Dialog open={open}>
-        <DialogTrigger asChild>
-          <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
-        </DialogTrigger>
-        {open && <DialogContent className="min-w-[75%]" aria-describedby="">
-          <DialogHeader className="mb-2">
-            <DialogTitle>
-              <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
-              <Separator className="bg-red-500"/>
-            </DialogTitle>
-          </DialogHeader>
-  
-          <Tabs className="w-[100%]" defaultValue="userdetails">
-           <TabsList className="grid grid-cols-4">
-             <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
-             <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
-             <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
-             <TabsTrigger value="groups" >👨‍👦‍👦 Groups</TabsTrigger>
-           </TabsList>
-           <TabsContent value="userdetails">
-            <div className="m-1 container w-[99%]">
-             <TabUserDetails _meta={meta} user={selectedUser} updateCountry={updateCountry}/>
-             </div>
-           </TabsContent>
-           <TabsContent value="roles">
-            <div className="m-1 container w-[99%]">
-             <TabRoles user= {selectedUser} meta={meta}/>
-             </div>
-           </TabsContent>
-           <TabsContent value="policies">
-            <div className="m-1 container w-[99%]">
-             <TabPolicies user={selectedUser} meta={meta} />
-             </div>
-           </TabsContent>
-           <TabsContent value="groups">
-            <div className="m-1 container w-[99%]">
-             <TabGroups user={selectedUser} meta={meta}/>
-             </div>
-           </TabsContent>
-          </Tabs>
-        </DialogContent>}
-      </Dialog>
+        <Dialog open={open}>
+          <DialogTrigger asChild>
+            <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
+          </DialogTrigger>
+          <DialogContent className="min-w-[75%]" aria-describedby="">
+            <DialogHeader className="mb-2">
+              <DialogTitle>
+                <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
+                <Separator className="bg-red-500"/>
+              </DialogTitle>
+            </DialogHeader>
+    
+            <Tabs className="w-[100%]" defaultValue="userdetails">
+            <TabsList className="grid grid-cols-4">
+              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
+              <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
+              <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
+              <TabsTrigger value="groups" >👨‍👦‍👦 Groups</TabsTrigger>
+            </TabsList>
+            <TabsContent value="userdetails">
+              <div className="m-1 container w-[99%]">
+              <TabUserDetails _meta={meta} user={selectedUser} updateCountry={updateCountry} />
+              </div>
+            </TabsContent>
+            <TabsContent value="roles">
+              <div className="m-1 container w-[99%]">
+              <TabRoles user= {selectedUser} meta={meta} />
+              </div>
+            </TabsContent>
+            <TabsContent value="policies">
+              <div className="m-1 container w-[99%]">
+              <TabPolicies user={selectedUser} meta={meta} />
+              </div>
+            </TabsContent>
+            <TabsContent value="groups">
+              <div className="m-1 container w-[99%]">
+              <TabGroups user={selectedUser} meta={meta} />
+              </div>
+            </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
     )
   }
 

@@ -12,6 +12,7 @@ import { log } from "@/lib/utils";
 import UserSectionDetails from "../components/user-section-details";
 import AddressSectionDetails from "../components/address-section-details";
 import LoginSectionDetails from "../components/login-section-details";
+import { Button } from "@/components/ui/button";
 
 
 const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType|undefined; updateCountry(country: CountryType): void;}) => {
@@ -41,19 +42,23 @@ const TabUserDetails = ({_meta, user, updateCountry}:{_meta:Meta; user: UserType
 
   const [reRender, setReRender] = useState<number>(0);
 
-  _meta.buttons = [(user ? updateButton : createButton), cancelButton]
+  const updateMeta = () => {
+    console.log("UPDATE META");
+    _meta.buttons = [(user ? updateButton : createButton), cancelButton]
 
-  const metaform = {
-      register: register,
-      errors: errors,
-      getValues: getValues
+    const metaform = {
+        register: register,
+        errors: errors,
+        getValues: getValues,
+    }
+  
+    _meta.form = metaform;
   }
-
-  _meta.form = metaform;
 
   const [phoneCode, setPhoneCode] = useState<string>();
   
   useEffect(() => {
+    updateMeta();
     if (user) {
       setPhoneCode(user.address.country.dialCode);
     } else {

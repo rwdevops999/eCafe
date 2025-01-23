@@ -36,9 +36,10 @@ export const issuer_users = "Users";
 export interface Meta {
     updateItems?: (type: string, itels: any[]) => void
     buttons?: ButtonConfig[]
+    submitForm?: (_meta: Meta) => void
     closeDialog?: () => void
     form?: {
-        register: UseFormRegister<FormSchemaType>
+        register?: UseFormRegister<FormSchemaType>
         errors?: FieldErrors<FormSchemaType>,
         getValues?: UseFormGetValues<FormSchemaType>
     }

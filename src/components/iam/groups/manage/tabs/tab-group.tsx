@@ -29,9 +29,10 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
    });
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    if (meta.manageSubject) {
-      meta.manageSubject(data);
-    }
+    console.log("SUBMIT");
+    // if (meta.manageSubject) {
+    //   meta.manageSubject(data);
+    // }
   }
   
   useEffect(() => {

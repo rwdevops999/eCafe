@@ -11,6 +11,10 @@ const TabGroups = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
+  if (meta.submitForm) {
+    console.log("TabGroups: SF defined");
+  }
+
   const [metaForGroups, setMetaForGroups] = useState<Meta>();
 
   const renderToast = () => {
@@ -20,6 +24,10 @@ const TabGroups = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
 
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
+
+    if (meta.form?.getValues) {
+      console.log("TabGroups: groupsLoadedCallback1: GetValues defined");
+    }
 
     meta.buttons = [validateButton, (user ? updateButton : createButton), cancelButton]
     meta.items = {
@@ -31,6 +39,7 @@ const TabGroups = ({meta, user}:{meta: Meta; user: UserType|undefined;}) => {
       getSelection: meta.items?.getSelection,
       validateItems: meta.items?.validateItems,
     }
+
     setMetaForGroups(meta);
 
     dismiss(toastId);
