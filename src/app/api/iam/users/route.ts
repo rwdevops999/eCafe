@@ -12,33 +12,33 @@ const  setUserForCreate = (data: UserType) => {
     firstname: data.firstname,
     phone: (data.phone ? data.phone : ""),
     email: data.email,
-    password: encrypt(data.password),
+    password: encrypt(data.password!),
     address: {
       create: {
-        street: (data.address.street ? data.address.street : ""),
-        number: (data.address.number ? data.address.number : ""),
-        box: (data.address.box ? data.address.box : ""),
-        city: (data.address.city ? data.address.city : ""),
-        postalcode: (data.address.postalcode ? data.address.postalcode : ""),
-        county: (data.address.county ? data.address.county : ""),
+        street: (data.address?.street ? data.address.street : ""),
+        number: (data.address?.number ? data.address.number : ""),
+        box: (data.address?.box ? data.address.box : ""),
+        city: (data.address?.city ? data.address.city : ""),
+        postalcode: (data.address?.postalcode ? data.address.postalcode : ""),
+        county: (data.address?.county ? data.address.county : ""),
         country: {
           connect: {
-            id: data.address.country.id,
+            id: (data.address?.country ? data.address.country.id : null)
           }
         }
       },
     },
     roles: {
       // disconnect: data.roles.removed,
-      connect: data.roles.selected
+      connect: data.roles?.selected
     },
     policies: {
       // disconnect: data.policies.removed,
-      connect: data.policies.selected
+      connect: data.policies?.selected
     },
     groups: {
       // disconnect: data.policies.removed,
-      connect: data.groups.selected
+      connect: data.groups?.selected
     }
   });
 }
@@ -50,34 +50,34 @@ const  setUserForUpdate = (data: UserType) => {
     firstname: data.firstname,
     phone: (data.phone ? data.phone : ""),
     email: data.email,
-    password: encrypt(data.password),
+    password: encrypt(data.password!),
     address: {
       update: {
         // id: data.address.id,
-        street: (data.address.street ? data.address.street : ""),
-        number: (data.address.number ? data.address.number : ""),
-        box: (data.address.box ? data.address.box : ""),
-        city: (data.address.city ? data.address.city : ""),
-        postalcode: (data.address.postalcode ? data.address.postalcode : ""),
-        county: (data.address.county ? data.address.county : ""),
+        street: (data.address?.street ? data.address.street : ""),
+        number: (data.address?.number ? data.address.number : ""),
+        box: (data.address?.box ? data.address.box : ""),
+        city: (data.address?.city ? data.address.city : ""),
+        postalcode: (data.address?.postalcode ? data.address.postalcode : ""),
+        county: (data.address?.county ? data.address.county : ""),
         country: {
           connect: {
-            id: data.address.country.id,
+            id: (data.address?.country ? data.address.country.id : null)
           }
         }
       }
     },
     roles: {
-      disconnect: data.roles.removed,
-      connect: data.roles.selected
+      disconnect: data.roles?.removed,
+      connect: data.roles?.selected
     },
     policies: {
-      disconnect: data.policies.removed,
-      connect: data.policies.selected
+      disconnect: data.policies?.removed,
+      connect: data.policies?.selected
     },
     groups: {
-      disconnect: data.groups.removed,
-      connect: data.groups.selected
+      disconnect: data.groups?.removed,
+      connect: data.groups?.selected
     }
   });
 }
