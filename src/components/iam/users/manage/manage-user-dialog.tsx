@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { Mail } from "lucide-react";
 
-const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
+const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
   const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta>(meta);
 
@@ -248,6 +248,16 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   useEffect(() => {
+    if (meta.user) {
+      setRelations(metaForManageUserDialog.user);
+      country.current = meta.user.address.country;
+    } else {
+      selectedRoles.current = [];
+      selectedPolicies.current = [];
+      selectedGroups.current = [];
+      handleLoadCountries(countriesLoadedCallback);
+    }
+
     meta.control?.test ? meta.control.test("ManageUserDialog") : () => {};
 
     meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
@@ -261,19 +271,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     setMetaForManageUserDialog(meta);
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
   }, []);
-
-  useEffect(() => {
-    setSelectedUser(user);
-    if (user) {
-      setRelations(user);
-      country.current = user.address.country;
-    } else {
-      selectedRoles.current = [];
-      selectedPolicies.current = [];
-      selectedGroups.current = [];
-      handleLoadCountries(countriesLoadedCallback);
-    }
-  }, [user]);
 
   const updateCountry = (_country: CountryType) => {
     country.current = _country;
@@ -374,22 +371,22 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
               </TabsList>
               <TabsContent value="userdetails">
                 <div className="m-1 container w-[99%]">
-                <TabUserDetails _meta={metaForManageUserDialog} user={selectedUser} updateCountry={updateCountry} />
+                <TabUserDetails _meta={metaForManageUserDialog} updateCountry={updateCountry} />
                 </div>
               </TabsContent>
               <TabsContent value="roles">
                 <div className="m-1 container w-[99%]">
-                <TabRoles user= {selectedUser} meta={metaForManageUserDialog} />
+                <TabRoles meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               <TabsContent value="policies">
                 <div className="m-1 container w-[99%]">
-                <TabPolicies user={selectedUser} meta={metaForManageUserDialog} />
+                <TabPolicies meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               <TabsContent value="groups">
                 <div className="m-1 container w-[99%]">
-                <TabGroups user={selectedUser} meta={metaForManageUserDialog} />
+                <TabGroups meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               </Tabs>
