@@ -50,8 +50,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   const closeDialog = () => {
-    log(true, "MUD", "Closing Dialog");
-
     originalRoles.current = [];
     selectedRoles.current = [];
   
@@ -66,13 +64,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   const prepareUser = (data: any): UserType => {
-    log(true, "ManageUserDialog", "prepareUser[originalRoles]", originalRoles.current, true);
-    log(true, "ManageUserDialog", "prepareUser[selectedRoles]", selectedRoles.current, true);
-    log(true, "ManageUserDialog", "prepareUser[originalPolicies]", originalPolicies.current, true);
-    log(true, "ManageUserDialog", "prepareUser[selectedPolicies]", selectedPolicies.current, true);
-    log(true, "ManageUserDialog", "prepareUser[originalGroups]", originalGroups.current, true);
-    log(true, "ManageUserDialog", "prepareUser[selectedGroups]", selectedGroups.current, true);
-
     const roles: RoleType[] = selectedRoles.current.map(_role => {
       let role: RoleType = {
         id: _role.id,
@@ -82,7 +73,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     });
 
     const diffRoles: number[] = difference(originalRoles.current, selectedRoles.current);
-    log(true, "ManageUserDialog", "prepareUser[diffRoles]", diffRoles, true);
     const removedRoles: PolicyType[] = diffRoles.map(_id => {
       let role: RoleType = {
         id: _id
@@ -90,7 +80,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
 
       return role;
     });
-    log(true, "ManageUserDialog", "prepareUser[removedRoles]", removedRoles, true);
 
     const policies: PolicyType[] = selectedPolicies.current.map(_policy => {
       let policy: PolicyType = {
@@ -101,7 +90,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     });
 
     const diffPolicies: number[] = difference(originalPolicies.current, selectedPolicies.current);
-    log(true, "ManageUserDialog", "prepareUser[diffPolicies]", diffPolicies, true);
     const removedPolicies: PolicyType[] = diffPolicies.map(_id => {
       let policy: PolicyType = {
         id: _id
@@ -109,7 +97,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
 
       return policy;
     });
-    log(true, "ManageUserDialog", "prepareUser[removedPolicies]", removedPolicies, true);
 
     const groups: GroupType[] = selectedGroups.current.map(_group => {
       let group: GroupType = {
@@ -120,7 +107,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     });
 
     const diffGroups: number[] = difference(originalGroups.current, selectedGroups.current);
-    log(true, "ManageUserDialog", "prepareUser[diffGroups]", diffGroups, true);
     const removedGroups: GroupType[] = diffGroups.map(_id => {
       let group: GroupType = {
         id: _id
@@ -128,7 +114,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
 
       return group;
     });
-    log(true, "ManageUserDialog", "prepareUser[removedGroups]", removedGroups, true);
 
     return {
       id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.id : 0),
@@ -242,8 +227,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   const handleSubmitForm = () => {
     if (metaForManageUserDialog.form?.getValues) {
       validateFormValues(metaForManageUserDialog.form.getValues())
-    } else {
-      console.log("GetValues not defined");
     }
   }
 
@@ -257,8 +240,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
       selectedGroups.current = [];
       handleLoadCountries(countriesLoadedCallback);
     }
-
-    meta.control?.test ? meta.control.test("ManageUserDialog") : () => {};
 
     meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
     meta.control ? meta.control.handleUser = handleManageUser : meta.control = {handleUser: handleManageUser};
@@ -291,19 +272,15 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   const getSelection = (type: string): Data[] => {
-    log(true, "MUD", "getSelection");
     if (type === issuer_roles) {
-      log(true, "MUD", "getSelection(roles)", selectedRoles.current, true);
       return selectedRoles.current
     }
 
     if (type === issuer_policies) {
-      log(true, "MUD", "getSelection(policies)", selectedPolicies.current, true);
       return selectedPolicies.current
     }
 
     if (type === issuer_groups) {
-      log(true, "MUD", "getSelection(group)", selectedGroups.current, true);
       return selectedGroups.current
     }
 

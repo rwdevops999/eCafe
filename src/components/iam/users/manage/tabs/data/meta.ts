@@ -63,7 +63,6 @@ export interface Meta {
     buttons?: ButtonConfig[]
     changeMeta?: (meta: Meta) => void
     control?:{
-        test?: (sender: string) => void
         updateItems?: (type: string, ites: any[]) => void
         closeDialog?: () => void
         handleUser?: (data: any) => void,

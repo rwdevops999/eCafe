@@ -19,8 +19,6 @@ const TabGroups = ({meta}:{meta: Meta;}) => {
   }
 
   const groupsLoadedCallback = (_data: GroupType[]) => {
-    meta.control?.test ? meta.control.test("TabGroups") : () => {};
-
     let mappedGroups = mapGroupsToData(_data);
 
     meta.buttons = [validateButton, (meta.user ? updateButton : createButton), cancelButton]

@@ -44,10 +44,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     usersLoaded.current = true;
   }
 
-  const testMeta = (sender: string) => {
-    console.log("META TEST: ", sender);
-  }
-
   const changeMeta = (meta: Meta) => {
     setMetaForUserDetails(meta);
     setReload((x: number) => x+1);
@@ -59,7 +55,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
       user: undefined,
       changeMeta: changeMeta,
       control: {
-        test: testMeta,
         updateItems: updateItems,
       }
     }
@@ -99,7 +94,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleReset = () => {
-    log(true, "UD", "RESETTING");
     setUser(undefined);
 
     if (metaForUserDetails) {

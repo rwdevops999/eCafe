@@ -27,7 +27,6 @@ const TabItems = ({meta}:{meta:Meta}) => {
   }
 
   const handleGetSelection = (): number[] => {
-    log(true," TabItems", "GetSelection");
     if (meta.items && meta.items.getSelection) {
       const selected: Data[] = meta.items.getSelection(meta.items.issuer!);
       const ids: number[] = selected.map((_select: Data) => _select.id);
@@ -38,7 +37,6 @@ const TabItems = ({meta}:{meta:Meta}) => {
   }
 
   const renderComponent = () => {
-    log(true," TabItems", "RENDER");
     return (
       <>
           <PageTitle className="m-2" title={meta.items?.title!} />
