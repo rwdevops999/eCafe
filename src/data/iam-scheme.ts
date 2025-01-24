@@ -76,7 +76,7 @@ const addressScheme= z.object({
     box: z.string().optional().nullable(),
     city: z.string().optional().nullable(),
     postalcode: z.string().optional().nullable(),
-    country: countryScheme,
+    country: countryScheme.optional(),
     county: z.string().optional().nullable(),
 });
 export type AddressType = z.infer<typeof addressScheme>
@@ -85,34 +85,49 @@ const groupScheme = z.object({
     id: z.number(),
     name: z.string().optional(),
     description: z.string().optional(),
+    roles: z.object({
+        original: z.array(roleScheme),
+        selected: z.array(roleScheme),
+        removed: z.array(roleScheme),
+    }).optional(),
+    policies: z.object({
+        original: z.array(policyScheme),
+        selected: z.array(policyScheme),
+        removed: z.array(policyScheme),
+    }).optional(),
+    users: z.object({
+        original: z.array(z.any()),
+        selected: z.array(z.any()),
+        removed: z.array(z.any()),
+
+    }).optional()
 });
 export type GroupType = z.infer<typeof groupScheme>
 
 const userScheme = z.object({
     id: z.number(),
-    name: z.string(),
-    firstname: z.string(),
+    name: z.string().optional(),
+    firstname: z.string().optional(),
     phone: z.string().optional(),
     phonecode: z.string().optional(),
-    email: z.string(),
-    password: z.string(),
-    address: addressScheme,
+    email: z.string().optional(),
+    password: z.string().optional(),
+    address: addressScheme.optional(),
     roles: z.object({
         original: z.array(roleScheme),
         selected: z.array(roleScheme),
         removed: z.array(roleScheme),
-    }),
+    }).optional(),
     policies: z.object({
         original: z.array(policyScheme),
         selected: z.array(policyScheme),
         removed: z.array(policyScheme),
-    }),
+    }).optional(),
     groups: z.object({
         original: z.array(groupScheme),
         selected: z.array(groupScheme),
         removed: z.array(groupScheme),
-
-    })
+    }).optional()
     // roles: z.array(roleScheme),
     // policies: z.array(policyScheme),
 });

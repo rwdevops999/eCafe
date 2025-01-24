@@ -20,8 +20,6 @@ const TabPolicies = ({meta}:{meta: Meta;}) => {
   }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
-    meta.control?.test ? meta.control.test("TabPolicies") : () => {};
-
     let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
 
     meta.buttons = [validateButton, (meta.user ? updateButton : createButton), cancelButton]

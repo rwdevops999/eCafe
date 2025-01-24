@@ -73,7 +73,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     });
 
     const diffRoles: number[] = difference(originalRoles.current, selectedRoles.current);
-    const removedRoles: PolicyType[] = diffRoles.map(_id => {
+    const removedRoles: RoleType[] = diffRoles.map(_id => {
       let role: RoleType = {
         id: _id
       }
@@ -124,7 +124,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
       email: data.email,
       password: data.password,
       address: {
-        id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.address.id : 0),
+        id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.address?.id : 0),
         street: data.street,
         number: data.number,
         box: data.box,
@@ -186,19 +186,19 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
 
   const setRelations = (user: UserType|undefined): void => {
     if (user) {
-      if (user.roles.original.length > 0) {
+      if (user.roles && user.roles.original.length > 0) {
         const mappedRoles: Data[] = mapRolesToData(user.roles.original);
         selectedRoles.current = mappedRoles
         originalRoles.current = mappedRoles;
       }
 
-      if (user.policies.original.length > 0) {
+      if (user.policies && user.policies.original.length > 0) {
         const mappedPolicies: Data[] = mapPoliciesToData(user.policies.original);
         selectedPolicies.current = mappedPolicies;
         originalPolicies.current = mappedPolicies;
       }
 
-      if (user.groups.original.length > 0) {
+      if (user.groups && user.groups.original.length > 0) {
         const mappedGroups: Data[] = mapGroupsToData(user.groups.original);
         selectedGroups.current = mappedGroups;
         originalGroups.current = mappedGroups;
@@ -233,7 +233,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   useEffect(() => {
     if (meta.user) {
       setRelations(metaForManageUserDialog.user);
-      country.current = meta.user.address.country;
+      country.current = meta.user.address?.country;
     } else {
       selectedRoles.current = [];
       selectedPolicies.current = [];
@@ -242,7 +242,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     }
 
     meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
-    meta.control ? meta.control.handleUser = handleManageUser : meta.control = {handleUser: handleManageUser};
+    meta.control ? meta.control.handleSubject = handleManageUser : meta.control = {handleSubject: handleManageUser};
     meta.form ? meta.form.submitForm = handleSubmitForm : meta.form = {submitForm: handleSubmitForm};
     meta.sender = "ManageUserdialog";
     meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection}

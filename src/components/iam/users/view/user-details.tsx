@@ -54,9 +54,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
       sender: "UserDetails",
       user: undefined,
       changeMeta: changeMeta,
-      control: {
-        updateItems: updateItems,
-      }
     }
     setMetaForUserDetails(meta);
 
@@ -108,15 +105,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
       deleteUser(user);
     } else {
       updateUser(user);
-    }
-  }
-
-  const setupRoles = (roles: RoleType[]) => {
-  }
-
-  const updateItems = (type: string, items: any[]) => {
-    if (type === "roles") {
-      setupRoles(items);
     }
   }
 

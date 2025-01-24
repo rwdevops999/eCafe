@@ -30,13 +30,13 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta; updateCountry(countr
       name: _meta.user?.name,
       firstname: _meta.user?.firstname,
       phone: _meta.user?.phone,
-      code: (_meta.user ? `(${_meta.user.address.country.dialCode})` : defaultCountry.dialCode),
-      street: _meta.user?.address.street,
-      number: _meta.user?.address.number,
-      box: _meta.user?.address.box,
-      city: _meta.user?.address.city,
-      postalcode: _meta.user?.address.postalcode,
-      county: _meta.user?.address.county,
+      code: (_meta.user ? `(${_meta.user.address?.country?.dialCode})` : defaultCountry.dialCode),
+      street: _meta.user?.address?.street,
+      number: _meta.user?.address?.number,
+      box: _meta.user?.address?.box,
+      city: _meta.user?.address?.city,
+      postalcode: _meta.user?.address?.postalcode,
+      county: _meta.user?.address?.county,
       email: _meta.user?.email,
       password: _meta.user?.password,
     }
@@ -48,12 +48,10 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta; updateCountry(countr
   
   useEffect(() => {
     if (_meta.user) {
-      setPhoneCode(_meta.user.address.country.dialCode);
+      setPhoneCode(_meta.user.address?.country?.dialCode);
     } else {
       setPhoneCode(defaultCountry.dialCode);
     }
-
-    _meta.control?.test ? _meta.control.test("TabUserDetails") : () => {};
 
     _meta.sender = "TabUserDetails";
     _meta.data ? _meta.data.updateData = updateUserCountry : _meta.data = {updateData: updateUserCountry};

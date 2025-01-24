@@ -13,7 +13,8 @@ import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
+import { handleDeleteGroup, handleDeleteUser, handleLoadGroups } from "@/lib/db";
+import { Meta } from "../../users/manage/tabs/data/meta";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -24,23 +25,36 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     toastId = id;
   }
 
+  const [metaForGroupDetails, setMetaForGroupDetails] = useState<Meta>();
+  const [reload, setReload] = useState<number>(0);
+  
   const groups = useRef<GroupType[]>([]);
   const groupsLoaded = useRef<boolean>(false);
-  const [groupsData, setGroupsData] = useState<Data[]>([]);
+  const groupsData = useRef<Data[]>([]);
   
   const [group, setGroup] = useState<GroupType|undefined>();
-  const [reload, setReload] = useState<number>(0);
 
   const groupsLoadedCallback = (data: GroupType[]) => {
     dismiss(toastId);
 
     groups.current = data;
-    setGroupsData(mapGroupsToData(data, 2));
+    groupsData.current = mapGroupsToData(data);
     groupsLoaded.current = true;
   }
   
+  const changeMeta = (meta: Meta) => {
+    setMetaForGroupDetails(meta);
+    setReload((x: number) => x+1);
+  }
+  
   useEffect(() => {
-    setGroup(undefined);
+    let meta:Meta = {
+      sender: "UserDetails",
+      user: undefined,
+      changeMeta: changeMeta,
+    }
+    setMetaForGroupDetails(meta);
+
     renderToast();
     handleLoadGroups(groupsLoadedCallback);
   }, []);
@@ -50,17 +64,23 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     handleLoadGroups(groupsLoadedCallback);
   }, [reload, setReload]);
 
-  const handleReset = () => {
-    setGroup(undefined);
-  }
-
   const groupDeletedCallback = () => {
     setGroup(undefined);
     setReload((x:any) => x+1);
   }
 
+  const deleteGroup = (group: Data) => {
+    handleDeleteGroup(group.id, groupDeletedCallback);
+  }
+
   const updateGroup = (group: Data) => {
-    setGroup(groups.current.find((_group) => _group.id === group.id));
+    const selectedGroup: GroupType = groups.current.find((_group) => _group.id === group.id)!;
+
+    setGroup(selectedGroup);
+    if (metaForGroupDetails) {
+      metaForGroupDetails.group = selectedGroup;
+      setMetaForGroupDetails(metaForGroupDetails);
+    }
     
     const button = document.getElementById("groupDialogButton");
     if (button !== null) {
@@ -68,9 +88,19 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     }
   }
 
+  const handleReset = () => {
+    setGroup(undefined);
+
+    if (metaForGroupDetails) {
+      metaForGroupDetails.group = undefined;
+      setMetaForGroupDetails(metaForGroupDetails);
+      setReload((x: number) => x+1);
+    }
+  }
+
   const handleAction = (action: string, group: Data) => {
     if (action === action_delete) {
-      handleDeleteGroup(group.id, groupDeletedCallback);
+      deleteGroup(group);
     } else {
       updateGroup(group);
     }
@@ -81,20 +111,23 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   };
 
   const renderComponent = () => {
-    return (
+    if  (groupsData && metaForGroupDetails) {
+      return (
       <div>
         <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/groups"}]} />
         <PageTitle className="m-2" title={`Overview user groups`} />
 
         <div className="flex items-center justify-end">
-          <ManageGroupDialog _enabled={groupsLoaded.current} group={group} handleReset={handleReset} setReload={setReload}/>
-          {/* _enabled={true} user={user} handleReset={handleReset} setReload={setReload}/>  */}
+          <ManageGroupDialog meta={metaForGroupDetails} _enabled={groupsLoaded.current} handleReset={handleReset} setReload={setReload}/>
         </div>
         <div className="block space-y-5">
-          <DataTable data={groupsData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+          <DataTable data={groupsData.current} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
         </div>
         </div>
       );
+    }
+
+    return null;
   }
 
   return (<>{renderComponent()}</>);

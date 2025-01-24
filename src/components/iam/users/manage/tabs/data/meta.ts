@@ -1,4 +1,4 @@
-import { countryScheme, UserType } from "@/data/iam-scheme";
+import { countryScheme, GroupType, UserType } from "@/data/iam-scheme";
 import { Data } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table";
 import { FieldErrors, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
@@ -60,19 +60,19 @@ export const issuer_users = "Users";
 export interface Meta {
     sender: string
     user?: UserType
+    group?: GroupType
     buttons?: ButtonConfig[]
     changeMeta?: (meta: Meta) => void
     control?:{
-        updateItems?: (type: string, ites: any[]) => void
         closeDialog?: () => void
-        handleUser?: (data: any) => void,
+        handleSubject?: (data: any) => void,
     },
     form?: {
         submitForm?: () => void
-        register?: UseFormRegister<FormSchemaType>
-        errors?: FieldErrors<FormSchemaType>,
-        getValues?: UseFormGetValues<FormSchemaType>
-        reset?: UseFormReset<FormSchemaType>
+        register?: UseFormRegister<any>
+        errors?: FieldErrors<any>,
+        getValues?: UseFormGetValues<any>
+        reset?: UseFormReset<any>
     },
     items?: {
         issuer?: string

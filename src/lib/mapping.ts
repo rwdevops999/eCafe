@@ -14,7 +14,7 @@ const dataScheme = z.object({
     name: z.string(),
     description: z.string(),
     children: z.array(z.any()),
-    other : additionalScheme.optional()
+    other: additionalScheme.optional()
 });
 export type Data = z.infer<typeof dataScheme>
 
@@ -91,13 +91,13 @@ export const mapServicesToData = (_services: ServiceType[]): Data[] => {
     return dataArray;
 }
 
-export const mapStatementsToData = (statements: ServiceStatementType[], level: number = 1, services?: any[]): Data[] => {
+export const mapStatementsToData = (statements: ServiceStatementType[]|undefined, level: number = 1, services?: any[]): Data[] => {
     let result: Data[] = [];
 
     log(debug, "MAPPING", "Statements", statements, true);
     log(debug, "MAPPING", "at level", Number(level));
 
-    if  (statements && level >= 0) {
+    if  (statements && statements.length > 0 && level >= 0) {
         log(debug, "MAPPING", "Level", "Statements");
 
         level -= 1;
@@ -122,20 +122,20 @@ export const mapStatementsToData = (statements: ServiceStatementType[], level: n
     return result;
 }
 
-export const mapPoliciesToData = (policies: PolicyType[], level: number = 1, services?: any[]): Data[] => {
+export const mapPoliciesToData = (policies: PolicyType[]|undefined, level: number = 1, services?: any[]): Data[] => {
     let data: Data[] = [];
 
     log(debug, "MAPPING", "Policies", policies, true);
     log(debug, "MAPPING", "at level", Number(level));
 
-    if (policies && level >= 0) {
+    if (policies && policies.length > 0 && level >= 0) {
         log(debug, "MAPPING", "Level", "Policies");
         level -= 1;
         data = policies.map(policy => {
             return {
                 id: policy.id,
-                name: policy.name,
-                description: policy.description,
+                name: policy.name ? policy.name : "",
+                description: policy.description ? policy.description : "",
                 children: mapStatementsToData(policy.statements, level, services),
                 other: {
                     managed: policy.managed
@@ -155,8 +155,8 @@ export const mapRolesToData = (roles: RoleType[] ): Data[] => {
     data = roles.map(role => {
         return {
             id: role.id,
-            name: role.name,
-            description: role.description,
+            name: role.name ? role.name : "",
+            description: role.description ? role.description : "",
             managed: role.managed,
             children: mapPoliciesToData(role.policies, 2)
         }
@@ -165,14 +165,14 @@ export const mapRolesToData = (roles: RoleType[] ): Data[] => {
     return data;
 }
 
-export const mapUsersToData = (users:  UserType[], level: number): Data[] => {
+export const mapUsersToData = (users:  UserType[]): Data[] => {
     let data: Data[] = [];
 
     data = users.map(user => {
         return {
             id: user.id,
-            name: user.name,
-            description: user.firstname,
+            name: user.name ? user.name : "",
+            description: user.firstname ? user.firstname : "",
             children: []
         }
     })
@@ -183,14 +183,16 @@ export const mapUsersToData = (users:  UserType[], level: number): Data[] => {
 export const mapGroupsToData = (groups:  GroupType[]): Data[] => {
     let data: Data[] = [];
 
-    data = groups.map(group => {
-        return {
-            id: group.id,
-            name: group.name,
-            description: group.description,
-            children: []
-        }
-    })
+    if (groups.length > 0) {
+        data = groups.map(group => {
+            return {
+                id: group.id,
+                name: group.name ? group.name : "",
+                description: group.description ? group.description : "",
+                children: [],
+            }
+        })
+    }
 
     return data;
 }
