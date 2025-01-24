@@ -19,7 +19,7 @@ const addressPostal = "postal";
 const addressCounty = "county";
 const addressCountry = "country";
 
-const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefined}) => {
+const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
   const [countries, setCountries] = useState<CountryType[]>([]);
 
   const [country, setCountry] = useState<string>();
@@ -28,9 +28,9 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
     setCountries(data.sort((a, b) => a.name!.localeCompare(b.name!)));
     const country: CountryType | undefined = data.find((country) => country.name === defaultCountry.name);
     if  (country) {
-      if (user === undefined) {
+      if (_meta.user === undefined) {
         setCountry(country.name);
-        _meta.userData?.updateData(country);
+        _meta.data?.updateData(country);
       }
     }
   }
@@ -40,8 +40,8 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
   }, []);
 
   useEffect(() => {
-    if  (user) {
-      setCountry(user.address.country.name);
+    if  (_meta.user) {
+      setCountry(_meta.user.address.country.name);
     }
   });
 
@@ -49,8 +49,8 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
     const country: CountryType | undefined = countries.find((country) => country.name === _country);
     if (country) {
       setCountry(country.name);
-      if (user !== undefined) {
-        _meta.userData?.updateData(country);
+      if (_meta.user !== undefined) {
+        _meta.data?.updateData(country);
       }
     }
   };
@@ -70,7 +70,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressStreet}
                   placeholder={`${addressStreet}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form?.register(addressStreet)}
+                  {..._meta.form!.register!(addressStreet)}
                   />
               </div>
             </div>
@@ -82,7 +82,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressNumber}
                   placeholder={`Nr...`}
                   className="col-span-1 h-8"
-                  {..._meta.form?.register(addressNumber)}
+                  {..._meta.form!.register!(addressNumber)}
                 />
               </div>
             </div>
@@ -94,7 +94,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressBox}
                   placeholder={`${addressBox}...`}
                   className="col-span-1 h-8"
-                  {..._meta.form?.register(addressBox)}
+                  {..._meta.form!.register!(addressBox)}
                 />
               </div>
             </div>
@@ -108,7 +108,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressCity}
                   placeholder={`${addressCity}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form?.register(addressCity)}
+                  {..._meta.form!.register!(addressCity)}
                 />
               </div>
             </div>
@@ -119,7 +119,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressPostal}
                   placeholder={`${addressPostal}...`}
                   className="h-8 col-span-1"
-                  {..._meta.form?.register("postalcode")}
+                  {..._meta.form!.register!("postalcode")}
                 />
               </div>
             </div>
@@ -156,7 +156,7 @@ const AddressSectionDetails = ({_meta, user}:{_meta: Meta; user: UserType|undefi
                   id={addressCounty}
                   placeholder={`${addressCounty}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form?.register(addressCounty)}
+                  {..._meta.form!.register!(addressCounty)}
                 />
               </div>
             </div>

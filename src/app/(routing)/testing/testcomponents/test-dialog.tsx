@@ -20,16 +20,11 @@ const TestDialog = ({meta}:{meta: TestMetaType}) => {
   const [open, setOpen] = useState<boolean>(false);
   
   useEffect(() => {
-    if (meta === undefined) {
-      console.log("META UNDEFINED")
-    } else {
-      console.log("UE", meta.data);
+    console.log("DIALOG USE EFFECT");
       setMetaForDialog(meta);
-    }
   }, []);
 
   const changeMeta = () => {
-    console.log("Change clicked");
     meta.data = "TestDialog";
     meta.test = meta.test ? {test: "TestDialog"} : {test: "TestDialog(undefined)"};
 
@@ -41,16 +36,13 @@ const TestDialog = ({meta}:{meta: TestMetaType}) => {
   }
 
   const renderComponent = () => {
-    console.log("renderComponent");
-
+    console.log("DIALOG RENDER");
     if (metaForDialog === undefined) {
       return (
         <div>
           <Button onClick={changeMeta}>Change</Button>
         </div>);
     }
-
-    console.log("render Dialog");
 
     return (
       <>

@@ -35,7 +35,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailFirstName}
                   placeholder={`${detailFirstName}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form!.register(detailFirstName)}
+                  {..._meta.form!.register!(detailFirstName)}
                   />
               </div>
               {_meta.form!.errors?.firstname && 
@@ -49,7 +49,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailName}
                   placeholder={`${detailName}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form!.register("name")}
+                  {..._meta.form!.register!("name")}
                 />
               </div>
               {_meta.form!.errors?.name && 
@@ -67,7 +67,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailPhonecode}
                   placeholder={`${detailPhonecode}...`}
                   className="h-8 col-span-1"
-                  {..._meta.form!.register(detailPhonecode)}
+                  {..._meta.form!.register!(detailPhonecode)}
                   onChange={()=>{}}
                   value={dialCode}
                   />
@@ -75,7 +75,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   id={detailPhone}
                   placeholder={`${detailPhone}...`}
                   className="h-8 col-span-3"
-                  {..._meta.form!.register(detailPhone)}
+                  {..._meta.form!.register!(detailPhone)}
                   />
               </div>
             </div>

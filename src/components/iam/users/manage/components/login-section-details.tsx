@@ -24,11 +24,11 @@ const LoginSectionDetails = ({_meta}:{_meta: Meta}) => {
                 type="email"
                 id={logonEmail}
                 className="col-span-4"
-                {..._meta?.form.register(logonEmail)}
+                {..._meta.form!.register!(logonEmail)}
                 />
             </div>
-            {_meta?.form.errors?.email && 
-              <span className="text-red-500">{_meta.form.errors.email.message}</span>
+            {_meta.form!.errors?.email && 
+              <span className="text-red-500">{_meta.form!.errors.email.message}</span>
             }
           </div>
           <div className="col-span-6">
@@ -38,11 +38,11 @@ const LoginSectionDetails = ({_meta}:{_meta: Meta}) => {
                 type="password"
                 id={logonPassword}
                 className="col-span-4"
-                {..._meta?.form.register(logonPassword)}
+                {..._meta.form!.register!(logonPassword)}
               />
             </div>
-            {_meta?.form.errors?.password && 
-              <span className="text-red-500">{_meta.form.errors.password.message}</span>
+            {_meta.form!.errors?.password && 
+              <span className="text-red-500">{_meta.form!.errors.password.message}</span>
             }
           </div>
         </div>

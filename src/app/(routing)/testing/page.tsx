@@ -9,6 +9,7 @@ export type TestMetaType = {
     test: string
   }
   changeMeta?: (meta: TestMetaType) => void
+  sayHello?: (s: string) => void
 }
 
 const Test = () => {
@@ -16,9 +17,6 @@ const Test = () => {
   const [reload, setReload] = useState<number>(0);
 
   const changeMeta = (meta: TestMetaType) => {
-    if (meta.data === undefined) {
-      console.log("META DATA UNDEFINED");
-    }
     setMetaForPage(meta);
     setReload((x: number) => x+1);
   }
@@ -26,6 +24,7 @@ const Test = () => {
   const [metaForPage, setMetaForPage] = useState<TestMetaType>();
 
   useEffect(() => {
+    console.log("PAGE USE EFFECT");
     let meta: TestMetaType = {
       data : "TestPage",
       test: {
@@ -38,6 +37,7 @@ const Test = () => {
   }, [])
 
   const renderComponent = () => {
+    console.log("PAGE RENDER");
 
     if (metaForPage) {
       return (

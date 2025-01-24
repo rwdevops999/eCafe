@@ -12,7 +12,6 @@ import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
 import { log } from "@/lib/utils";
 import { Meta } from "../manage/tabs/data/meta";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
@@ -26,24 +25,46 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     toastId = id;
   }
 
-  const users = useRef<UserType[]>([]);
-  const usersLoaded = useRef<boolean>(false);
-  const [usersData, setUsersData] = useState<Data[]>([]);
-
-  const [user, setUser] = useState<UserType|undefined>();
+  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta>();
   const [reload, setReload] = useState<number>(0);
 
+  const users = useRef<UserType[]>([]);
+  const usersLoaded = useRef<boolean>(false);
+  // const [usersData, setUsersData] = useState<Data[]>([]);
+
+  const usersData = useRef<Data[]>([]);
+
+  const [user, setUser] = useState<UserType|undefined>();
+
   const usersLoadedCallback = (data: UserType[]) => {
-    log(true, "UserDetails", "usersLoadedCallback", data, true);
     dismiss(toastId);
 
     users.current = data;
-    setUsersData(mapUsersToData(data, 2));
+    usersData.current = mapUsersToData(data, 2);
     usersLoaded.current = true;
   }
 
+  const testMeta = (sender: string) => {
+    console.log("META TEST: ", sender);
+  }
+
+  const changeMeta = (meta: Meta) => {
+    setMetaForUserDetails(meta);
+    setReload((x: number) => x+1);
+  }
+  
   useEffect(() => {
-    setUser(undefined);
+    let meta:Meta = {
+      sender: "UserDetails",
+      user: undefined,
+      changeMeta: changeMeta,
+      control: {
+        test: testMeta,
+        updateItems: updateItems,
+      }
+    }
+    setMetaForUserDetails(meta);
+
     renderToast();
     handleLoadUsers(usersLoadedCallback);
   }, []);
@@ -66,6 +87,10 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     const selectedUser: UserType = users.current.find((_user) => _user.id === user.id)!;
 
     setUser(selectedUser);
+    if (metaForUserDetails) {
+      metaForUserDetails.user = selectedUser;
+      setMetaForUserDetails(metaForUserDetails);
+    }
     
     const button = document.getElementById("dialogButton");
     if (button !== null) {
@@ -74,7 +99,14 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleReset = () => {
-    setUser(undefined);   
+    log(true, "UD", "RESETTING");
+    setUser(undefined);
+
+    if (metaForUserDetails) {
+      metaForUserDetails.user = undefined;
+      setMetaForUserDetails(metaForUserDetails);
+      setReload((x: number) => x+1);
+    }
   }
 
   const handleAction = (action: string, user: Data) => {
@@ -94,27 +126,22 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     }
   }
 
-  const meta: Meta = {
-    updateItems: updateItems,
-  };
-  log(true, "UserDetails", "SET Meta", meta, true);
-
   const tablemeta: TableMeta<Data[]> = {
     handleAction: handleAction,
   };
 
   const renderComponent = () => {
-    if  (usersData) {
+    if  (usersData && metaForUserDetails) {
       return (
         <div>
             <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/users"}]} />
             <PageTitle className="m-2" title={`Overview users`} />
 
             <div className="flex items-center justify-end">
-            <ManageUserDialog meta={meta} _enabled={usersLoaded.current} user={user} handleReset={handleReset} setReload={setReload}/> 
+            <ManageUserDialog meta={metaForUserDetails} _enabled={usersLoaded.current} handleReset={handleReset} setReload={setReload}/> 
             </div>
             <div className="block space-y-5">
-              <DataTable id="UserDetailsTable" data={usersData} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+              <DataTable id="UserDetailsTable" data={usersData.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
             </div>
         </div>
       );

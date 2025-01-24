@@ -23,9 +23,11 @@ import { FieldValues, UseFormGetValues } from "react-hook-form";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import AlertMessage from "@/components/ecafe/alert-message";
+import { Mail } from "lucide-react";
 
 const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: Meta; _enabled:boolean; user: UserType|undefined; handleReset(): void; setReload(x:any):void;}) => {
   const [selectedUser, setSelectedUser] = useState<UserType>();
+  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta>(meta);
 
   const originalRoles = useRef<Data[]>([]);
   const selectedRoles = useRef<Data[]>([]);
@@ -48,8 +50,19 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const closeDialog = () => {
-    handleReset();
+    log(true, "MUD", "Closing Dialog");
+
+    originalRoles.current = [];
+    selectedRoles.current = [];
+  
+    originalPolicies.current = [];
+    selectedPolicies.current = [];
+  
+    originalGroups.current = [];
+    selectedGroups.current = [];
+  
     handleDialogState(false);
+    handleReset();
   }
 
   const prepareUser = (data: any): UserType => {
@@ -118,7 +131,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     log(true, "ManageUserDialog", "prepareUser[removedGroups]", removedGroups, true);
 
     return {
-      id: (selectedUser ? selectedUser.id : 0),
+      id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.id : 0),
       name: data.name,
       firstname: data.firstname,
       phone: data.phone,
@@ -126,7 +139,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
       email: data.email,
       password: data.password,
       address: {
-        id: (selectedUser ? selectedUser.address.id : 0),
+        id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.address.id : 0),
         street: data.street,
         number: data.number,
         box: data.box,
@@ -163,7 +176,7 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const handleManageUser = (data: any): void => {
-    if  (selectedUser) {
+    if  (metaForManageUserDialog.user) {
       const user: UserType = prepareUser(data);
       if  (user) {
         updateUser(user, userChangedCallback);
@@ -187,7 +200,6 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   }
 
   const setRelations = (user: UserType|undefined): void => {
-    log(true, "ManageUserDialog", "setRelations[user]", user, true);
     if (user) {
       if (user.roles.original.length > 0) {
         const mappedRoles: Data[] = mapRolesToData(user.roles.original);
@@ -196,17 +208,13 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
       }
 
       if (user.policies.original.length > 0) {
-        log(true, "ManageUserDialog", "setRelations[user.policies]", user.policies, true);
         const mappedPolicies: Data[] = mapPoliciesToData(user.policies.original);
-        log(true, "ManageUserDialog", "setRelations[mapped.policies]", mappedPolicies, true);
         selectedPolicies.current = mappedPolicies;
         originalPolicies.current = mappedPolicies;
       }
 
       if (user.groups.original.length > 0) {
-        log(true, "ManageUserDialog", "setRelations[user.groups]", user.groups, true);
         const mappedGroups: Data[] = mapGroupsToData(user.groups.original);
-        log(true, "ManageUserDialog", "setRelations[mapped.groups]", mappedGroups, true);
         selectedGroups.current = mappedGroups;
         originalGroups.current = mappedGroups;
       }
@@ -231,37 +239,41 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     }
   }
 
-  const handleSubmitForm = (_meta: Meta) => {
-    console.log("DIALOG SUBMIT");
-    if (_meta.form?.getValues) {
-      validateFormValues(_meta.form.getValues())
+  const handleSubmitForm = () => {
+    if (metaForManageUserDialog.form?.getValues) {
+      validateFormValues(metaForManageUserDialog.form.getValues())
     } else {
       console.log("GetValues not defined");
     }
   }
 
   useEffect(() => {
-    setSelectedUser(user);
+    meta.control?.test ? meta.control.test("ManageUserDialog") : () => {};
 
+    meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
+    meta.control ? meta.control.handleUser = handleManageUser : meta.control = {handleUser: handleManageUser};
+    meta.form ? meta.form.submitForm = handleSubmitForm : meta.form = {submitForm: handleSubmitForm};
+    meta.sender = "ManageUserdialog";
+    meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection}
+    meta.items ? meta.items.getSelection = getSelection : meta.items = {getSelection: getSelection}
+    meta.items ? meta.items.validateItems = validateItems : meta.items = {validateItems: validateItems}
+  
+    setMetaForManageUserDialog(meta);
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+  }, []);
+
+  useEffect(() => {
+    setSelectedUser(user);
     if (user) {
       setRelations(user);
       country.current = user.address.country;
     } else {
-      log(true, "ManageUserDialog", "reset selectedPolicies");
       selectedRoles.current = [];
       selectedPolicies.current = [];
       selectedGroups.current = [];
       handleLoadCountries(countriesLoadedCallback);
     }
   }, [user]);
-
-  meta.closeDialog = closeDialog;
-  meta.form = {
-    register: (name: any, options?: any): any => {},
-  };
-  meta.userData = {updateData: (data: any): void => {}},
-  meta.manageSubject = handleManageUser;
-  meta.submitForm = handleSubmitForm;
 
   const updateCountry = (_country: CountryType) => {
     country.current = _country;
@@ -270,30 +282,31 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
   const setSelection = (type: string, data: Data[]) => {
     switch (type) {
       case issuer_roles:
-        log(true, "ManageUserDialog", "roles setSelection[data]", data, true);
         selectedRoles.current = data;
         break;
       case issuer_policies:
-        log(true, "ManageUserDialog", "policies setSelection[data]", data, true);
         selectedPolicies.current = data;
         break;
       case issuer_groups:
-        log(true, "ManageUserDialog", "groups setSelection[data]", data, true);
         selectedGroups.current = data;
         break
     }
   }
 
   const getSelection = (type: string): Data[] => {
+    log(true, "MUD", "getSelection");
     if (type === issuer_roles) {
+      log(true, "MUD", "getSelection(roles)", selectedRoles.current, true);
       return selectedRoles.current
     }
 
     if (type === issuer_policies) {
+      log(true, "MUD", "getSelection(policies)", selectedPolicies.current, true);
       return selectedPolicies.current
     }
 
     if (type === issuer_groups) {
+      log(true, "MUD", "getSelection(group)", selectedGroups.current, true);
       return selectedGroups.current
     }
 
@@ -333,61 +346,59 @@ const ManageUserDialog = ({meta, _enabled, user, handleReset, setReload}:{meta: 
     return (validationResult.result === "ok");
   }
 
-  meta.items = {
-    setSelection: setSelection,
-    getSelection: getSelection,
-    validateItems: validateItems,
-  }
-
   const renderComponent = () => {
     if (alert && alert.open) {
       return (<AlertMessage alert={alert}></AlertMessage>)
     }
 
-    return (
-        <Dialog open={open}>
-          <DialogTrigger asChild>
-            <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
-          </DialogTrigger>
-          <DialogContent className="min-w-[75%]" aria-describedby="">
-            <DialogHeader className="mb-2">
-              <DialogTitle>
-                <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
-                <Separator className="bg-red-500"/>
-              </DialogTitle>
-            </DialogHeader>
-    
-            <Tabs className="w-[100%]" defaultValue="userdetails">
-            <TabsList className="grid grid-cols-4">
-              <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
-              <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
-              <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
-              <TabsTrigger value="groups" >👨‍👦‍👦 Groups</TabsTrigger>
-            </TabsList>
-            <TabsContent value="userdetails">
-              <div className="m-1 container w-[99%]">
-              <TabUserDetails _meta={meta} user={selectedUser} updateCountry={updateCountry} />
-              </div>
-            </TabsContent>
-            <TabsContent value="roles">
-              <div className="m-1 container w-[99%]">
-              <TabRoles user= {selectedUser} meta={meta} />
-              </div>
-            </TabsContent>
-            <TabsContent value="policies">
-              <div className="m-1 container w-[99%]">
-              <TabPolicies user={selectedUser} meta={meta} />
-              </div>
-            </TabsContent>
-            <TabsContent value="groups">
-              <div className="m-1 container w-[99%]">
-              <TabGroups user={selectedUser} meta={meta} />
-              </div>
-            </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
-    )
+    if (metaForManageUserDialog) {
+      return (
+          <Dialog open={open}>
+            <DialogTrigger asChild>
+              <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
+            </DialogTrigger>
+            <DialogContent className="min-w-[75%]" aria-describedby="">
+              <DialogHeader className="mb-2">
+                <DialogTitle>
+                  <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
+                  <Separator className="bg-red-500"/>
+                </DialogTitle>
+              </DialogHeader>
+      
+              <Tabs className="w-[100%]" defaultValue="userdetails">
+              <TabsList className="grid grid-cols-4">
+                <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
+                <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
+                <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
+                <TabsTrigger value="groups" >👨‍👦‍👦 Groups</TabsTrigger>
+              </TabsList>
+              <TabsContent value="userdetails">
+                <div className="m-1 container w-[99%]">
+                <TabUserDetails _meta={metaForManageUserDialog} user={selectedUser} updateCountry={updateCountry} />
+                </div>
+              </TabsContent>
+              <TabsContent value="roles">
+                <div className="m-1 container w-[99%]">
+                <TabRoles user= {selectedUser} meta={metaForManageUserDialog} />
+                </div>
+              </TabsContent>
+              <TabsContent value="policies">
+                <div className="m-1 container w-[99%]">
+                <TabPolicies user={selectedUser} meta={metaForManageUserDialog} />
+                </div>
+              </TabsContent>
+              <TabsContent value="groups">
+                <div className="m-1 container w-[99%]">
+                <TabGroups user={selectedUser} meta={metaForManageUserDialog} />
+                </div>
+              </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
+      )
+    }
+
+    return null;
   }
 
 return (<>{renderComponent()}</>);

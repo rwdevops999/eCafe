@@ -15,11 +15,16 @@ const Tab2 = ({meta}:{meta: TestMetaType}) => {
 }
 
   useEffect(() => {
+    console.log("TAB2 USE EFFECT");
     setMetaForTab2(meta);
+
+    meta.sayHello ? meta.sayHello("Tab2 says Hello") : (s: string) => {}
+
     updateMeta();
   }, [])
 
   const renderComponent = () => {
+    console.log("TAB2 RENDER");
     if (metaForTab2) {
         return (
             <div>

@@ -8,11 +8,11 @@ import { handleLoadPolicies } from "@/lib/db";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 
-const TabPolicies = ({meta, user}:{meta: Meta; user: UserType|undefined}) => {
+const TabPolicies = ({meta}:{meta: Meta;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForPolicies, setMetaForPolicies] = useState<Meta>();
+  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta>();
 
   const renderToast = () => {
       let {id} = toast({title: "Policies", description: "loading ..."})
@@ -20,35 +20,21 @@ const TabPolicies = ({meta, user}:{meta: Meta; user: UserType|undefined}) => {
   }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
+    meta.control?.test ? meta.control.test("TabPolicies") : () => {};
+
     let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
 
-    if (meta.form?.getValues) {
-      console.log("TabGroups: policiesLoadedCallback2: GetValues defined");
-    }
+    meta.buttons = [validateButton, (meta.user ? updateButton : createButton), cancelButton]
+    meta.items ? meta.items.issuer = issuer_policies : meta.items = {issuer: issuer_policies};
+    meta.items ? meta.items.title = "Assign policies to user" : meta.items = {title: "Assign policies to user"};
+    meta.items ? meta.items.columnname = "Policies" : meta.items = {columnname: "Policies"};
+    meta.items ? meta.items.data = mappedPolicies : meta.items = {data: mappedPolicies};
 
-    meta.buttons = [validateButton, (user ? updateButton : createButton), cancelButton]
-    meta.items = {
-      issuer: issuer_policies,
-      title: "Assign policies to user",
-      columnname: "Policies",
-      data: mappedPolicies,
-      setSelection: meta.items?.setSelection,
-      getSelection: meta.items?.getSelection,
-      validateItems: meta.items?.validateItems,
-    }
-
-    if (meta.form?.getValues) {
-      console.log("TabGroups: policiesLoadedCallback2: GetValues defined");
-    }
-
-    setMetaForPolicies(meta);
+    setMetaForTabPolicies(meta);
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
 
     dismiss(toastId);
   }
-
-  useEffect(() => {
-    console.log("POLICIES UE: " + meta.form?.getValues);
-  }, [meta]);
 
   useEffect(() => {
     renderToast();
@@ -56,9 +42,9 @@ const TabPolicies = ({meta, user}:{meta: Meta; user: UserType|undefined}) => {
   }, [])
 
   const renderComponent = () => {
-    if (metaForPolicies) {
+    if (metaForTabPolicies) {
       return (
-        <TabItems meta={metaForPolicies}/>
+        <TabItems meta={metaForTabPolicies}/>
       );
     }
 

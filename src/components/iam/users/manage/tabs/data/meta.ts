@@ -1,7 +1,7 @@
-import { countryScheme } from "@/data/iam-scheme";
+import { countryScheme, UserType } from "@/data/iam-scheme";
 import { Data } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table";
-import { FieldErrors, UseFormGetValues, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
 import { z } from "zod";
 
 export const createButton = "create";
@@ -33,28 +33,59 @@ export const issuer_policies = "Policies";
 export const issuer_groups = "Groups";
 export const issuer_users = "Users";
 
+// export interface Meta {
+//     buttons?: ButtonConfig[]
+//     submitForm?: (_meta: Meta) => void
+//     closeDialog?: () => void
+//     form?: {
+//         register?: UseFormRegister<FormSchemaType>
+//         errors?: FieldErrors<FormSchemaType>,
+//         getValues?: UseFormGetValues<FormSchemaType>
+//     }
+//     userData?: {
+//         updateData: (data: any) => void
+//     }
+//     manageSubject?: (data: any) => void,
+//     items?: {
+//         issuer?: string
+//         title?: string
+//         columnname?: string
+//         data?: Data[]
+//         setSelection?: (type: string, data: Data[]) => void
+//         getSelection?: (type:string) => Data[]
+//         validateItems?: () => boolean
+//     }
+// }
+
 export interface Meta {
-    updateItems?: (type: string, itels: any[]) => void
+    sender: string
+    user?: UserType
     buttons?: ButtonConfig[]
-    submitForm?: (_meta: Meta) => void
-    closeDialog?: () => void
+    changeMeta?: (meta: Meta) => void
+    control?:{
+        test?: (sender: string) => void
+        updateItems?: (type: string, ites: any[]) => void
+        closeDialog?: () => void
+        handleUser?: (data: any) => void,
+    },
     form?: {
+        submitForm?: () => void
         register?: UseFormRegister<FormSchemaType>
         errors?: FieldErrors<FormSchemaType>,
         getValues?: UseFormGetValues<FormSchemaType>
-    }
-    userData?: {
-        updateData: (data: any) => void
-    }
-    manageSubject?: (data: any) => void,
+        reset?: UseFormReset<FormSchemaType>
+    },
     items?: {
         issuer?: string
         title?: string
         columnname?: string
         data?: Data[]
+
         setSelection?: (type: string, data: Data[]) => void
         getSelection?: (type:string) => Data[]
         validateItems?: () => boolean
+    },
+    data?: {
+         updateData: (data: any) => void
     }
 }
-

@@ -7,15 +7,9 @@ import { useState } from "react";
 const ActionButtons = ({_meta, validateEnabled = false}:{_meta:Meta; validateEnabled?: boolean}) => {
     const [valid, setValid] = useState<boolean>(false);
 
-    if (_meta.form?.getValues) {
-        console.log("ActionButtons: GetValues Defined")
-    } else {
-        console.log("ActionButtons: GetValues NOT Defined")
-    }
-
     const closeDialog = (_dummy: boolean) => {
-        if (_meta.closeDialog) {
-            _meta.closeDialog();
+        if (_meta.control?.closeDialog) {
+            _meta.control?.closeDialog();
         }
     }
 
@@ -26,10 +20,8 @@ const ActionButtons = ({_meta, validateEnabled = false}:{_meta:Meta; validateEna
     }
 
     const handleSetData = (_dummy: boolean) => {
-        console.log("SETDATA");
-        if (_meta.submitForm) {
-            console.log("SUBMIT");
-            _meta.submitForm(_meta);
+        if (_meta.form?.submitForm) {
+            _meta.form?.submitForm();
         }
     }
 
