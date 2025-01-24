@@ -1,56 +1,37 @@
 'use client'
 
-import { useEffect, useState } from "react";
-import TestDialog from "./testcomponents/test-dialog";
-
-export type TestMetaType = {
-  data: string
-  test?: {
-    test: string
-  }
-  changeMeta?: (meta: TestMetaType) => void
-  sayHello?: (s: string) => void
-}
+import EcafeButton from "@/components/ecafe/ecafe-button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./dialog";
+import PageTitle from "@/components/ecafe/page-title";
+import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const Test = () => {
+  const [open, setOpen] = useState<boolean>(false);
 
-  const [reload, setReload] = useState<number>(0);
-
-  const changeMeta = (meta: TestMetaType) => {
-    setMetaForPage(meta);
-    setReload((x: number) => x+1);
+  const handleDialogState = (state: boolean) => {
+    setOpen(state);
   }
 
-  const [metaForPage, setMetaForPage] = useState<TestMetaType>();
-
-  useEffect(() => {
-    console.log("PAGE USE EFFECT");
-    let meta: TestMetaType = {
-      data : "TestPage",
-      test: {
-        test: "TestPage"
-      },
-      changeMeta: changeMeta
-    }
-  
-    setMetaForPage(meta);
-  }, [])
-
   const renderComponent = () => {
-    console.log("PAGE RENDER");
-
-    if (metaForPage) {
       return (
-        <>
-          {metaForPage.data} - {metaForPage.test?.test}
-
-          <TestDialog meta={metaForPage} />
-        </>
-      );
-    }
-
-    return null;
-};
+        <Dialog open={open}>
+          <DialogTrigger asChild>
+          <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} />
+        </DialogTrigger>
+        <DialogContent variant="default" size="test" position="default">
+          <DialogHeader className="mb-2">
+            <DialogTitle>
+              <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>
+              <Separator className="bg-red-500"/>
+            </DialogTitle>
+          </DialogHeader>
+          {/* <Button>Test</Button> */}
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
 
   return (<>{renderComponent()}</>)
