@@ -15,6 +15,7 @@ import { DataTable } from "@/components/datatable/data-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { handleDeleteGroup, handleDeleteUser, handleLoadGroups } from "@/lib/db";
 import { Meta } from "../../users/manage/tabs/data/meta";
+import { FormSchemaType } from "../manage/tabs/data/data";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -25,7 +26,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     toastId = id;
   }
 
-  const [metaForGroupDetails, setMetaForGroupDetails] = useState<Meta>();
+  const [metaForGroupDetails, setMetaForGroupDetails] = useState<Meta<FormSchemaType>>();
   const [reload, setReload] = useState<number>(0);
   
   const groups = useRef<GroupType[]>([]);
@@ -42,15 +43,15 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     groupsLoaded.current = true;
   }
   
-  const changeMeta = (meta: Meta) => {
+  const changeMeta = (meta: Meta<FormSchemaType>) => {
     setMetaForGroupDetails(meta);
     setReload((x: number) => x+1);
   }
   
   useEffect(() => {
-    let meta:Meta = {
-      sender: "UserDetails",
-      user: undefined,
+    let meta:Meta<FormSchemaType> = {
+      sender: "GroupDetails",
+      subject: undefined,
       changeMeta: changeMeta,
     }
     setMetaForGroupDetails(meta);
@@ -78,7 +79,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
     setGroup(selectedGroup);
     if (metaForGroupDetails) {
-      metaForGroupDetails.group = selectedGroup;
+      metaForGroupDetails.subject = selectedGroup;
       setMetaForGroupDetails(metaForGroupDetails);
     }
     
@@ -92,7 +93,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     setGroup(undefined);
 
     if (metaForGroupDetails) {
-      metaForGroupDetails.group = undefined;
+      metaForGroupDetails.subject = undefined;
       setMetaForGroupDetails(metaForGroupDetails);
       setReload((x: number) => x+1);
     }
@@ -106,7 +107,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     }
   }
 
-  const meta: TableMeta<Data[]> = {
+  const tablemeta: TableMeta<Data[]> = {
     handleAction: handleAction,
   };
 
@@ -121,7 +122,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
           <ManageGroupDialog meta={metaForGroupDetails} _enabled={groupsLoaded.current} handleReset={handleReset} setReload={setReload}/>
         </div>
         <div className="block space-y-5">
-          <DataTable data={groupsData.current} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+          <DataTable data={groupsData.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
         </div>
         </div>
       );

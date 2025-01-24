@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import { Meta } from "../tabs/data/meta";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { log } from "@/lib/utils";
@@ -19,7 +19,7 @@ const addressPostal = "postal";
 const addressCounty = "county";
 const addressCountry = "country";
 
-const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
+const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
   const [countries, setCountries] = useState<CountryType[]>([]);
 
   const [country, setCountry] = useState<string>();
@@ -28,7 +28,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
     setCountries(data.sort((a, b) => a.name!.localeCompare(b.name!)));
     const country: CountryType | undefined = data.find((country) => country.name === defaultCountry.name);
     if  (country) {
-      if (_meta.user === undefined) {
+      if (_meta.subject === undefined) {
         setCountry(country.name);
         _meta.data?.updateData(country);
       }
@@ -40,8 +40,8 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
   }, []);
 
   useEffect(() => {
-    if  (_meta.user) {
-      setCountry(_meta.user.address.country.name);
+    if  (_meta.subject) {
+      setCountry(_meta.subject.address.country.name);
     }
   });
 
@@ -49,7 +49,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
     const country: CountryType | undefined = countries.find((country) => country.name === _country);
     if (country) {
       setCountry(country.name);
-      if (_meta.user !== undefined) {
+      if (_meta.subject !== undefined) {
         _meta.data?.updateData(country);
       }
     }

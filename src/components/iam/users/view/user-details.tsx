@@ -13,7 +13,7 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
 import { log } from "@/lib/utils";
-import { Meta } from "../manage/tabs/data/meta";
+import { FormSchemaType, Meta } from "../manage/tabs/data/meta";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
@@ -25,13 +25,11 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     toastId = id;
   }
 
-  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta>();
+  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta<FormSchemaType>>();
   const [reload, setReload] = useState<number>(0);
 
   const users = useRef<UserType[]>([]);
   const usersLoaded = useRef<boolean>(false);
-  // const [usersData, setUsersData] = useState<Data[]>([]);
-
   const usersData = useRef<Data[]>([]);
 
   const [user, setUser] = useState<UserType|undefined>();
@@ -40,19 +38,19 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     dismiss(toastId);
 
     users.current = data;
-    usersData.current = mapUsersToData(data, 2);
+    usersData.current = mapUsersToData(data);
     usersLoaded.current = true;
   }
 
-  const changeMeta = (meta: Meta) => {
+  const changeMeta = (meta: Meta<FormSchemaType>) => {
     setMetaForUserDetails(meta);
     setReload((x: number) => x+1);
   }
   
   useEffect(() => {
-    let meta:Meta = {
+    let meta:Meta<FormSchemaType> = {
       sender: "UserDetails",
-      user: undefined,
+      subject: undefined,
       changeMeta: changeMeta,
     }
     setMetaForUserDetails(meta);
@@ -80,7 +78,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
 
     setUser(selectedUser);
     if (metaForUserDetails) {
-      metaForUserDetails.user = selectedUser;
+      metaForUserDetails.subject = selectedUser;
       setMetaForUserDetails(metaForUserDetails);
     }
     
@@ -94,7 +92,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     setUser(undefined);
 
     if (metaForUserDetails) {
-      metaForUserDetails.user = undefined;
+      metaForUserDetails.subject = undefined;
       setMetaForUserDetails(metaForUserDetails);
       setReload((x: number) => x+1);
     }

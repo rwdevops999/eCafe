@@ -229,6 +229,8 @@ export async function GET(request: NextRequest) {
 export async function PUT(req: NextRequest) {
   const data: UserType = await req.json();
 
+  log(true, "UD", "user for update", setUserForUpdate(data) , true);
+
   const  updatedUser = await prisma.user.update({
     where: {
       id: data.id

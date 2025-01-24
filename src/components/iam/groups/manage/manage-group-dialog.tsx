@@ -1,3 +1,5 @@
+'use client'
+
 import PageTitle from "@/components/ecafe/page-title";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
@@ -19,9 +21,8 @@ import TabRoles from "../../users/manage/tabs/tab-roles";
 import TabPolicies from "../../users/manage/tabs/tab-policies";
 import TabUsers from "../../users/manage/tabs/tab-users";
 
-const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
-  const [selectedGroup, setSelectedGroup] = useState<GroupType>();
-  const [metaForManageGroupDialog, setMetaForManageGroupDialog] = useState<Meta>(meta);
+const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
+  const [metaForManageGroupDialog, setMetaForManageGroupDialog] = useState<Meta<FormSchemaType>>(meta);
   
   const originalRoles = useRef<Data[]>([]);
   const selectedRoles = useRef<Data[]>([]);
@@ -123,7 +124,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; 
     });
 
     return {
-      id: (metaForManageGroupDialog.group ? metaForManageGroupDialog.group.id : 0),
+      id: (metaForManageGroupDialog.subject ? metaForManageGroupDialog.subject.id : 0),
       name: data.name,
       description: data.description,
       roles: {
@@ -150,7 +151,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; 
   }
 
   const handleManageGroup = (data: any): void => {
-   if  (metaForManageGroupDialog.group) {
+   if  (metaForManageGroupDialog.subject) {
       const group: GroupType = prepareGroup(data);
       if  (group) {
         updateGroup(group, groupChangedCallback);
@@ -259,8 +260,8 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; 
     
     
   useEffect(() => {
-    if (meta.group) {
-      setRelations(metaForManageGroupDialog.group);
+    if (metaForManageGroupDialog.subject) {
+      setRelations(metaForManageGroupDialog.subject);
     } else {
       selectedRoles.current = [];
       selectedPolicies.current = [];
@@ -277,8 +278,8 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; 
   
     setMetaForManageGroupDialog(meta);
 
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
-  }, []);
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+  }, [meta.subject]);
 
   const renderComponent = () => {
     if (alert && alert.open) {
@@ -308,7 +309,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta; 
               </TabsList>
               <TabsContent value="group">
                 <div className="m-1 container w-[99%]">
-                  <TabGroup meta={meta} group={selectedGroup}/>
+                  <TabGroup meta={meta}/>
                 </div>
               </TabsContent>
             <TabsContent value="roles">

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { z } from "zod";
-import { Meta } from "../tabs/data/meta";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ const detailName = "name";
 const detailPhone = "phone";
 const detailPhonecode = "code";
 
-const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string|undefined}) => {
+const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta<FormSchemaType>; phonecode: string|undefined}) => {
   const [dialCode, setDialCode] = useState<string>("");
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   />
               </div>
               {_meta.form!.errors?.firstname && 
-                <span className="text-red-500">{_meta.form!.errors.firstname.message}</span>
+                <span className="text-red-500">Error in firstname"</span>
               }
             </div>
             <div className="col-span-6">
@@ -52,9 +52,12 @@ const   UserSectionDetails = ({_meta, phonecode}:{_meta: Meta; phonecode: string
                   {..._meta.form!.register!("name")}
                 />
               </div>
-              {_meta.form!.errors?.name && 
-                <span className="text-red-500">{_meta.form!.errors.name.message}</span>
+              {_meta.form && _meta.form.errors && _meta.form.errors.name &&
+                <span className="text-red-500">{_meta.form.errors.name.message}</span>
               }
+              {/* {_meta.form!.errors?.name && 
+                <span className="text-red-500">{}</span>
+              } */}
             </div>
           </div>
   

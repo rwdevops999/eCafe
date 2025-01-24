@@ -8,11 +8,11 @@ import { handleLoadPolicies } from "@/lib/db";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 
-const TabPolicies = ({meta}:{meta: Meta;}) => {
+const TabPolicies = ({meta}:{meta: Meta<any>;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta>();
+  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta<any>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Policies", description: "loading ..."})
@@ -22,14 +22,14 @@ const TabPolicies = ({meta}:{meta: Meta;}) => {
   const policiesLoadedCallback = (_data: PolicyType[]) => {
     let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
 
-    meta.buttons = [validateButton, (meta.user ? updateButton : createButton), cancelButton]
+    meta.buttons = [validateButton, (meta.subject ? updateButton : createButton), cancelButton]
     meta.items ? meta.items.issuer = issuer_policies : meta.items = {issuer: issuer_policies};
     meta.items ? meta.items.title = "Assign policies to user" : meta.items = {title: "Assign policies to user"};
     meta.items ? meta.items.columnname = "Policies" : meta.items = {columnname: "Policies"};
     meta.items ? meta.items.data = mappedPolicies : meta.items = {data: mappedPolicies};
 
     setMetaForTabPolicies(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<any>) => {}
 
     dismiss(toastId);
   }

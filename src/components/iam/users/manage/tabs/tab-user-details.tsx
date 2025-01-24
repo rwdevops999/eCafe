@@ -15,30 +15,29 @@ import LoginSectionDetails from "../components/login-section-details";
 import { Button } from "@/components/ui/button";
 
 
-const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta; updateCountry(country: CountryType): void;}) => {
-  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta>();
+const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta<FormSchemaType>; updateCountry(country: CountryType): void;}) => {
+  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta<FormSchemaType>>();
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
     reset,
     getValues
   } = useForm<FormSchemaType>({ 
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: _meta.user?.name,
-      firstname: _meta.user?.firstname,
-      phone: _meta.user?.phone,
-      code: (_meta.user ? `(${_meta.user.address?.country?.dialCode})` : defaultCountry.dialCode),
-      street: _meta.user?.address?.street,
-      number: _meta.user?.address?.number,
-      box: _meta.user?.address?.box,
-      city: _meta.user?.address?.city,
-      postalcode: _meta.user?.address?.postalcode,
-      county: _meta.user?.address?.county,
-      email: _meta.user?.email,
-      password: _meta.user?.password,
+      name: _meta.subject?.name,
+      firstname: _meta.subject?.firstname,
+      phone: _meta.subject?.phone,
+      code: (_meta.subject ? `(${_meta.subject.address?.country?.dialCode})` : defaultCountry.dialCode),
+      street: _meta.subject?.address?.street,
+      number: _meta.subject?.address?.number,
+      box: _meta.subject?.address?.box,
+      city: _meta.subject?.address?.city,
+      postalcode: _meta.subject?.address?.postalcode,
+      county: _meta.subject?.address?.county,
+      email: _meta.subject?.email,
+      password: _meta.subject?.password,
     }
    });
 
@@ -47,15 +46,15 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta; updateCountry(countr
   const [phoneCode, setPhoneCode] = useState<string>();
   
   useEffect(() => {
-    if (_meta.user) {
-      setPhoneCode(_meta.user.address?.country?.dialCode);
+    if (_meta.subject) {
+      setPhoneCode(_meta.subject.address?.country?.dialCode);
     } else {
       setPhoneCode(defaultCountry.dialCode);
     }
 
     _meta.sender = "TabUserDetails";
     _meta.data ? _meta.data.updateData = updateUserCountry : _meta.data = {updateData: updateUserCountry};
-    _meta.buttons = [(_meta.user ? updateButton : createButton), cancelButton];
+    _meta.buttons = [(_meta.subject ? updateButton : createButton), cancelButton];
 
     _meta.form ? _meta.form.register = register : _meta.form = {register: register}
     _meta.form ? _meta.form.errors = errors : _meta.form = {errors: errors}

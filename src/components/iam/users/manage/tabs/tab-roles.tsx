@@ -8,11 +8,11 @@ import { handleLoadRoles } from "@/lib/db"
 import { useToast } from "@/hooks/use-toast"
 import TabItems from "@/components/iam/components/tab-items"
 
-const TabRoles = ({meta}:{meta: Meta; }) => {
+const TabRoles = ({meta}:{meta: Meta<any>; }) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabRoles, setMetaForTabRoles] = useState<Meta>();
+  const [metaForTabRoles, setMetaForTabRoles] = useState<Meta<any>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Roles", description: "loading ..."})
@@ -20,18 +20,16 @@ const TabRoles = ({meta}:{meta: Meta; }) => {
   }
 
   const rolesLoadedCallback = (_data: RoleType[]) => {
-    meta.control?.test ? meta.control.test("TabRoles") : () => {};
-
     let mappedRoles = mapRolesToData(_data);
 
-    meta.buttons = [validateButton, (meta.user ? updateButton : createButton), cancelButton]
+    meta.buttons = [validateButton, (meta.subject ? updateButton : createButton), cancelButton]
     meta.items ? meta.items.issuer = issuer_roles : meta.items = {issuer: issuer_roles};
     meta.items ? meta.items.title = "Assign roles to user" : meta.items = {title: "Assign roles to user"};
     meta.items ? meta.items.columnname = "Roles" : meta.items = {columnname: "Roles"};
     meta.items ? meta.items.data = mappedRoles : meta.items = {data: mappedRoles};
 
     setMetaForTabRoles(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<any>) => {}
 
     dismiss(toastId);
   }

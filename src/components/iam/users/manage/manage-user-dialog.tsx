@@ -25,9 +25,8 @@ import { Label } from "@/components/ui/label";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { Mail } from "lucide-react";
 
-const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
-  const [selectedUser, setSelectedUser] = useState<UserType>();
-  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta>(meta);
+const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
+  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
 
   const originalRoles = useRef<Data[]>([]);
   const selectedRoles = useRef<Data[]>([]);
@@ -116,7 +115,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     });
 
     return {
-      id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.id : 0),
+      id: (metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0),
       name: data.name,
       firstname: data.firstname,
       phone: data.phone,
@@ -124,7 +123,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
       email: data.email,
       password: data.password,
       address: {
-        id: (metaForManageUserDialog.user ? metaForManageUserDialog.user.address?.id : 0),
+        id: (metaForManageUserDialog.subject ? metaForManageUserDialog.subject.address?.id : 0),
         street: data.street,
         number: data.number,
         box: data.box,
@@ -161,7 +160,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   const handleManageUser = (data: any): void => {
-    if  (metaForManageUserDialog.user) {
+    if  (metaForManageUserDialog.subject) {
       const user: UserType = prepareUser(data);
       if  (user) {
         updateUser(user, userChangedCallback);
@@ -231,9 +230,9 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   useEffect(() => {
-    if (meta.user) {
-      setRelations(metaForManageUserDialog.user);
-      country.current = meta.user.address?.country;
+    if (metaForManageUserDialog.subject) {
+      setRelations(metaForManageUserDialog.subject);
+      country.current = metaForManageUserDialog.subject.address?.country;
     } else {
       selectedRoles.current = [];
       selectedPolicies.current = [];
@@ -244,14 +243,15 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
     meta.control ? meta.control.handleSubject = handleManageUser : meta.control = {handleSubject: handleManageUser};
     meta.form ? meta.form.submitForm = handleSubmitForm : meta.form = {submitForm: handleSubmitForm};
-    meta.sender = "ManageUserdialog";
+    meta.sender = "ManageGroupdialog";
     meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection}
     meta.items ? meta.items.getSelection = getSelection : meta.items = {getSelection: getSelection}
     meta.items ? meta.items.validateItems = validateItems : meta.items = {validateItems: validateItems}
   
     setMetaForManageUserDialog(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
-  }, []);
+    
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+  }, [meta.subject]);
 
   const updateCountry = (_country: CountryType) => {
     country.current = _country;

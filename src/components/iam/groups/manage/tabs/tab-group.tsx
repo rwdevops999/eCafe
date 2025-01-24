@@ -1,3 +1,5 @@
+'use client'
+
 import { GroupType } from "@/data/iam-scheme";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/data";
@@ -9,36 +11,38 @@ import ActionButtons from "@/components/iam/users/manage/components/action-butto
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const groupName = "name";
 const groupDescription = "description";
 
-const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
+const TabGroup = ({meta}:{meta: Meta<FormSchemaType>;}) => {
+  const [metaForTabGroup, setMetaForTabGroup] = useState<Meta<FormSchemaType>>();
+
   const {
     register,
-    handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    getValues
   } = useForm<FormSchemaType>({ 
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: group?.name,
-      description: group?.description,
+      name: meta.subject?.name,
+      description: meta.subject?.description,
     }
    });
 
-  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    console.log("SUBMIT");
-    // if (meta.manageSubject) {
-    //   meta.manageSubject(data);
-    // }
-  }
-  
   useEffect(() => {
-    if (group === undefined) {
-      reset();
-    }
+    meta.sender = "TabGroup";
+    meta.buttons = [(meta.subject ? updateButton : createButton), cancelButton];
+
+    meta.form ? meta.form.register = register : meta.form = {register: register}
+    meta.form ? meta.form.errors = errors : meta.form = {errors: errors}
+    meta.form ? meta.form.reset = reset : meta.form = {reset: reset}
+    meta.form ? meta.form.getValues = getValues : meta.form = {getValues: getValues}
+
+    setMetaForTabGroup(meta);
+    meta.changeMeta ? meta.changeMeta(meta) : null;
   }, []);
 
   const GroupDetails = () => {
@@ -66,7 +70,6 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
           </div>
   
           <div className="grid grid-cols-12 mb-1">
-            {/* <div className="col-span-12"> */}
               <div className="grid col-span-12 grid-cols-12 items-center">
                 <Label className="col-span-1" htmlFor={groupDescription}>Description :</Label>
                 <Input
@@ -80,36 +83,37 @@ const TabGroup = ({meta, group}:{meta: Meta; group:GroupType|undefined}) => {
                 <span className="text-red-500">{errors.description.message}</span>
               }
             </div>
-          {/* </div> */}
         </CardContent>
       </Card>
     )
   }
 
-  meta.buttons = [(group ? updateButton : createButton), cancelButton]
-  
   const renderComponent = () => {
-    return (
-      <>
-      <PageTitle className="m-2" title={`Group Details`} />
-      <Separator />
-      <div className="block space-y-1">
-        <form className="form w-[100%]" onSubmit={handleSubmit(onSubmit)} >
-          <div className="grid grid-cols-12">
-            <div className="col-span-11 space-y-1">
-              <GroupDetails />
-            </div>
-            <div className=" flex justify-end">
-              <ActionButtons _meta={meta}/>
-            </div>
+    if (metaForTabGroup) {
+      return (
+        <>
+          <PageTitle className="m-2" title={`Group Details`} />
+          <Separator />
+          <div className="block space-y-1">
+            <form className="form w-[100%]" >
+              <div className="grid grid-cols-12">
+                <div className="col-span-11 space-y-1">
+                  <GroupDetails />
+                </div>
+                <div className=" flex justify-end">
+                  <ActionButtons _meta={metaForTabGroup}/>
+                </div>
+              </div>
+              {/* <div>
+                {JSON.stringify(errors)}
+              </div> */}
+            </form>
           </div>
-          {/* <div>
-            {JSON.stringify(errors)}
-          </div> */}
-        </form>
-      </div>
-    </>
-  )
+        </>
+      )
+    }
+
+    return null;
   }
 
   return (

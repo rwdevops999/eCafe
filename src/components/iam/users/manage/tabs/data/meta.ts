@@ -1,8 +1,8 @@
 import { countryScheme, GroupType, UserType } from "@/data/iam-scheme";
 import { Data } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table";
-import { FieldErrors, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
-import { z } from "zod";
+import { FieldErrors, FieldValues, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
+import { z, ZodType } from "zod";
 
 export const createButton = "create";
 export const updateButton = "update";
@@ -57,12 +57,11 @@ export const issuer_users = "Users";
 //     }
 // }
 
-export interface Meta {
+export interface Meta<T  extends FieldValues> {
     sender: string
-    user?: UserType
-    group?: GroupType
+    subject?: any
     buttons?: ButtonConfig[]
-    changeMeta?: (meta: Meta) => void
+    changeMeta?: (meta: Meta<T>) => void
     control?:{
         closeDialog?: () => void
         handleSubject?: (data: any) => void,
@@ -70,7 +69,7 @@ export interface Meta {
     form?: {
         submitForm?: () => void
         register?: UseFormRegister<any>
-        errors?: FieldErrors<any>,
+        errors?: FieldErrors<T>,
         getValues?: UseFormGetValues<any>
         reset?: UseFormReset<any>
     },

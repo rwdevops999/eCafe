@@ -4,7 +4,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import { cancelButton, createButton, Meta, updateButton, validateButton } from "../tabs/data/meta";
 import { useState } from "react";
 
-const ActionButtons = ({_meta, validateEnabled = false}:{_meta:Meta; validateEnabled?: boolean}) => {
+const ActionButtons = ({_meta, validateEnabled = false}:{_meta:Meta<any>; validateEnabled?: boolean}) => {
     const [valid, setValid] = useState<boolean>(false);
 
     const closeDialog = (_dummy: boolean) => {
