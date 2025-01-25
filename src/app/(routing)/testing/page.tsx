@@ -344,6 +344,11 @@ const Test = () => {
   let allowArray: AccessType[] = [];
   let denyArray: AccessType[] = [];
 
+  const resetValidationArrays = () => {
+    allowArray = [];
+    denyArray = [];
+  }
+
   const validateData = (_data: Data[], _path: string[]) => {
     _data.forEach(element => {
       if (element.children.length === 0) {
@@ -368,11 +373,6 @@ const Test = () => {
         }
       }
     });
-  }
-
-  const resetArrays = () => {
-    allowArray = [];
-    denyArray = [];
   }
 
   type AccessPath = {
@@ -462,13 +462,12 @@ const Test = () => {
     return result;
   }
 
-  const mapping: Data[] = fullMapSubjectToData(user);
-  resetArrays();
-  validateData(mapping, []);
-  let result: AccessResultType[] = intersection(allowArray, denyArray);
-  log(true, "TEST", "INTERSECTION", result, true);
-  let conflictsData = mapConflictsToData(result);
-  log(true, "TEST", "display conflict", conflictsData, true);
+  const validateMappedData = (data: Data[]): Data[] => {
+    resetValidationArrays();
+    validateData(data, []);
+    let result: AccessResultType[] = intersection(allowArray, denyArray);
+    return mapConflictsToData(result);
+  };
 
   const data = [
     {

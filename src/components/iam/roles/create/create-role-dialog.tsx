@@ -3,10 +3,9 @@
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageTitle from "@/components/ecafe/page-title";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertType, CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { AlertTableType, AlertType } from "@/data/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@radix-ui/react-separator";
@@ -16,7 +15,7 @@ import { z } from "zod";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { Row } from "@tanstack/react-table";
-import { getPolicyStatements, noValidation, validateData, ValidationType } from "@/lib/validate";
+import { validateMappedData } from "@/lib/validate";
 import { log } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,9 @@ import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType, RoleType } from "@/data/iam-scheme";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { createRole, handleLoadPolicies } from "@/lib/db";
-import AlertMessage from "@/components/ecafe/alert-message";
+import { alertcolumns } from "@/components/ecafe/table/alert-columns";
+import AlertTable from "@/components/ecafe/alert-table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -47,7 +48,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const [open, setOpen] = useState<boolean>(false);
 
   const managed = useRef<boolean>(false);
-  const [valid, setValid] = useState<ValidationType>(noValidation);
+  const [valid, setValid] = useState<boolean>(false);
   const [alert, setAlert] = useState<AlertType>();
 
   const [policies, setPolicies] = useState<PolicyType[]>([]);
@@ -76,7 +77,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
 
   const resetAll = () => {
     reset();
-    setValid(noValidation);
+    setValid(false);
     managed.current = false;
   }
 
@@ -135,12 +136,13 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setAlert(undefined);
   }
 
-  const showAlert = (_title: string, _message: string) => {
-    const alert = {
+  const showAlert = (_title: string, _message: string, data: Data[]) => {
+    const alert: AlertTableType = {
       open: true,
       error: true,
       title: _title,
       message: _message,
+      table: <DataTable data={data} columns={alertcolumns}/>,
       child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
@@ -148,15 +150,15 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   }
 
   const handleValidate = (_value: boolean): void => {
-    const policyStatements: Data[] = getPolicyStatements(selectedPolicies);
+    log(true, "CRD", "VALIDATE", selectedPolicies, true);
+
+    let conflicts: Data[] = validateMappedData(selectedPolicies);
     
-    let validationResult: ValidationType = validateData(policyStatements);
-
-    if (validationResult.result === "error") {
-      showAlert("Validation Error", validationResult.message!);
-    }
-
-    setValid(validationResult);
+      if (conflicts.length > 0) {
+        showAlert("Validation Error", "Conflicts", conflicts);
+      }
+    
+      setValid(conflicts.length === 0);
   }
 
   const handleChangeSelection = (selection: Row<Data>[]) => {
@@ -164,9 +166,9 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   }
 
   const renderDialog = () => {
-      if (alert && alert.open) {
-        return (<AlertMessage alert={alert}></AlertMessage>)
-      }
+    if (alert && alert.open) {
+      return (<AlertTable alert={alert}></AlertTable>)
+    }
 
       return (
         <Dialog open={open}>
@@ -222,7 +224,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
                 </div>
                 <div className="space-y-1">
                   <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedPolicies.length > 0}/>
-                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid.result === "ok"} type={"submit"}/>
+                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
                   <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                 </div>
               </div>

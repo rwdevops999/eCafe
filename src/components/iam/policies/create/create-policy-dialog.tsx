@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import EcafeButton from "@/components/ecafe/ecafe-button"
 import PageTitle from "@/components/ecafe/page-title";
 import { Label } from "@/components/ui/label";
@@ -18,16 +17,18 @@ import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { noValidation, validateData, ValidationType } from "@/lib/validate";
 import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertType } from "@/data/types";
+import { AlertTableType, AlertType } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { createPolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
-import AlertMessage from "@/components/ecafe/alert-message";
+import AlertTable from "@/components/ecafe/alert-table";
+import { alertcolumns } from "@/components/ecafe/table/alert-columns";
+import { validateMappedData } from "@/lib/validate";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -53,7 +54,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   /**
    * created policy is valid
    */
-  const [valid, setValid] = useState<ValidationType>(noValidation);
+  const [valid, setValid] = useState<boolean>(false);
 
   /**
    * the selected service for getting the statements for creating the policy
@@ -78,12 +79,13 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     setAlert(undefined);
   }
 
-  const showAlert = (_title: string, _message: string) => {
-    const alert = {
+  const showAlert = (_title: string, _message: string, data: Data[]) => {
+    const alert: AlertTableType = {
       open: true,
       error: true,
       title: _title,
       message: _message,
+      table: <DataTable data={data} columns={alertcolumns}/>,
       child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
@@ -92,13 +94,15 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const handleValidate = (value: boolean): void => {
     // const statements: Data[] = getStatements(selectedStatements);
-    let validationResult: ValidationType = validateData(selectedStatements);
+    log(true, "CPD", "VALIDATE", selectedStatements, true);
 
-    if (validationResult.result === "error") {
-      showAlert("Validation Error", validationResult.message!);
+    let conflicts: Data[] = validateMappedData(selectedStatements);
+
+    if (conflicts.length > 0) {
+      showAlert("Validation Error", "Conflicts", conflicts);
     }
 
-    setValid(validationResult);
+    setValid(conflicts.length === 0);
   }
 
   const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
@@ -188,7 +192,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const resetAll = () => {
     reset();
-    setValid(noValidation);
+    setValid(false);
   }
 
   useEffect(() => {
@@ -203,7 +207,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const renderDialog = () => {
     if (alert && alert.open) {
-      return (<AlertMessage alert={alert}></AlertMessage>)
+      return (<AlertTable alert={alert}></AlertTable>)
     }
 
       return (
@@ -268,7 +272,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
                 </div>
                 <div className="space-y-1">
                   <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedStatements.length > 0}/>
-                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid.result === "ok"} type={"submit"}/>
+                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
                   <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                 </div>
               </div>

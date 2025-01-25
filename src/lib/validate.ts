@@ -1,180 +1,59 @@
-import { intersection, log, PushResultType, PushType } from "@/lib/utils";
-import { z } from "zod";
-import { Data } from "./mapping";
-import { Row } from "@tanstack/react-table";
+import { Data, mapConflictsToData } from "./mapping"
+import { intersection } from "./utils"
 
-// export const getStatements = (data: Row<Data>[]): Data[] => {
-//     let statements: Data[] = [];
-
-//     statements = data.map((row) => {
-//         return row.original;
-//     })
-
-//     return statements;
-// }
-
-// export const getPolicyStatements = (data: Row<Data>[]): Data[] => {
-//     let statements: Data[] = [];
-
-//     statements = data.map((row) => {
-//       let validationType: Data = {
-//         name: row.original.name,
-//         children: row.original.children,
-//         id: row.original.id,
-//         description: row.original.description,
-//       }
-
-//       return validationType;
-//     })
-
-//     return statements;
-// }
-
-export const getPolicyStatements = (data: Data[]): Data[] => {
-    let statements: Data[] = [];
-
-    statements = data.map((policy) => {
-      let validationType: Data = {
-        name: policy.name,
-        children: policy.children,
-        id: policy.id,
-        description: policy.description,
-      }
-
-      return validationType;
-    })
-
-    return statements;
+/* ============== NEW VERSION ============= */
+type AccessPath = {
+    path: string[]
 }
 
-// export const getRoleStatements = (data: Row<Data>[]): Data[] => {
-//     let roleStatements: Data[] = data.flatMap((row) => {
-//       let roleOriginator: string = row.original.name;
-//       let statementTypes: Data[] = row.original.children.map((policy) => { 
-//         let policyOriginator = `${roleOriginator}[${policy.name}]`;
-//             let statementType: Data = {
-//                 name: policyOriginator,
-//                 children: policy.children,
-//                 id: policy.id,
-//                 description: policy.description,
-//             }
-//             return statementType;
-    
-//       })
-
-//       return statementTypes;
-//     })
-
-//     return roleStatements;
-// }
-
-export const getRoleStatements = (data: Data[]): Data[] => {
-    let roleStatements: Data[] = data.flatMap((role) => {
-        let roleOriginator: string = role.name;
-        let statementTypes: Data[] = role.children.map((policy) => { 
-            let policyOriginator = `${roleOriginator}[${policy.name}]`;
-                let statementType: Data = {
-                    name: policyOriginator,
-                    children: policy.children,
-                    id: policy.id,
-                    description: policy.description,
-                }
-                return statementType;
-        
-          })
-
-          return statementTypes;
-    });
-
-    return roleStatements;
+type AccessResultType = {
+    action: string,
+    allowed: AccessPath[],
+    denied: AccessPath[]
 }
 
-let allowedActions: PushType[] = [];
-let deniedActions: PushType[] = [];
-
-const validationValues = ["ok", "warning", "error", "no"] as const;
-
-const validationScheme = z.object({
-    result: z.enum(validationValues),
-    message: z.string().optional()
-});
-export type ValidationType = z.infer<typeof validationScheme>;
-
-export const okValidation: ValidationType = {result: "ok"}
-export const noValidation: ValidationType = {result: "no"}
-
-const debug: boolean = true;
-
-const push = (_actionArray: PushType[], _originator: string | undefined, _action: Data) => {
-    let push: PushType = {
-        originator: (_originator ? _originator : ""),
-        name: _action.name
-    };
-  
-    _actionArray.push(push)
+type AccessType = {
+    path: string[],
+    action: string
 }
-  
-const resetValidation = (): ValidationType => {
-    allowedActions = [];
-    deniedActions = [];
 
-    return {
-        result: "ok"
-    };
-};
+let allowedActionsArray: AccessType[] = [];
+let deniedActionsArray: AccessType[] = [];
 
-export const validateData = (_data: Data[], _originator?: string, _access?: string, _validation?: ValidationType | undefined, _level?: number): ValidationType => {
-    log(debug, "Validation", "data", _data, true);
-    if (_level === undefined) {
-        _level = 0;
-    }
+const resetValidationArrays = () => {
+  allowedActionsArray = [];
+  deniedActionsArray = [];
+}
 
-    if (_validation === undefined) {
-        _validation = resetValidation();
-    }
-
-    if (_data.length > 0) {
-        _data.map((d) => {
-            if  (d.children.length > 0) {
-                if (! _originator || _level === 0) {
-                    _originator = d.name;
-                }
-
-                if (d.other?.access) {
-                    _access = d.other.access;
-                }
-
-                return validateData(d.children, _originator, _access, _validation, (_level+1));
-            } else {
-                if (_access === "Allow") {
-                    log(debug, "VALIDATION", "PUSH(allow)", d.name);
-                    push(allowedActions, _originator, d);
-                } else {
-                    log(debug, "VALIDATION", "PUSH(deny)", d.name);
-                    push(deniedActions, _originator, d);
-                }
-            }
-        });
-    }
-
-    if (_level === 0) {
-        log(debug, "VALIDATE", "ALLOWED", allowedActions, true);
-        log(debug, "VALIDATE", "DENIED", deniedActions, true);
-
-        const intersect: PushResultType[] = intersection(allowedActions, deniedActions);
-
-        log(debug, "VALIDATE", "INTERSECT", intersect, true);
-        log(debug, "VALIDATE", "_validation2", _validation, true);
-
-        if (intersect.length > 0) {
-            log(debug, "VALIDATE", "SET ERROR");
-            _validation.result = "error";
-            _validation.message = `${intersect[0].name} conflicts in ${intersect[0].originator1} and ${intersect[0].originator2}`;
+const validateData = (_data: Data[], _path: string[]) => {
+    _data.forEach(element => {
+      if (element.children.length === 0) {
+        const item: AccessType = {
+          path: [..._path],
+          action: element.name
         }
-    }
 
-    log(debug, "VALIDATE", "RESULT", _validation, true);
-
-    return _validation;
+        if (element.other?.access === "Allow") {
+          allowedActionsArray.push(item);
+        } else {
+          deniedActionsArray.push(item);
+        }
+        // We reached the action
+      } else {
+        _path.push(element.name);
+        validateData(element.children, _path);
+        const index = _path.findIndex((_element) => _element === element.name);
+        if (index !== -1) {
+          _path.splice(index, 1);
+        }
+      }
+    });
 }
+
+export const validateMappedData = (data: Data[]): Data[] => {
+    resetValidationArrays();
+    validateData(data, []);
+    let result: AccessResultType[] = intersection(allowedActionsArray, deniedActionsArray);
+    return mapConflictsToData(result);
+};
 

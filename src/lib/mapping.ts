@@ -196,3 +196,42 @@ export const mapGroupsToData = (groups:  GroupType[]): Data[] => {
 
     return data;
 }
+
+
+/* ============ NEW VERSION ================= */
+const prettify = (path: any[]): string => {
+    return path.join(" > ");
+}
+
+const mapConflictChildren = (allowed: any[], denied: any): Data[] => {
+    let result: Data[] = [];
+
+    for (let i = 0; i < allowed.length; i++) {
+      let d:Data = {
+        id: i,
+        name: prettify(allowed[i].path),
+        description: prettify(denied[i].path),
+        children: []
+      }
+
+      result.push(d);
+    }
+
+    return result;
+  }
+
+export const mapConflictsToData = (conflicts: any[]): Data[] => {
+    let result: Data[] = [];
+
+    let _id: number = 0;
+    result = conflicts.map((conflict) => {
+      return {
+        id: _id++,
+        name: conflict.action,
+        description: "ERROR",
+        children: mapConflictChildren(conflict.allowed, conflict.denied)
+      }
+    })
+
+    return result;
+  }
