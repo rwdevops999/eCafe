@@ -38,6 +38,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     dismiss(toastId);
 
     users.current = data;
+    log(true,"UD", "mapped users", mapUsersToData(data), true);
     usersData.current = mapUsersToData(data);
     usersLoaded.current = true;
   }

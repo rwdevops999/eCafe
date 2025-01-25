@@ -85,7 +85,10 @@ const  setUserForUpdate = (data: UserType) => {
 export async function POST(req: NextRequest) {
     const data: UserType = await req.json();
 
+    log(true, "API", "Create USER", data, true);
+
     const user: any = setUserForCreate(data);
+    log(true, "API", "USER", user, true);
 
     const createdUser = await prisma.user.create({data: user});
 
@@ -109,9 +112,54 @@ const findAllUsers = async () => {
             country: true
           },
         },
-        roles: true,
-        policies: true,
-        groups: true
+        roles: {
+          include: {
+            policies: {
+              include: {
+                statements: {
+                  include: {
+                    actions: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        policies: {
+          include: {
+            statements: {
+              include: {
+                actions: true
+              }
+            }
+          }
+        },
+        groups: {
+          include: {
+            roles: {
+              include: {
+                policies: {
+                  include: {
+                    statements: {
+                      include: {
+                        actions: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            policies: {
+              include: {
+                statements: {
+                  include: {
+                    actions: true
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   );

@@ -2,7 +2,6 @@
 
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageTitle from "@/components/ecafe/page-title";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogTrigger } from "@radix-ui/react-dialog";
@@ -24,6 +23,7 @@ import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { Mail } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
@@ -113,6 +113,14 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
 
       return group;
     });
+
+    log(true, "MGD", "prepareUser[roles]", roles, true);
+    log(true, "MGD", "prepareUser[removedRoles]", removedRoles, true);
+    log(true, "MGD", "prepareUser[policies]", policies, true);
+    log(true, "MGD", "prepareUser[removedPolicies]", removedPolicies, true);
+    log(true, "MGD", "prepareUser[groups]", groups, true);
+    log(true, "MGD", "prepareUser[removedGroups]", removedGroups, true);
+
 
     return {
       id: (metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0),
@@ -210,6 +218,8 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
   }
 
   const validateFormValues = (data: FormSchemaType) => {
+    log(true, "MUD", "validateFormValues", data, true);
+
     try {
       const parsedData = FormSchema.parse(data);
       handleManageUser(data);
@@ -306,18 +316,21 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
   }
 
   const validateItems = (): boolean => {
-    const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
-    const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
+    log(true, "MUD", "Validate User", meta.subject, true);
+    
+    return true;
+    // const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
+    // const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
 
-    const validationData: Data[] = [...policyStatements, ...roleStatements];
+    // const validationData: Data[] = [...policyStatements, ...roleStatements];
 
-    let validationResult: ValidationType = validateData(validationData);
+    // let validationResult: ValidationType = validateData(validationData);
 
-    if (validationResult.result === "error") {
-      showAlert("Validation Error", validationResult.message!);
-    }
+    // if (validationResult.result === "error") {
+    //   showAlert("Validation Error", validationResult.message!);
+    // }
 
-    return (validationResult.result === "ok");
+    // return (validationResult.result === "ok");
   }
 
   const renderComponent = () => {
@@ -331,7 +344,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
             <DialogTrigger asChild>
               <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage user" clickHandler={handleDialogState} clickValue={true} enabled={_enabled}/>
             </DialogTrigger>
-            <DialogContent className="min-w-[75%]" aria-describedby="">
+            <DialogContent id="DC" className="min-w-[75%]" aria-describedby="">
               <DialogHeader className="mb-2">
                 <DialogTitle>
                   <PageTitle title="Manage user" className="m-2 -ml-[2px]"/>

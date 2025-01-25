@@ -9,6 +9,15 @@ export type AlertType = {
   child?: any;
 }
 
+export type AlertTableType = {
+  open: boolean;
+  error: boolean;
+  title: string;
+  message: string;
+  child?: any;
+  table?: any;
+}
+
 export type ServicebyIdAndNameType = {
   id: number,
   name: string

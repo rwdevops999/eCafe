@@ -68,10 +68,10 @@ export interface Meta<T  extends FieldValues> {
     },
     form?: {
         submitForm?: () => void
-        register?: UseFormRegister<any>
-        errors?: FieldErrors<T>,
-        getValues?: UseFormGetValues<any>
-        reset?: UseFormReset<any>
+        register?: UseFormRegister<FormSchemaType>
+        errors?: FieldErrors<FormSchemaType>,
+        getValues?: UseFormGetValues<FormSchemaType>
+        reset?: UseFormReset<FormSchemaType>
     },
     items?: {
         issuer?: string

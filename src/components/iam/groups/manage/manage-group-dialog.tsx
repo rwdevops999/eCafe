@@ -12,7 +12,7 @@ import { issuer_policies, issuer_roles, issuer_users, Meta } from "../../users/m
 import { AlertType, CallbackFunctionDefault } from "@/data/types";
 import { createGroup, updateGroup } from "@/lib/db";
 import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
-import { difference } from "@/lib/utils";
+import { difference, log } from "@/lib/utils";
 import { FormSchema, FormSchemaType } from "./tabs/data/data";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/components/ecafe/alert-message";
@@ -123,6 +123,13 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
       return user;
     });
 
+    log(true, "MGD", "prepareGroup[roles]", roles, true);
+    log(true, "MGD", "prepareGroup[removedRoles]", removedRoles, true);
+    log(true, "MGD", "prepareGroup[policies]", policies, true);
+    log(true, "MGD", "prepareGroup[removedPolicies]", removedPolicies, true);
+    log(true, "MGD", "prepareGroup[users]", users, true);
+    log(true, "MGD", "prepareGroup[removedUsers]", removedUsers, true);
+
     return {
       id: (metaForManageGroupDialog.subject ? metaForManageGroupDialog.subject.id : 0),
       name: data.name,
@@ -157,6 +164,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
         updateGroup(group, groupChangedCallback);
       }
     } else {
+      log(true, "MGD", "CREATE GROUP");
       const group: GroupType = prepareGroup(data);
 
       if  (group) {

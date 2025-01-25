@@ -1,12 +1,13 @@
 import { GroupType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
+import { log } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const  setGroupForCreate = (data: GroupType) => {
   return ({
     name: data.name,
-    decription: data.description,
+    description: data.description,
     roles: {
       // disconnect: data.roles.removed,
       connect: data.roles?.selected
@@ -45,7 +46,10 @@ const  setGroupForUpdate = (data: GroupType) => {
 export async function POST(req: NextRequest) {
   const data: GroupType = await req.json();
 
+  log(true, "API", "Create Group", data, true);
+
   const group: any = setGroupForCreate(data);
+  log(true, "API", "GROUP", group, true);
 
   const createdGroup = await prisma.group.create({data: group});
 

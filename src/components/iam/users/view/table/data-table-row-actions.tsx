@@ -20,7 +20,7 @@ export function DataTableRowActions<TData>({
   const handleDelete = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     const user: Data = row.original as Data;
     const meta = table.options.meta;
-    meta?.handleAction(action_delete, user);
+    (meta && meta.handleAction ? meta.handleAction(action_delete, user) : () => {});
     event.preventDefault();
     event.stopPropagation();
   }
