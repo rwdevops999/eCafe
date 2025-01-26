@@ -40,7 +40,7 @@ import AlertMessage from "@/components/ecafe/alert-message";
 
         let mappedPolicies: Data[] = mapPoliciesToData(data);
 
-        setPoliciesData(mapPoliciesToData(data));
+        setPoliciesData(mappedPolicies);
         policiesLoaded.current = true;
         dismiss(toastId);
     }

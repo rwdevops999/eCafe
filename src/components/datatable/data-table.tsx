@@ -97,7 +97,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     filterFromLeafRows: true,
     getPaginationRowModel: getPaginationRowModel(),
-    enableRowSelection: enableRowSelection,
+    enableRowSelection: row => row.depth === 0,
     enableSubRowSelection: false,
     onRowSelectionChange: setRowSelection,
     getFacetedRowModel: getFacetedRowModel(),

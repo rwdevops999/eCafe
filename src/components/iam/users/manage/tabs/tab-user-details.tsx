@@ -15,21 +15,23 @@ import LoginSectionDetails from "../components/login-section-details";
 import { Button } from "@/components/ui/button";
 
 
-const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta<FormSchemaType>; updateCountry(country: CountryType): void;}) => {
-  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta<FormSchemaType>>();
+const TabUserDetails = ({_meta}:{_meta:Meta;}) => {
+  log (true, "TUD", "IN", _meta.data, true);
+  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta>();
 
   const {
     register,
     formState: { errors },
     reset,
-    getValues
+    getValues,
+    handleSubmit
   } = useForm<FormSchemaType>({ 
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: _meta.subject?.name,
       firstname: _meta.subject?.firstname,
       phone: _meta.subject?.phone,
-      code: (_meta.subject ? `(${_meta.subject.address?.country?.dialCode})` : defaultCountry.dialCode),
+      code: _meta.data.country.dialCode,
       street: _meta.subject?.address?.street,
       number: _meta.subject?.address?.number,
       box: _meta.subject?.address?.box,
@@ -43,19 +45,23 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta<FormSchemaType>; upda
 
   const [reRender, setReRender] = useState<number>(0);
 
-  const [phoneCode, setPhoneCode] = useState<string>();
+  const onSubmit = () => console.log("SUBMIIIIIIT(1)");
+
+  const handleSubmitForm = () => {
+    console.log("SUBMIIIIIIT(2)")
+    handleSubmit(onSubmit)();
+  }
   
   useEffect(() => {
-    if (_meta.subject) {
-      setPhoneCode(_meta.subject.address?.country?.dialCode);
-    } else {
-      setPhoneCode(defaultCountry.dialCode);
+    let createMode: boolean = (_meta.subject === undefined);
+    if (! createMode) {
+      createMode = (_meta.subject.id === 0);
     }
 
     _meta.sender = "TabUserDetails";
-    _meta.data ? _meta.data.updateData = updateUserCountry : _meta.data = {updateData: updateUserCountry};
-    _meta.buttons = [(_meta.subject ? updateButton : createButton), cancelButton];
-
+    _meta.buttons = [createMode ? createButton : updateButton, cancelButton];
+    console.log("SET CONTROL");
+    _meta.handleSubmitForm = handleSubmitForm,
     _meta.form ? _meta.form.register = register : _meta.form = {register: register}
     _meta.form ? _meta.form.errors = errors : _meta.form = {errors: errors}
     _meta.form ? _meta.form.reset = reset : _meta.form = {reset: reset}
@@ -65,12 +71,6 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta<FormSchemaType>; upda
     _meta.changeMeta ? _meta.changeMeta(_meta) : null;
   }, [])
 
-  const updateUserCountry = (country: CountryType) => {
-    setPhoneCode(country.dialCode);
-    setReRender((x: any) => x+1);
-    updateCountry(country);
-  }
-
   const renderComponent = () => {
     if (metaForTabUserDetails) {
       return (
@@ -79,10 +79,10 @@ const TabUserDetails = ({_meta, updateCountry}:{_meta:Meta<FormSchemaType>; upda
           <PageTitle className="m-2" title={`User Details`} />
           <Separator />
           <div className="block space-y-1">
-            <form className="form w-[100%]" >
+            <form className="form w-[100%]" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-12">
                 <div className="col-span-11 space-y-1">
-                  <UserSectionDetails _meta={metaForTabUserDetails} phonecode={phoneCode}/>
+                  <UserSectionDetails _meta={metaForTabUserDetails}/>
                   <AddressSectionDetails _meta={metaForTabUserDetails}/>
                   <LoginSectionDetails _meta={metaForTabUserDetails}/>
                 </div>

@@ -6,11 +6,11 @@ import { handleLoadUsers } from "@/lib/db";
 import TabItems from "@/components/iam/components/tab-items";
 import { UserType } from "@/data/iam-scheme";
 
-const TabUsers = ({meta}:{meta: Meta<any>;}) => {
+const TabUsers = ({meta}:{meta: Meta;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabUsers, setMetaForTabUsers] = useState<Meta<any>>();
+  const [metaForTabUsers, setMetaForTabUsers] = useState<Meta>();
 
   const renderToast = () => {
       let {id} = toast({title: "Users", description: "loading ..."})
@@ -20,14 +20,19 @@ const TabUsers = ({meta}:{meta: Meta<any>;}) => {
   const usersLoadedCallback = (_data: UserType[]) => {
     let mappedUsers = mapUsersToData(_data);
 
-    meta.buttons = [validateButton, (meta.subject ? updateButton : createButton), cancelButton]
+    let createMode: boolean = meta.subject === undefined;
+    if (! createMode) {
+      createMode = meta.subject.id === 0;
+    }
+
+    meta.buttons = [validateButton, createMode ? createButton : updateButton, cancelButton]
     meta.items ? meta.items.issuer = issuer_users : meta.items = {issuer: issuer_users};
     meta.items ? meta.items.title = "Assign users to group" : meta.items = {title: "Assign users to group"};
     meta.items ? meta.items.columnname = "Users" : meta.items = {columnname: "Users"};
     meta.items ? meta.items.data = mappedUsers : meta.items = {data: mappedUsers};
 
     setMetaForTabUsers(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<any>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
 
     dismiss(toastId);
   }

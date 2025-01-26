@@ -41,34 +41,6 @@ export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
     return result;
 }
 
-export const mapActionsToData = (actions: ActionType[], level: number, permission: string): Data[] => {
-    let result: Data[] = [];
-
-    log(debug, "MAPPING", "Actions", actions, true);
-    log(debug, "MAPPING", "at level", Number(level));
-
-    if (actions && level >= 0) {
-        log(debug, "MAPPING", "Level", "Actions");
-        level -= 1;
-
-        actions.map(action => {
-            let data: Data = {
-                id: action.id,
-                name: action.name,
-                description: action.name,
-                children: [],
-                other: {
-                    access: permission
-                }
-            }
-
-            result.push(data);
-        })
-    }
-
-    return result;
-}
-
 const getServiceName = (serviceId: Number, services: any[]): string => {
     const service = services.find((s) => s.id === serviceId)
     if (service) {
@@ -89,80 +61,6 @@ export const mapServicesToData = (_services: ServiceType[]): Data[] => {
     });
 
     return dataArray;
-}
-
-export const mapStatementsToData = (statements: ServiceStatementType[]|undefined, level: number = 1, services?: any[]): Data[] => {
-    let result: Data[] = [];
-
-    log(debug, "MAPPING", "Statements", statements, true);
-    log(debug, "MAPPING", "at level", Number(level));
-
-    if  (statements && statements.length > 0 && level >= 0) {
-        log(debug, "MAPPING", "Level", "Statements");
-
-        level -= 1;
-        statements.map(statement => {
-            let data: Data = {
-            id: statement.id,
-            name: statement.sid,
-            description: statement.description,
-            children: mapActionsToData(statement.actions, level, statement.permission),
-            other: {
-                serviceId: statement.serviceId,
-                serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
-                managed: statement.managed,
-                access: statement.permission
-            }
-        };
-
-        result.push(data);
-    });
-    }
-
-    return result;
-}
-
-export const mapPoliciesToData = (policies: PolicyType[]|undefined, level: number = 1, services?: any[]): Data[] => {
-    let data: Data[] = [];
-
-    log(debug, "MAPPING", "Policies", policies, true);
-    log(debug, "MAPPING", "at level", Number(level));
-
-    if (policies && policies.length > 0 && level >= 0) {
-        log(debug, "MAPPING", "Level", "Policies");
-        level -= 1;
-        data = policies.map(policy => {
-            return {
-                id: policy.id,
-                name: policy.name ? policy.name : "",
-                description: policy.description ? policy.description : "",
-                children: mapStatementsToData(policy.statements, level, services),
-                other: {
-                    managed: policy.managed
-                }
-            }
-        })
-    }
-
-    log(debug, "MAPPING", "Mapped Policies", data, true);
-
-    return data;
-}
-
-export const mapRolesToData = (roles: RoleType[] ): Data[] => {
-    let data: Data[] = [];
-
-    data = roles.map(role => {
-        return {
-            id: role.id,
-            name: role.name ? role.name : "",
-            description: role.description ? role.description : "",
-            managed: role.managed,
-            children: mapPoliciesToData(role.policies, 2)
-        }
-    })
-
-    return data;
 }
 
 export const mapUsersToData = (users:  UserType[]): Data[] => {
@@ -196,7 +94,6 @@ export const mapGroupsToData = (groups:  GroupType[]): Data[] => {
 
     return data;
 }
-
 
 /* ============ NEW VERSION ================= */
 const prettify = (path: any[]): string => {
@@ -232,6 +129,156 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
         children: mapConflictChildren(conflict.allowed, conflict.denied)
       }
     })
+
+    return result;
+  }
+
+  const mapActionsToData = (actions: any[], permission: string): Data[] => {
+    let result: Data[] = [];
+
+    result = actions.map((action) => {
+      return {
+        id: action.id,
+        name: action.name,
+        description: "",
+        children: [],
+        other: {
+          access: permission,
+        }
+      }
+    })
+    return result;
+  }
+
+  export const mapStatementsToData = (statements: any[] | undefined, services?: any[]): Data[] => {
+    let result: Data[] = [];
+
+    if (statements) {
+      result = statements.map((statement) => {
+        return {
+          id: statement.id,
+          name: statement.sid,
+          description: statement.description,
+          children: mapActionsToData(statement.actions, statement.permission),
+          other: {
+            serviceId: statement.serviceId,
+            serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
+            managed: statement.managed,
+            access: statement.permission
+            }
+        }
+      })
+    }
+
+    return result;
+};
+
+  export const mapPoliciesToData = (policies: any[] | undefined): Data[] => {
+    let result: Data[] = [];
+
+    if (policies) {
+      result = policies.map((policy) => {
+        return {
+          id: policy.id,
+          name: policy.name!,
+          description: policy.description!,
+          children: mapStatementsToData(policy.statements),
+          other: {
+            managed: policy.managed
+          }
+        }
+      })
+    }
+
+    return result;
+  };
+
+  export const mapRolesToData = (roles: any[]|undefined): Data[] => {
+    let result: Data[] = [];
+
+    if (roles) {
+      result = roles.map((role) => {
+        return {
+          id: role.id,
+          name: role.name!,
+          description: role.description!,
+          children: mapPoliciesToData(role.policies)
+        }
+      });
+    }
+
+    return result;
+  }
+
+  const mapSubjectChildren = (subject: any): Data[] => {
+    let result: Data[] = [];
+
+    let roles: Data[] = [];
+    let policies: Data[] = [];
+    let groups: Data[] = [];
+
+    if (subject.roles?.original) {
+      roles = mapRolesToData(subject.roles?.original);
+      log(true, "TEST", "MAPPED USER ROLES", roles, true);
+    }
+
+    if (subject.policies?.original) {
+      policies = mapPoliciesToData(subject.policies?.original);
+      log(true, "TEST", "MAPPED USER POLICIES", policies, true);
+    }
+
+    if (subject.groups?.original) {
+      groups = mapGroupsToData(subject.groups?.original);
+      log(true, "TEST", "MAPPED USER GROUPS", groups, true);
+    }
+
+    // HIER MOETEN POLICIES EN ROLES BEHANDELD WORDEN
+
+    result = [...roles, ...policies, ...groups];
+
+    return result;
+  }
+
+  export const fullMapSubjectToData = (subject: any): Data[] => {
+    let result: Data[] = [];
+
+    const subjectData: Data = {
+      id: subject.id,
+      name: subject.name!,
+      description: "",
+      children: mapSubjectChildren(subject)
+    }
+
+    result.push(subjectData);
+    log(true, "TEST", "FULL RESULT", result, true);
+
+    return result;
+  }
+
+  export const fullMapNoSubjectToData = (data: any, policies: any[], roles: any[], groups?: any[]): Data[] => {
+    let result: Data[] = [];
+
+    if (roles) {
+        data.roles.original = roles;
+    }   
+
+    if (policies) {
+        data.policies.original = roles;
+    }   
+
+    if (groups) {
+        data.groups.original = roles;
+    }   
+
+    const subjectData: Data = {
+      id: data.id,
+      name: data.name!,
+      description: "",
+      children: mapSubjectChildren(data)
+    }
+
+    result.push(subjectData);
+    log(true, "TEST", "FULL RESULT", result, true);
 
     return result;
   }

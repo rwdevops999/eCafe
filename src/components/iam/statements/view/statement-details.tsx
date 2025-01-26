@@ -71,7 +71,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   const statementsLoadedCallback = (data: ServiceStatementType[]) => {
     dismiss(toastId);
     setStatements(data);
-    setStatementData(mapStatementsToData(data, 2, services.current));
+    setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
   }
 

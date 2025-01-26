@@ -1,6 +1,7 @@
 import { LanguageType } from "@/app/api/languages/data/scheme";
 import { GroupType, PolicyType, RoleType, ServiceStatementType, UserType } from "@/data/iam-scheme";
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { CallbackFunctionDefault, CallbackFunctionDependencyLoaded, CallbackFunctionSubjectLoaded } from "@/data/types";
+import { Data } from "./mapping";
 
 /**
  * DB
@@ -264,3 +265,8 @@ export const updateUser = async (_data: UserType, callback: CallbackFunctionDefa
     }).then(response => callback());
 }
 
+export const loadDependencies = async (subject: any, url: string, dependencies: any[], callback: CallbackFunctionDependencyLoaded) => {
+    await fetch(url + "?ids="+JSON.stringify(dependencies))
+    .then((response) => response.json())
+    .then((response) =>callback(subject, response));
+}

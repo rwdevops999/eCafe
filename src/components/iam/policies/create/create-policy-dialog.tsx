@@ -130,7 +130,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   const statementsLoadedCallback = (data: ServiceStatementType[]) => {
     setStatements(data);
 
-    const sd: Data[] = mapStatementsToData(data, 1, services.current);
+    const sd: Data[] = mapStatementsToData(data, services.current);
     setStatementData(sd);
   }
 

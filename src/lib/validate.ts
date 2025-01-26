@@ -56,4 +56,3 @@ export const validateMappedData = (data: Data[]): Data[] => {
     let result: AccessResultType[] = intersection(allowedActionsArray, deniedActionsArray);
     return mapConflictsToData(result);
 };
-

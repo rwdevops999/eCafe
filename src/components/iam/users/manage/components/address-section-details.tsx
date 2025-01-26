@@ -19,19 +19,23 @@ const addressPostal = "postal";
 const addressCounty = "county";
 const addressCountry = "country";
 
-const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
+const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
+  log (true, "ASD", "IN", _meta.data, true);
   const [countries, setCountries] = useState<CountryType[]>([]);
-
-  const [country, setCountry] = useState<string>();
 
   const countriesLoadedCallback = (data: CountryType[]) => {
     setCountries(data.sort((a, b) => a.name!.localeCompare(b.name!)));
-    const country: CountryType | undefined = data.find((country) => country.name === defaultCountry.name);
+    const country: CountryType | undefined = data.find((country) => country.name === _meta.data.country.name);
     if  (country) {
-      if (_meta.subject === undefined) {
-        setCountry(country.name);
-        _meta.data?.updateData(country);
+      _meta.data = {
+        country: {
+          id: country.id ? country.id : 0,
+          dialCode: country.dialCode,
+          name: country.name
+       }
       }
+      log (true, "ASD", "Countries Loaded", _meta.data, true);
+      _meta.changeMeta ? _meta.changeMeta(_meta) : null;
     }
   }
 
@@ -39,23 +43,23 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
     handleLoadCountries(countriesLoadedCallback); 
   }, []);
 
-  useEffect(() => {
-    if  (_meta.subject) {
-      setCountry(_meta.subject.address.country.name);
-    }
-  });
-
   const handleCountryChange = (_country: string) => {
     const country: CountryType | undefined = countries.find((country) => country.name === _country);
     if (country) {
-      setCountry(country.name);
-      if (_meta.subject !== undefined) {
-        _meta.data?.updateData(country);
+      _meta.data = {
+        country: {
+          id: country.id ? country.id : 0,
+          dialCode: country.dialCode,
+          name: country.name
+       }
       }
+      log (true, "ASD", "Country Changed", _meta.data, true);
+      _meta.changeMeta ? _meta.changeMeta(_meta) : null;
     }
   };
 
   const renderComponent = () => {
+    if (_meta.form) {
       return (
         <Card className="border-stone-500">
           <CardHeader>
@@ -70,7 +74,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressStreet}
                   placeholder={`${addressStreet}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form!.register!(addressStreet)}
+                  {..._meta.form.register!(addressStreet)}
                   />
               </div>
             </div>
@@ -82,7 +86,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressNumber}
                   placeholder={`Nr...`}
                   className="col-span-1 h-8"
-                  {..._meta.form!.register!(addressNumber)}
+                  {..._meta.form.register!(addressNumber)}
                 />
               </div>
             </div>
@@ -94,7 +98,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressBox}
                   placeholder={`${addressBox}...`}
                   className="col-span-1 h-8"
-                  {..._meta.form!.register!(addressBox)}
+                  {..._meta.form.register!(addressBox)}
                 />
               </div>
             </div>
@@ -108,7 +112,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressCity}
                   placeholder={`${addressCity}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form!.register!(addressCity)}
+                  {..._meta.form.register!(addressCity)}
                 />
               </div>
             </div>
@@ -119,7 +123,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressPostal}
                   placeholder={`${addressPostal}...`}
                   className="h-8 col-span-1"
-                  {..._meta.form!.register!("postalcode")}
+                  {..._meta.form.register!("postalcode")}
                 />
               </div>
             </div>
@@ -131,7 +135,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                 <Label className="col-span-1" htmlFor="country">Country:</Label>
                 <Select 
                   onValueChange={(value) => handleCountryChange(value)}
-                  value={country}
+                  value={_meta.data.country.name}
                   >
                   <SelectTrigger className="col-span-4">
                     <SelectValue placeholder="Select a country" />
@@ -156,7 +160,7 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
                   id={addressCounty}
                   placeholder={`${addressCounty}...`}
                   className="h-8 col-span-4"
-                  {..._meta.form!.register!(addressCounty)}
+                  {..._meta.form.register!(addressCounty)}
                 />
               </div>
             </div>
@@ -164,9 +168,9 @@ const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
           </CardContent>
         </Card>
       )
-    // }
+    }
 
-    // return null;
+    return null;
   }
 
   return (<>{renderComponent()}</>);

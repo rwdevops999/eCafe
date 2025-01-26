@@ -7,11 +7,11 @@ import { handleLoadGroups } from "@/lib/db";
 import { GroupType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
 
-const TabGroups = ({meta}:{meta: Meta<any>;}) => {
+const TabGroups = ({meta}:{meta: Meta;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabGroups, setMetaForTabGroups] = useState<Meta<any>>();
+  const [metaForTabGroups, setMetaForTabGroups] = useState<Meta>();
 
   const renderToast = () => {
       let {id} = toast({title: "Groups", description: "loading ..."})
@@ -21,14 +21,19 @@ const TabGroups = ({meta}:{meta: Meta<any>;}) => {
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
 
-    meta.buttons = [validateButton, (meta.subject ? updateButton : createButton), cancelButton]
+    let createMode: boolean = (meta.subject === undefined);
+    if (! createMode) {
+      createMode = (meta.subject.id === 0);
+    }
+
+    meta.buttons = [validateButton, createMode ? createButton : updateButton, cancelButton]
     meta.items ? meta.items.issuer = issuer_groups : meta.items = {issuer: issuer_groups};
     meta.items ? meta.items.title = "Assign user to groups" : meta.items = {title: "Assign user to groups"};
     meta.items ? meta.items.columnname = "Groups" : meta.items = {columnname: "Groups"};
     meta.items ? meta.items.data = mappedGroups : meta.items = {data: mappedGroups};
 
     setMetaForTabGroups(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<any>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
 
     dismiss(toastId);
   }

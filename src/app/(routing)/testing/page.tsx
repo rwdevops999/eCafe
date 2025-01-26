@@ -9,6 +9,7 @@ import { Data } from "@/lib/mapping";
 import { log } from "@/lib/utils";
 import { useState } from "react";
 import { columns } from "./table/columns";
+import TooltipMessage from "./tooltip-message";
 
 const user = {
 	id:28,
@@ -501,11 +502,12 @@ const Test = () => {
   }
 
   const renderComponent = () => {
-    if (alert && alert.open) {
-        return (<AlertTable alert={alert}></AlertTable>)
-    }
+    // if (alert && alert.open) {
+    //     return (<AlertTable alert={alert}></AlertTable>)
+    // }
 
-    return <Button onClick={showAlert}>Show Alert</Button>;
+    // return <Button onClick={showAlert}>Show Alert</Button>;
+    return (<TooltipMessage label="test" message="the message" className="bg-red-500" />);
   };
 
   return (<>{renderComponent()}</>)

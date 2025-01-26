@@ -4,7 +4,7 @@ import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import ManageUserDialog from "../manage/manage-user-dialog";
 import { useEffect, useRef, useState } from "react";
-import { RoleType, UserType } from "@/data/iam-scheme";
+import { defaultCountry, RoleType, UserType } from "@/data/iam-scheme";
 import { useToast } from "@/hooks/use-toast";
 import { Data, mapUsersToData } from "@/lib/mapping";
 import { DataTable } from "@/components/datatable/data-table";
@@ -25,7 +25,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     toastId = id;
   }
 
-  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta<FormSchemaType>>();
+  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta>();
   const [reload, setReload] = useState<number>(0);
 
   const users = useRef<UserType[]>([]);
@@ -38,22 +38,31 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     dismiss(toastId);
 
     users.current = data;
-    log(true,"UD", "mapped users", mapUsersToData(data), true);
     usersData.current = mapUsersToData(data);
     usersLoaded.current = true;
   }
 
-  const changeMeta = (meta: Meta<FormSchemaType>) => {
+  const changeMeta = (meta: Meta) => {
+    log (true, "UD", "CHANGE META", meta.data, true);
     setMetaForUserDetails(meta);
     setReload((x: number) => x+1);
   }
   
   useEffect(() => {
-    let meta:Meta<FormSchemaType> = {
+    let meta:Meta = {
       sender: "UserDetails",
       subject: undefined,
       changeMeta: changeMeta,
+      data: {
+        country: {
+          id: 0,
+          name: defaultCountry.name,
+          dialCode: defaultCountry.dialCode
+        }
+      }
     }
+
+    log (true, "UD", "INIT META", meta.data, true);
     setMetaForUserDetails(meta);
 
     renderToast();
@@ -90,10 +99,12 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleReset = () => {
+    log (true, "UD", "RESET");
     setUser(undefined);
 
     if (metaForUserDetails) {
       metaForUserDetails.subject = undefined;
+      
       setMetaForUserDetails(metaForUserDetails);
       setReload((x: number) => x+1);
     }

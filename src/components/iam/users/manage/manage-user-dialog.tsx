@@ -12,21 +12,23 @@ import TabPolicies from "./tabs/tab-policies";
 import TabGroups from "./tabs/tab-groups";
 import { FormSchema, FormSchemaType, issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { difference, log } from "@/lib/utils";
-import { AlertType } from "@/data/types";
+import { AlertTableType, AlertType } from "@/data/types";
 import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
-import { Data, mapGroupsToData, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
-import { getPolicyStatements, getRoleStatements, validateData, ValidationType } from "@/lib/validate";
+import { Data, fullMapSubjectToData, mapGroupsToData, mapPoliciesToData, mapRolesToData } from "@/lib/mapping";
+import { validateMappedData } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
-import { createUser, handleLoadCountries, updateUser } from "@/lib/db";
-import { FieldValues, UseFormGetValues } from "react-hook-form";
+import { createUser, handleLoadCountries, loadDependencies, updateUser } from "@/lib/db";
 import { z } from "zod";
-import { Label } from "@/components/ui/label";
 import AlertMessage from "@/components/ecafe/alert-message";
-import { Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DataTable } from "@/components/datatable/data-table";
+import { alertcolumns } from "@/components/ecafe/table/alert-columns";
+import AlertTable from "@/components/ecafe/alert-table";
 
-const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
-  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
+const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
+  log (true, "MUD", "IN", meta.data, true);
+
+  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta>(meta);
 
   const originalRoles = useRef<Data[]>([]);
   const selectedRoles = useRef<Data[]>([]);
@@ -36,8 +38,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
 
   const originalGroups = useRef<Data[]>([]);
   const selectedGroups = useRef<Data[]>([]);
-
-  const country = useRef<CountryType|undefined>(undefined);
 
   /**
    * state of the dialog
@@ -61,6 +61,8 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
     handleDialogState(false);
     handleReset();
   }
+
+  const [valid, setValid] = useState<boolean>(false);
 
   const prepareUser = (data: any): UserType => {
     const roles: RoleType[] = selectedRoles.current.map(_role => {
@@ -121,13 +123,12 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
     log(true, "MGD", "prepareUser[groups]", groups, true);
     log(true, "MGD", "prepareUser[removedGroups]", removedGroups, true);
 
-
     return {
       id: (metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0),
       name: data.name,
       firstname: data.firstname,
       phone: data.phone,
-      phonecode: `(${country.current?.dialCode})`,
+      phonecode: metaForManageUserDialog.data.country.dialCode,
       email: data.email,
       password: data.password,
       address: {
@@ -138,11 +139,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
         city: data.city,
         postalcode: data.postalcode,
         county: data.county,
-        country: {
-          id: (country.current ? country.current.id : 0),
-          name: (country.current ? country.current.name : ""),
-          dialCode: (country.current ? country.current.dialCode : "")
-        }
+        country: metaForManageUserDialog.data.country
       },
       roles: {
         original: [],
@@ -187,7 +184,13 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
     const _country: CountryType|undefined = data.find((country: CountryType) => country.name === defaultCountry.name);
 
     if  (_country) {
-      country.current = _country;
+      metaForManageUserDialog.data.country = {
+          id: (_country.id ? _country.id : 0),
+          name: (_country.name ? _country.name: defaultCountry.name),
+          dialCode: (_country.dialCode ? _country.dialCode : defaultCountry.dialCode)
+        }
+      log (true, "MUD", "Countries Loaded", metaForManageUserDialog.data, true);
+      metaForManageUserDialog.changeMeta ? metaForManageUserDialog.changeMeta(metaForManageUserDialog) : null;
     }
   }
 
@@ -217,6 +220,18 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
     }
   }
 
+  const [tab, setTab] = useState("userdetails");
+
+  const switchTabAndSubmit = () => {
+    log(true, "MUD", "switch tab");
+    setTab("userdetail");
+      if (metaForManageUserDialog.handleSubmitForm) {
+        log(true, "MUD", "SUBMIT FORM CALLABLE");
+        metaForManageUserDialog.handleSubmitForm();
+      }
+    // metaForManageUserDialog.control && metaForManageUserDialog.control.handleSubmitForm ? metaForManageUserDialog.control.handleSubmitForm() : null
+  }
+
   const validateFormValues = (data: FormSchemaType) => {
     log(true, "MUD", "validateFormValues", data, true);
 
@@ -226,7 +241,8 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-          showAlert("validation failed", "User data is not correct");
+          showSimpleAlert("validation failed", "User data is not correct");
+          switchTabAndSubmit("userdetails");
         } else {
         console.error("Unexpected error: ", error);
       }
@@ -242,7 +258,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
   useEffect(() => {
     if (metaForManageUserDialog.subject) {
       setRelations(metaForManageUserDialog.subject);
-      country.current = metaForManageUserDialog.subject.address?.country;
     } else {
       selectedRoles.current = [];
       selectedPolicies.current = [];
@@ -260,12 +275,8 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
   
     setMetaForManageUserDialog(meta);
     
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
   }, [meta.subject]);
-
-  const updateCountry = (_country: CountryType) => {
-    country.current = _country;
-  }
 
   const setSelection = (type: string, data: Data[]) => {
     switch (type) {
@@ -297,13 +308,15 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
     return [];
   }
 
-  const [alert, setAlert] = useState<AlertType>();
+  const [simpleAlert, setSimpleAlert] = useState<AlertType>();
+  const [tableAlert, setTableAlert] = useState<AlertType>();
   
   const handleRemoveAlert = () => {
-    setAlert(undefined);
+    setSimpleAlert(undefined);
+    setTableAlert(undefined);
   }
 
-  const showAlert = (_title: string, _message: string) => {
+  const showSimpleAlert = (_title: string, _message: string) => {
     const alert = {
       open: true,
       error: true,
@@ -312,30 +325,129 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
       child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
     };
   
-    setAlert(alert);
+    setSimpleAlert(alert);
+  }
+
+    const showTableAlert = (_title: string, _message: string, data: Data[]) => {
+      const alert: AlertTableType = {
+        open: true,
+        error: true,
+        title: _title,
+        message: _message,
+        table: <DataTable data={data} columns={alertcolumns}/>,
+        child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
+      };
+    
+      setTableAlert(alert);
+    }
+
+  const validateSubject = (subject: any) => {
+    log(true, "MUD", "Validate Subject", subject, true);
+
+    const mappedSubject: Data[] = fullMapSubjectToData(subject);
+    const conflicts = validateMappedData(mappedSubject);
+
+    if (conflicts.length > 0) {
+      showTableAlert("Validation Error", "Conflicts", conflicts);
+    }
+
+    setValid(conflicts.length === 0);
+    // setValid(true);
+  }
+
+  const dependencyGroupsLoadedCallback = (subject: any, data: any[]) => {
+    subject.groups.original = data;
+
+    log(true, "MUD", "VALIDATE SUBJECT");
+    validateSubject(subject);
+  }
+
+  const dependencyPoliciesLoadedCallback = (subject: any, data: any[]) => {
+      subject.policies.original = data;
+
+      if (subject.groups && subject.groups.selected && subject.groups.selected.lenght > 0) {
+        log(true, "MUD", "Loading Groups(3)");
+        loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
+      } else {
+        validateSubject(subject);
+      }
+  }
+  
+  const dependencyRolesLoadedCallback = (subject: any, data: any[]) => {
+    log(true, "MUD", "...ROLES LOADED", data, true);
+
+    subject.roles.original = data;
+
+    if (subject.policies && subject.policies.selected && subject.policies.selected.length > 0) {
+      log(true, "MUD", "Loading Policies(2)");
+      loadDependencies(subject, "http://localhost:3000/api/iam/policies/dependencies", subject.policies.selected, dependencyPoliciesLoadedCallback);
+    } else if (subject.groups && subject.groups.selected && subject.groups.selected.length > 0) {
+      log(true, "MUD", "Loading Groups(2)");
+      loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
+    } else {
+      validateSubject(subject);
+    }
   }
 
   const validateItems = (): boolean => {
     log(true, "MUD", "Validate User", meta.subject, true);
-    
-    return true;
-    // const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
-    // const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
 
-    // const validationData: Data[] = [...policyStatements, ...roleStatements];
+    let user: UserType = meta.subject;
+    if (user === undefined) {
+      if (metaForManageUserDialog.form && metaForManageUserDialog.form.getValues) {
+        log(true, "MUD", "Values defined");
+        user = prepareUser(metaForManageUserDialog.form.getValues());
 
-    // let validationResult: ValidationType = validateData(validationData);
+        if (user.roles && user.roles.selected && user.roles.selected.length > 0) {
+          log(true, "MUD", "Loading Roles");
+          loadDependencies(user, "http://localhost:3000/api/iam/roles/dependencies", user.roles.selected, dependencyRolesLoadedCallback);
+        } else if (user.policies && user.policies.selected && user.policies.selected.length > 0) {
+          log(true, "MUD", "Loading Policies");
+          loadDependencies(user, "http://localhost:3000/api/iam/policies/dependencies", user.policies.selected, dependencyPoliciesLoadedCallback);
+        } else if (user.groups && user.groups.selected && user.groups.selected.length > 0) {
+          log(true, "MUD", "Loading Groups");
+          loadDependencies(user, "http://localhost:3000/api/iam/groups/dependencies", user.groups.selected, dependencyGroupsLoadedCallback);
+        }
+      }
+    }
 
-    // if (validationResult.result === "error") {
-    //   showAlert("Validation Error", validationResult.message!);
-    // }
+    return valid;
+  }
 
-    // return (validationResult.result === "ok");
+  const onTabChange = (value: string) => {
+    setTab(value);
+
+    if (metaForManageUserDialog && metaForManageUserDialog.form && metaForManageUserDialog.form.getValues) {
+      let subject = {
+        id: metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0,
+        name: metaForManageUserDialog.form.getValues().name,
+        firstname: metaForManageUserDialog.form.getValues().firstname,
+        code: metaForManageUserDialog.data.country.dialCode,
+        phone: metaForManageUserDialog.form.getValues().phone,
+        address : {
+          street: metaForManageUserDialog.form.getValues().street,
+          number:metaForManageUserDialog.form.getValues().number,
+          box: metaForManageUserDialog.form.getValues().box,
+          city: metaForManageUserDialog.form.getValues().city,
+          postalcode: metaForManageUserDialog.form.getValues().postalcode,
+          county: metaForManageUserDialog.form.getValues().county,
+          country: metaForManageUserDialog.data.country
+          },
+        email: metaForManageUserDialog.form.getValues().email,
+        password: metaForManageUserDialog.form.getValues().password,
+      }
+
+      metaForManageUserDialog.subject = subject;
+      metaForManageUserDialog.changeMeta ? metaForManageUserDialog.changeMeta(metaForManageUserDialog) : null;
+    }
   }
 
   const renderComponent = () => {
-    if (alert && alert.open) {
-      return (<AlertMessage alert={alert}></AlertMessage>)
+    if (simpleAlert && simpleAlert.open) {
+      return (<AlertMessage alert={simpleAlert}></AlertMessage>)
+    }
+    if (tableAlert && tableAlert.open) {
+      return (<AlertTable alert={tableAlert}></AlertTable>)
     }
 
     if (metaForManageUserDialog) {
@@ -352,7 +464,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
                 </DialogTitle>
               </DialogHeader>
       
-              <Tabs className="w-[100%]" defaultValue="userdetails">
+              <Tabs className="w-[100%]" value={tab} onValueChange={onTabChange}>
               <TabsList className="grid grid-cols-4">
                 <TabsTrigger value="userdetails">🙍🏻‍♂️ User Details</TabsTrigger>
                 <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
@@ -361,7 +473,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
               </TabsList>
               <TabsContent value="userdetails">
                 <div className="m-1 container w-[99%]">
-                <TabUserDetails _meta={metaForManageUserDialog} updateCountry={updateCountry} />
+                <TabUserDetails _meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               <TabsContent value="roles">

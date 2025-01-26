@@ -26,3 +26,4 @@ export type ServicebyIdAndNameType = {
 export type CallbackFunctionDefault = () => void;
 export type CallbackFunctionSubjectLoaded = (data: any[]) => void;
 
+export type CallbackFunctionDependencyLoaded = (subject: any, data: any[]) => void;

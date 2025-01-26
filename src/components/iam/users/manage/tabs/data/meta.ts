@@ -57,11 +57,12 @@ export const issuer_users = "Users";
 //     }
 // }
 
-export interface Meta<T  extends FieldValues> {
+export interface Meta {
     sender: string
     subject?: any
     buttons?: ButtonConfig[]
-    changeMeta?: (meta: Meta<T>) => void
+    changeMeta?: (meta: Meta) => void
+    handleSubmitForm?: () => void,
     control?:{
         closeDialog?: () => void
         handleSubject?: (data: any) => void,
@@ -83,7 +84,11 @@ export interface Meta<T  extends FieldValues> {
         getSelection?: (type:string) => Data[]
         validateItems?: () => boolean
     },
-    data?: {
-         updateData: (data: any) => void
+    data: {
+        country: {
+            id: number,
+            dialCode: string,
+            name: string
+        }
     }
 }
