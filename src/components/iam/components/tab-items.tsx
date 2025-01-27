@@ -2,7 +2,6 @@
 
 import PageTitle from "@/components/ecafe/page-title"
 import { Separator } from "@/components/ui/separator"
-import { Meta } from "../users/manage/tabs/data/meta"
 import ActionButtons from "../users/manage/components/action-buttons"
 import { DataTable } from "@/components/datatable/data-table"
 
@@ -11,8 +10,11 @@ import { columns } from "./table/colums"
 import { Data } from "@/lib/mapping"
 import { useEffect, useState } from "react"
 import { log } from "@/lib/utils"
+import { MetaBase } from "@/data/meta"
+import { FormSchemaType } from "../users/manage/tabs/data/meta"
+import { FieldValues } from "react-hook-form"
 
-const TabItems = ({meta}:{meta:Meta}) => {
+const TabItems = <T extends FieldValues,>({meta}:{meta:MetaBase<T>}) => {
   const [validateEnabled, setValidateEnabled] = useState<boolean>(false);
 
   const tableMeta: TableMeta<Data[]> = {
@@ -47,7 +49,7 @@ const TabItems = ({meta}:{meta:Meta}) => {
                   <DataTable id="TabItemTable" columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={handleGetSelection()} />
               </div>
               <div className=" flex justify-end">
-              <ActionButtons _meta={(meta)} validateEnabled={validateEnabled}/>
+              <ActionButtons _meta={meta} validateEnabled={validateEnabled}/>
               </div>
           </div>
       </>

@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import { FormSchemaType, Meta } from "../tabs/data/meta";
 import { CountryType, defaultCountry, UserType } from "@/data/iam-scheme";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { log } from "@/lib/utils";
 import { CallbackFunctionSubjectLoaded } from "@/data/types";
 import { handleLoadCountries } from "@/lib/db";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
 
 const addressStreet = "street";
 const addressNumber = "number";
@@ -19,7 +19,7 @@ const addressPostal = "postal";
 const addressCounty = "county";
 const addressCountry = "country";
 
-const AddressSectionDetails = ({_meta}:{_meta: Meta;}) => {
+const AddressSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
   log (true, "ASD", "IN", _meta.data, true);
   const [countries, setCountries] = useState<CountryType[]>([]);
 

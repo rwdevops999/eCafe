@@ -4,13 +4,13 @@ import { EmailInput } from "@/components/ecafe/email-input";
 import { PasswordInput } from "@/components/ecafe/password-input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { FormSchemaType, Meta } from "../tabs/data/meta";
 import TooltipMessage from "@/components/ecafe/tooltip-message";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
 
 const logonEmail = "email";
 const logonPassword = "password";
 
-const LoginSectionDetails = ({_meta}:{_meta: Meta}) => {
+const LoginSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>}) => {
   if (_meta.form) {
     return (
       <Card className="border-stone-500">

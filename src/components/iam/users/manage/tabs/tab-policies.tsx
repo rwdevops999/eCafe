@@ -1,18 +1,19 @@
 import TabItems from "@/components/iam/components/tab-items";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { cancelButton, createButton, issuer_policies, Meta, updateButton, validateButton } from "./data/meta";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { ColumnMeta, RowData } from "@tanstack/react-table"
 import { handleLoadPolicies } from "@/lib/db";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
+import { FormSchemaType, Meta } from "./data/meta";
+import { cancelButton, createButton, issuer_policies, updateButton, validateButton } from "@/data/meta";
 
-const TabPolicies = ({meta}:{meta: Meta;}) => {
+const TabPolicies = ({meta}:{meta: Meta<FormSchemaType>;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta>();
+  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta<FormSchemaType>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Policies", description: "loading ..."})
@@ -20,7 +21,7 @@ const TabPolicies = ({meta}:{meta: Meta;}) => {
   }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
-    let mappedPolicies: Data[] = mapPoliciesToData(_data, 2);
+    let mappedPolicies: Data[] = mapPoliciesToData(_data);
 
     let createMode: boolean = (meta.subject === undefined);
     if (! createMode) {
@@ -34,7 +35,7 @@ const TabPolicies = ({meta}:{meta: Meta;}) => {
     meta.items ? meta.items.data = mappedPolicies : meta.items = {data: mappedPolicies};
 
     setMetaForTabPolicies(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
 
     dismiss(toastId);
   }

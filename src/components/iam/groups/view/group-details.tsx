@@ -14,7 +14,7 @@ import { TableMeta } from "@tanstack/react-table";
 import { DataTable } from "@/components/datatable/data-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { handleDeleteGroup, handleDeleteUser, handleLoadGroups } from "@/lib/db";
-import { Meta } from "../../users/manage/tabs/data/meta";
+import { Meta } from "../../users/manage/dist/data/meta";
 import { FormSchemaType } from "../manage/tabs/data/data";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {

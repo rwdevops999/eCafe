@@ -1,18 +1,18 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Meta } from "../tabs/data/meta";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { log } from "@/lib/utils";
 import TooltipMessage from "@/components/ecafe/tooltip-message";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
 
 const detailFirstName = "firstname";
 const detailName = "name";
 const detailPhone = "phone";
 const detailPhonecode = "code";
 
-const   UserSectionDetails = ({_meta}:{_meta: Meta;}) => {
+const   UserSectionDetails = ({_meta}:{_meta: Meta<FormSchemaType>;}) => {
   log (true, "USD", "IN", _meta.data, true);
   const renderComponent = () => {
     if (_meta.form) {

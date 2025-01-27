@@ -1,7 +1,6 @@
 'use client'
 
 import PageTitle from "@/components/ecafe/page-title";
-import { cancelButton, createButton, FormSchema, FormSchemaType, Meta, updateButton } from "./data/meta";
 import ActionButtons from "../components/action-buttons";
 import { Separator } from "@/components/ui/separator";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -13,11 +12,13 @@ import UserSectionDetails from "../components/user-section-details";
 import AddressSectionDetails from "../components/address-section-details";
 import LoginSectionDetails from "../components/login-section-details";
 import { Button } from "@/components/ui/button";
+import { FormSchema, FormSchemaType, Meta } from "./data/meta";
+import { cancelButton, createButton, updateButton } from "@/data/meta";
 
 
-const TabUserDetails = ({_meta}:{_meta:Meta;}) => {
+const TabUserDetails = ({_meta}:{_meta:Meta<FormSchemaType>;}) => {
   log (true, "TUD", "IN", _meta.data, true);
-  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta>();
+  const [metaForTabUserDetails, setMetaForTabUserDetails] = useState<Meta<FormSchemaType>>();
 
   const {
     register,
@@ -45,13 +46,6 @@ const TabUserDetails = ({_meta}:{_meta:Meta;}) => {
 
   const [reRender, setReRender] = useState<number>(0);
 
-  const onSubmit = () => console.log("SUBMIIIIIIT(1)");
-
-  const handleSubmitForm = () => {
-    console.log("SUBMIIIIIIT(2)")
-    handleSubmit(onSubmit)();
-  }
-  
   useEffect(() => {
     let createMode: boolean = (_meta.subject === undefined);
     if (! createMode) {
@@ -60,8 +54,6 @@ const TabUserDetails = ({_meta}:{_meta:Meta;}) => {
 
     _meta.sender = "TabUserDetails";
     _meta.buttons = [createMode ? createButton : updateButton, cancelButton];
-    console.log("SET CONTROL");
-    _meta.handleSubmitForm = handleSubmitForm,
     _meta.form ? _meta.form.register = register : _meta.form = {register: register}
     _meta.form ? _meta.form.errors = errors : _meta.form = {errors: errors}
     _meta.form ? _meta.form.reset = reset : _meta.form = {reset: reset}
@@ -79,7 +71,7 @@ const TabUserDetails = ({_meta}:{_meta:Meta;}) => {
           <PageTitle className="m-2" title={`User Details`} />
           <Separator />
           <div className="block space-y-1">
-            <form className="form w-[100%]" onSubmit={handleSubmit(onSubmit)}>
+            <form className="form w-[100%]">
               <div className="grid grid-cols-12">
                 <div className="col-span-11 space-y-1">
                   <UserSectionDetails _meta={metaForTabUserDetails}/>

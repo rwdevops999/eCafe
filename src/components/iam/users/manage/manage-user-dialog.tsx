@@ -10,7 +10,6 @@ import TabUserDetails from "./tabs/tab-user-details";
 import TabRoles from "./tabs/tab-roles";
 import TabPolicies from "./tabs/tab-policies";
 import TabGroups from "./tabs/tab-groups";
-import { FormSchema, FormSchemaType, issuer_groups, issuer_policies, issuer_roles, Meta } from "./tabs/data/meta";
 import { difference, log } from "@/lib/utils";
 import { AlertTableType, AlertType } from "@/data/types";
 import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
@@ -24,11 +23,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { DataTable } from "@/components/datatable/data-table";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import AlertTable from "@/components/ecafe/alert-table";
+import { FormSchema, FormSchemaType, Meta } from "./tabs/data/meta";
+import { issuer_groups, issuer_policies, issuer_roles } from "@/data/meta";
 
-const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
+const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   log (true, "MUD", "IN", meta.data, true);
 
-  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta>(meta);
+  const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
 
   const originalRoles = useRef<Data[]>([]);
   const selectedRoles = useRef<Data[]>([]);
@@ -116,12 +117,12 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
       return group;
     });
 
-    log(true, "MGD", "prepareUser[roles]", roles, true);
-    log(true, "MGD", "prepareUser[removedRoles]", removedRoles, true);
-    log(true, "MGD", "prepareUser[policies]", policies, true);
-    log(true, "MGD", "prepareUser[removedPolicies]", removedPolicies, true);
-    log(true, "MGD", "prepareUser[groups]", groups, true);
-    log(true, "MGD", "prepareUser[removedGroups]", removedGroups, true);
+    log(false, "MGD", "prepareUser[roles]", roles, true);
+    log(false, "MGD", "prepareUser[removedRoles]", removedRoles, true);
+    log(false, "MGD", "prepareUser[policies]", policies, true);
+    log(false, "MGD", "prepareUser[removedPolicies]", removedPolicies, true);
+    log(false, "MGD", "prepareUser[groups]", groups, true);
+    log(false, "MGD", "prepareUser[removedGroups]", removedGroups, true);
 
     return {
       id: (metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0),
@@ -223,18 +224,10 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   const [tab, setTab] = useState("userdetails");
 
   const switchTabAndSubmit = () => {
-    log(true, "MUD", "switch tab");
     setTab("userdetail");
-      if (metaForManageUserDialog.handleSubmitForm) {
-        log(true, "MUD", "SUBMIT FORM CALLABLE");
-        metaForManageUserDialog.handleSubmitForm();
-      }
-    // metaForManageUserDialog.control && metaForManageUserDialog.control.handleSubmitForm ? metaForManageUserDialog.control.handleSubmitForm() : null
   }
 
   const validateFormValues = (data: FormSchemaType) => {
-    log(true, "MUD", "validateFormValues", data, true);
-
     try {
       const parsedData = FormSchema.parse(data);
       handleManageUser(data);
@@ -242,7 +235,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     } catch (error) {
         if (error instanceof z.ZodError) {
           showSimpleAlert("validation failed", "User data is not correct");
-          switchTabAndSubmit("userdetails");
+          switchTabAndSubmit();
         } else {
         console.error("Unexpected error: ", error);
       }
@@ -275,7 +268,7 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   
     setMetaForManageUserDialog(meta);
     
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
   }, [meta.subject]);
 
   const setSelection = (type: string, data: Data[]) => {
@@ -342,8 +335,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     }
 
   const validateSubject = (subject: any) => {
-    log(true, "MUD", "Validate Subject", subject, true);
-
     const mappedSubject: Data[] = fullMapSubjectToData(subject);
     const conflicts = validateMappedData(mappedSubject);
 
@@ -352,13 +343,11 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
     }
 
     setValid(conflicts.length === 0);
-    // setValid(true);
   }
 
   const dependencyGroupsLoadedCallback = (subject: any, data: any[]) => {
     subject.groups.original = data;
 
-    log(true, "MUD", "VALIDATE SUBJECT");
     validateSubject(subject);
   }
 
@@ -366,7 +355,6 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
       subject.policies.original = data;
 
       if (subject.groups && subject.groups.selected && subject.groups.selected.lenght > 0) {
-        log(true, "MUD", "Loading Groups(3)");
         loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
       } else {
         validateSubject(subject);
@@ -374,15 +362,11 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
   
   const dependencyRolesLoadedCallback = (subject: any, data: any[]) => {
-    log(true, "MUD", "...ROLES LOADED", data, true);
-
     subject.roles.original = data;
 
     if (subject.policies && subject.policies.selected && subject.policies.selected.length > 0) {
-      log(true, "MUD", "Loading Policies(2)");
       loadDependencies(subject, "http://localhost:3000/api/iam/policies/dependencies", subject.policies.selected, dependencyPoliciesLoadedCallback);
     } else if (subject.groups && subject.groups.selected && subject.groups.selected.length > 0) {
-      log(true, "MUD", "Loading Groups(2)");
       loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
     } else {
       validateSubject(subject);
@@ -390,22 +374,16 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta; 
   }
 
   const validateItems = (): boolean => {
-    log(true, "MUD", "Validate User", meta.subject, true);
-
     let user: UserType = meta.subject;
     if (user === undefined) {
       if (metaForManageUserDialog.form && metaForManageUserDialog.form.getValues) {
-        log(true, "MUD", "Values defined");
         user = prepareUser(metaForManageUserDialog.form.getValues());
 
         if (user.roles && user.roles.selected && user.roles.selected.length > 0) {
-          log(true, "MUD", "Loading Roles");
           loadDependencies(user, "http://localhost:3000/api/iam/roles/dependencies", user.roles.selected, dependencyRolesLoadedCallback);
         } else if (user.policies && user.policies.selected && user.policies.selected.length > 0) {
-          log(true, "MUD", "Loading Policies");
           loadDependencies(user, "http://localhost:3000/api/iam/policies/dependencies", user.policies.selected, dependencyPoliciesLoadedCallback);
         } else if (user.groups && user.groups.selected && user.groups.selected.length > 0) {
-          log(true, "MUD", "Loading Groups");
           loadDependencies(user, "http://localhost:3000/api/iam/groups/dependencies", user.groups.selected, dependencyGroupsLoadedCallback);
         }
       }

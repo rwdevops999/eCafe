@@ -8,7 +8,7 @@ import TabGroup from "./tabs/tab-group";
 import { useEffect, useRef, useState } from "react";
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import { GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
-import { issuer_policies, issuer_roles, issuer_users, Meta } from "../../users/manage/tabs/data/meta";
+import { issuer_policies, issuer_roles, issuer_users, Meta } from "../../users/manage/dist/data/meta";
 import { AlertType, CallbackFunctionDefault } from "@/data/types";
 import { createGroup, updateGroup } from "@/lib/db";
 import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";

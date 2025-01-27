@@ -1,4 +1,4 @@
-import { DialogDataType } from "@/components/iam/users/manage/tabs/data/data";
+import { DialogDataType } from "@/components/iam/users/manage/dist/data/data";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
 import { decrypt, difference, encrypt, log } from "@/lib/utils";

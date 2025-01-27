@@ -60,10 +60,10 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setOpen(state);
   }
 
-  const policiesLoadedCallback = (data: PolicyType[]) => {
+  const policiesLoadedCallback = (policies: PolicyType[]) => {
     dismiss(toastId);
-    setPolicies(data);
-    const mappedPolicies: Data[] = mapPoliciesToData(data, 3);
+    setPolicies(policies);
+    const mappedPolicies: Data[] = mapPoliciesToData(policies);
     setPolicyData(mappedPolicies);
   }
 
@@ -150,8 +150,6 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   }
 
   const handleValidate = (_value: boolean): void => {
-    log(true, "CRD", "VALIDATE", selectedPolicies, true);
-
     let conflicts: Data[] = validateMappedData(selectedPolicies);
     
       if (conflicts.length > 0) {

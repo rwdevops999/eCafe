@@ -13,8 +13,8 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
 import { log } from "@/lib/utils";
-import { FormSchemaType, Meta } from "../manage/tabs/data/meta";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
+import { FormSchemaType, Meta } from "../manage/tabs/data/meta";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const { toast, dismiss } = useToast();
@@ -25,7 +25,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     toastId = id;
   }
 
-  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta>();
+  const [metaForUserDetails, setMetaForUserDetails] = useState<Meta<FormSchemaType>>();
   const [reload, setReload] = useState<number>(0);
 
   const users = useRef<UserType[]>([]);
@@ -42,14 +42,13 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     usersLoaded.current = true;
   }
 
-  const changeMeta = (meta: Meta) => {
-    log (true, "UD", "CHANGE META", meta.data, true);
+  const changeMeta = (meta: Meta<FormSchemaType>): void => {
     setMetaForUserDetails(meta);
     setReload((x: number) => x+1);
-  }
-  
+  };
+
   useEffect(() => {
-    let meta:Meta = {
+    let meta:Meta<FormSchemaType> = {
       sender: "UserDetails",
       subject: undefined,
       changeMeta: changeMeta,

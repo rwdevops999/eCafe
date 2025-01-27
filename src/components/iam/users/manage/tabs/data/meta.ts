@@ -1,15 +1,7 @@
-import { countryScheme, GroupType, UserType } from "@/data/iam-scheme";
-import { Data } from "@/lib/mapping";
-import { Row } from "@tanstack/react-table";
-import { FieldErrors, FieldValues, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
-import { z, ZodType } from "zod";
+import { MetaBase } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
+import { z } from "zod";
 
-export const createButton = "create";
-export const updateButton = "update";
-export const cancelButton = "cancel";
-export const validateButton = "validate";
-
-export type ButtonConfig = "create" | "cancel" | "validate" | "update";
 
 export const FormSchema = z.object({
     name: z.string().min(1, "Name must contain at least 1 character").max(50, "Name can't contain more than 50 characters"),
@@ -28,67 +20,13 @@ export const FormSchema = z.object({
   });
 export type FormSchemaType = z.infer<typeof FormSchema>;
   
-export const issuer_roles = "Roles";
-export const issuer_policies = "Policies";
-export const issuer_groups = "Groups";
-export const issuer_users = "Users";
-
-// export interface Meta {
-//     buttons?: ButtonConfig[]
-//     submitForm?: (_meta: Meta) => void
-//     closeDialog?: () => void
-//     form?: {
-//         register?: UseFormRegister<FormSchemaType>
-//         errors?: FieldErrors<FormSchemaType>,
-//         getValues?: UseFormGetValues<FormSchemaType>
-//     }
-//     userData?: {
-//         updateData: (data: any) => void
-//     }
-//     manageSubject?: (data: any) => void,
-//     items?: {
-//         issuer?: string
-//         title?: string
-//         columnname?: string
-//         data?: Data[]
-//         setSelection?: (type: string, data: Data[]) => void
-//         getSelection?: (type:string) => Data[]
-//         validateItems?: () => boolean
-//     }
-// }
-
-export interface Meta {
-    sender: string
-    subject?: any
-    buttons?: ButtonConfig[]
-    changeMeta?: (meta: Meta) => void
-    handleSubmitForm?: () => void,
-    control?:{
-        closeDialog?: () => void
-        handleSubject?: (data: any) => void,
-    },
-    form?: {
-        submitForm?: () => void
-        register?: UseFormRegister<FormSchemaType>
-        errors?: FieldErrors<FormSchemaType>,
-        getValues?: UseFormGetValues<FormSchemaType>
-        reset?: UseFormReset<FormSchemaType>
-    },
-    items?: {
-        issuer?: string
-        title?: string
-        columnname?: string
-        data?: Data[]
-
-        setSelection?: (type: string, data: Data[]) => void
-        getSelection?: (type:string) => Data[]
-        validateItems?: () => boolean
-    },
+export interface Meta<T extends FieldValues> extends MetaBase<T> {
+    changeMeta?: (meta: Meta<T>) => void,
     data: {
         country: {
             id: number,
             dialCode: string,
             name: string
         }
-    }
+    },
 }

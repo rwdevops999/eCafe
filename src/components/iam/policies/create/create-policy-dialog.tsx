@@ -94,8 +94,6 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const handleValidate = (value: boolean): void => {
     // const statements: Data[] = getStatements(selectedStatements);
-    log(true, "CPD", "VALIDATE", selectedStatements, true);
-
     let conflicts: Data[] = validateMappedData(selectedStatements);
 
     if (conflicts.length > 0) {

@@ -1,17 +1,18 @@
 import TabItems from "@/components/iam/components/tab-items"
-import { cancelButton, createButton, issuer_groups, Meta, updateButton, validateButton } from "./data/meta"
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { mapGroupsToData } from "@/lib/mapping";
 import { handleLoadGroups } from "@/lib/db";
 import { GroupType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
+import { FormSchemaType, Meta } from "./data/meta";
+import { cancelButton, createButton, issuer_groups, updateButton, validateButton } from "@/data/meta";
 
-const TabGroups = ({meta}:{meta: Meta;}) => {
+const TabGroups = ({meta}:{meta: Meta<FormSchemaType>;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabGroups, setMetaForTabGroups] = useState<Meta>();
+  const [metaForTabGroups, setMetaForTabGroups] = useState<Meta<FormSchemaType>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Groups", description: "loading ..."})
@@ -33,7 +34,7 @@ const TabGroups = ({meta}:{meta: Meta;}) => {
     meta.items ? meta.items.data = mappedGroups : meta.items = {data: mappedGroups};
 
     setMetaForTabGroups(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
 
     dismiss(toastId);
   }

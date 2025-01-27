@@ -219,17 +219,14 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
 
     if (subject.roles?.original) {
       roles = mapRolesToData(subject.roles?.original);
-      log(true, "TEST", "MAPPED USER ROLES", roles, true);
     }
 
     if (subject.policies?.original) {
       policies = mapPoliciesToData(subject.policies?.original);
-      log(true, "TEST", "MAPPED USER POLICIES", policies, true);
     }
 
     if (subject.groups?.original) {
       groups = mapGroupsToData(subject.groups?.original);
-      log(true, "TEST", "MAPPED USER GROUPS", groups, true);
     }
 
     // HIER MOETEN POLICIES EN ROLES BEHANDELD WORDEN
@@ -250,7 +247,6 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
     }
 
     result.push(subjectData);
-    log(true, "TEST", "FULL RESULT", result, true);
 
     return result;
   }
@@ -278,7 +274,6 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
     }
 
     result.push(subjectData);
-    log(true, "TEST", "FULL RESULT", result, true);
 
     return result;
   }

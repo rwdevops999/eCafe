@@ -1,5 +1,5 @@
 import { useToast } from "@/hooks/use-toast";
-import { cancelButton, createButton, issuer_users, Meta, updateButton, validateButton } from "./data/meta";
+import { cancelButton, createButton, issuer_users, Meta, updateButton, validateButton } from "../dist/data/meta";
 import { useEffect, useState } from "react";
 import { mapUsersToData } from "@/lib/mapping";
 import { handleLoadUsers } from "@/lib/db";

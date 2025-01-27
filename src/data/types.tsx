@@ -1,4 +1,4 @@
-import { CountryDataType } from "@/components/iam/users/manage/tabs/data/data";
+import { CountryDataType } from "@/components/iam/users/manage/dist/data/data";
 import { CountryType, PolicyType, RoleType, ServiceStatementType, ServiceType, UserType } from "./iam-scheme";
 
 export type AlertType = {

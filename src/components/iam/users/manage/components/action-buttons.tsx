@@ -1,10 +1,12 @@
 'use client'
 
 import EcafeButton from "@/components/ecafe/ecafe-button";
-import { cancelButton, createButton, Meta, updateButton, validateButton } from "../tabs/data/meta";
 import { useState } from "react";
+import { FormSchemaType, Meta } from "../tabs/data/meta";
+import { cancelButton, createButton, MetaBase, updateButton, validateButton } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
 
-const ActionButtons = ({_meta, validateEnabled = false}:{_meta:Meta; validateEnabled?: boolean}) => {
+const ActionButtons = <T extends FieldValues,>({_meta, validateEnabled = false}:{_meta:MetaBase<T>; validateEnabled?: boolean}) => {
     const [valid, setValid] = useState<boolean>(false);
 
     const closeDialog = (_dummy: boolean) => {
