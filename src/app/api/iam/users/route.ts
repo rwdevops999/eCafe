@@ -1,4 +1,3 @@
-import { DialogDataType } from "@/components/iam/users/manage/dist/data/data";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
 import { decrypt, difference, encrypt, log } from "@/lib/utils";
@@ -85,10 +84,7 @@ const  setUserForUpdate = (data: UserType) => {
 export async function POST(req: NextRequest) {
     const data: UserType = await req.json();
 
-    log(true, "API", "Create USER", data, true);
-
     const user: any = setUserForCreate(data);
-    log(true, "API", "USER", user, true);
 
     const createdUser = await prisma.user.create({data: user});
 
@@ -276,8 +272,6 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   const data: UserType = await req.json();
-
-  log(true, "UD", "user for update", setUserForUpdate(data) , true);
 
   const  updatedUser = await prisma.user.update({
     where: {

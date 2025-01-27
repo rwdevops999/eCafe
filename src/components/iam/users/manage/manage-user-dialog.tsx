@@ -26,7 +26,7 @@ import TabRoles from "../../components/tabs/tab-roles";
 import TabPolicies from "../../components/tabs/tab-policies";
 import TabGroups from "../../components/tabs/tab-groups";
 
-const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
+const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
 
   const originalRoles = useRef<Data[]>([]);

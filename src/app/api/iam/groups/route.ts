@@ -46,10 +46,7 @@ const  setGroupForUpdate = (data: GroupType) => {
 export async function POST(req: NextRequest) {
   const data: GroupType = await req.json();
 
-  log(true, "API", "Create Group", data, true);
-
   const group: any = setGroupForCreate(data);
-  log(true, "API", "GROUP", group, true);
 
   const createdGroup = await prisma.group.create({data: group});
 
