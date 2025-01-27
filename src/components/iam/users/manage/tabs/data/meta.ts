@@ -22,7 +22,7 @@ export type FormSchemaType = z.infer<typeof FormSchema>;
   
 export interface Meta<T extends FieldValues> extends MetaBase<T> {
     data: {
-        country: {
+        country?: {
             id: number,
             dialCode: string,
             name: string

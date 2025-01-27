@@ -9,15 +9,7 @@ import { cancelButton, createButton, issuer_groups, MetaBase, updateButton, vali
 import { FieldValues } from "react-hook-form";
 
 const TabGroups = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
   const [metaForTabGroups, setMetaForTabGroups] = useState<MetaBase<T>>();
-
-  const renderToast = () => {
-      let {id} = toast({title: "Groups", description: "loading ..."})
-      toastId = id;
-  }
 
   const groupsLoadedCallback = (_data: GroupType[]) => {
     let mappedGroups = mapGroupsToData(_data);
@@ -35,12 +27,9 @@ const TabGroups = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
 
     setMetaForTabGroups(meta);
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
-
-    dismiss(toastId);
   }
 
   useEffect(() => {
-    renderToast();
     handleLoadGroups(groupsLoadedCallback);
   }, [])
 

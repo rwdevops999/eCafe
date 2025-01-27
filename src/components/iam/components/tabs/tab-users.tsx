@@ -8,15 +8,7 @@ import { cancelButton, createButton, issuer_users, MetaBase, updateButton, valid
 import { FieldValues } from "react-hook-form";
 
 const TabUsers = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
   const [metaForTabUsers, setMetaForTabUsers] = useState<MetaBase<T>>();
-
-  const renderToast = () => {
-      let {id} = toast({title: "Users", description: "loading ..."})
-      toastId = id;
-  }
 
   const usersLoadedCallback = (_data: UserType[]) => {
     let mappedUsers = mapUsersToData(_data);
@@ -34,12 +26,9 @@ const TabUsers = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
 
     setMetaForTabUsers(meta);
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
-
-    dismiss(toastId);
   }
 
   useEffect(() => {
-    renderToast();
     handleLoadUsers(usersLoadedCallback);
   }, [])
 

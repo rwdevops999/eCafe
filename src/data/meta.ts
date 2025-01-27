@@ -37,8 +37,11 @@ export type MetaBase<T extends FieldValues> = {
 
         setSelection?: (type: string, data: Data[]) => void,
         getSelection?: (type:string) => Data[],
-        validateItems?: () => boolean
+        validateItems?: () => void
+        validationResult?: boolean,
+        loggie?: (sender: string) => void
     },
+    data: {}
 }
 
 // export interface MetaBase<T extends FieldValues> {

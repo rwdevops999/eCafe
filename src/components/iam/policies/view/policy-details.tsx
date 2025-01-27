@@ -103,7 +103,8 @@ import AlertMessage from "@/components/ecafe/alert-message";
                 </div>
     
                 <div className="block space-y-5">
-                    <DataTable data={policiesData} columns={columns} tablemeta={meta} expandAll={_policy !== undefined}/>
+                    <DataTable data={policiesData} columns={columns} tablemeta={meta} />
+                    {/* expandAll={_policy !== undefined}/> */}
                 </div>
             </div>
         )

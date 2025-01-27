@@ -10,15 +10,7 @@ import { cancelButton, createButton, issuer_policies, MetaBase, updateButton, va
 import { FieldValues } from "react-hook-form";
 
 const TabPolicies = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
   const [metaForTabPolicies, setMetaForTabPolicies] = useState<MetaBase<T>>();
-
-  const renderToast = () => {
-      let {id} = toast({title: "Policies", description: "loading ..."})
-      toastId = id;
-  }
 
   const policiesLoadedCallback = (_data: PolicyType[]) => {
     let mappedPolicies: Data[] = mapPoliciesToData(_data);
@@ -36,12 +28,9 @@ const TabPolicies = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
 
     setMetaForTabPolicies(meta);
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
-
-    dismiss(toastId);
   }
 
   useEffect(() => {
-    renderToast();
     handleLoadPolicies(policiesLoadedCallback);
   }, [])
 

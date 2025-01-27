@@ -24,7 +24,9 @@ const TabItems = <T extends FieldValues,>({meta}:{meta:MetaBase<T>}) => {
   const handleChangeSelection = (selection: Row<Data>[]) => {
     if (meta.items && meta.items.setSelection) {
       meta.items.setSelection(meta.items.issuer!, selection.map((row) => row.original));
+      meta.items.validationResult = false;
       setValidateEnabled(selection.length > 0);
+      meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
     }
   }
 

@@ -10,6 +10,26 @@ import { log } from "@/lib/utils";
 import { useState } from "react";
 import { columns } from "./table/columns";
 import TooltipMessage from "./tooltip-message";
+import { z } from "zod";
+import { FieldValues } from "react-hook-form";
+
+type MetaBase<T extends FieldValues> = {
+  sender: string
+  subject: any
+  changeMeta?: (meta: MetaBase<T>) => void
+  data: {}
+}
+
+interface Meta<T extends FieldValues> extends MetaBase<T> {
+  data: {
+    something?: string
+  },
+}
+
+const FormSchema = z.object({
+    name: z.string()
+});
+export type FormSchemaType = z.infer<typeof FormSchema>;
 
 const user = {
 	id:28,
@@ -501,16 +521,28 @@ const Test = () => {
     setAlert(alert);
   }
 
+  const changeMeta = (meta: Meta<FormSchemaType>): void => {
+  };
+  
+  let meta:Meta<FormSchemaType> = {
+    sender: "UserDetails",
+    subject: undefined,
+    changeMeta: changeMeta,
+    data: {
+      something: 'test'
+    }
+  }
+  
   const renderComponent = () => {
     // if (alert && alert.open) {
     //     return (<AlertTable alert={alert}></AlertTable>)
     // }
 
     // return <Button onClick={showAlert}>Show Alert</Button>;
-    return (<TooltipMessage label="test" message="the message" className="bg-red-500" />);
+    return (<></>);
   };
 
   return (<>{renderComponent()}</>)
 }
 
-export default Test
+export default Test 

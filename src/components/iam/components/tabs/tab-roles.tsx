@@ -10,15 +10,7 @@ import { cancelButton, createButton, issuer_roles, MetaBase, updateButton, valid
 import { FieldValues } from "react-hook-form"
 
 const TabRoles = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
   const [metaForTabRoles, setMetaForTabRoles] = useState<MetaBase<T>>();
-
-  const renderToast = () => {
-      let {id} = toast({title: "Roles", description: "loading ..."})
-      toastId = id;
-  }
 
   const rolesLoadedCallback = (_data: RoleType[]) => {
     let mappedRoles = mapRolesToData(_data);
@@ -36,12 +28,9 @@ const TabRoles = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
 
     setMetaForTabRoles(meta);
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
-
-    dismiss(toastId);
   }
 
   useEffect(() => {
-    renderToast();
     handleLoadRoles(rolesLoadedCallback);
   }, [])
 

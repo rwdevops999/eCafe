@@ -25,6 +25,7 @@ import { issuer_groups, issuer_policies, issuer_roles } from "@/data/meta";
 import TabRoles from "../../components/tabs/tab-roles";
 import TabPolicies from "../../components/tabs/tab-policies";
 import TabGroups from "../../components/tabs/tab-groups";
+import { doLoggie } from "../debug";
 
 const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
@@ -60,8 +61,6 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
     handleDialogState(false);
     handleReset();
   }
-
-  const [valid, setValid] = useState<boolean>(false);
 
   const prepareUser = (data: any): UserType => {
     const roles: RoleType[] = selectedRoles.current.map(_role => {
@@ -127,7 +126,7 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
       name: data.name,
       firstname: data.firstname,
       phone: data.phone,
-      phonecode: metaForManageUserDialog.data.country.dialCode,
+      phonecode: (metaForManageUserDialog.data.country ? metaForManageUserDialog.data.country.dialCode : defaultCountry.dialCode),
       email: data.email,
       password: data.password,
       address: {
@@ -260,10 +259,14 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
     meta.control ? meta.control.handleSubject = handleManageUser : meta.control = {handleSubject: handleManageUser};
     meta.form ? meta.form.submitForm = handleSubmitForm : meta.form = {submitForm: handleSubmitForm};
     meta.sender = "ManageGroupdialog";
-    meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection}
-    meta.items ? meta.items.getSelection = getSelection : meta.items = {getSelection: getSelection}
-    meta.items ? meta.items.validateItems = validateItems : meta.items = {validateItems: validateItems}
+    meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection};
+    meta.items ? meta.items.getSelection = getSelection : meta.items = {getSelection: getSelection};
+    meta.items ? meta.items.validateItems = validateItems : meta.items = {validateItems: validateItems};
+    meta.items.validationResult = false;
+    meta.items ? meta.items.loggie = loggie : meta.items = {loggie: loggie}
   
+    doLoggie<FormSchemaType>("ManageUserDialog", meta);
+
     setMetaForManageUserDialog(meta);
     
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
@@ -333,14 +336,24 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
     }
 
   const validateSubject = (subject: any) => {
+    log(true, "ManageUserDialog","validate subject 01");
     const mappedSubject: Data[] = fullMapSubjectToData(subject);
+    log(true, "ManageUserDialog","validate subject 02");
     const conflicts = validateMappedData(mappedSubject);
 
+    log(true, "ManageUserDialog","validate subject 03", (conflicts.length > 0));
     if (conflicts.length > 0) {
       showTableAlert("Validation Error", "Conflicts", conflicts);
     }
 
-    setValid(conflicts.length === 0);
+    log(true, "ManageUserDialog","validateSubject 04", (conflicts.length === 0));
+
+    if (metaForManageUserDialog && metaForManageUserDialog.items) {
+      log(true, "ManageUserDialog","set result", (conflicts.length === 0));
+      metaForManageUserDialog.items.validationResult = (conflicts.length === 0);
+      setMetaForManageUserDialog(metaForManageUserDialog);
+      metaForManageUserDialog.changeMeta ? metaForManageUserDialog.changeMeta(metaForManageUserDialog) : (_meta: Meta<FormSchemaType>) => {}
+      }
   }
 
   const dependencyGroupsLoadedCallback = (subject: any, data: any[]) => {
@@ -352,9 +365,13 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
   const dependencyPoliciesLoadedCallback = (subject: any, data: any[]) => {
       subject.policies.original = data;
 
+      log(true, "ManageUserDialog","for policies");
+
       if (subject.groups && subject.groups.selected && subject.groups.selected.lenght > 0) {
+        log(true, "ManageUserDialog","validate groups 3");
         loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
       } else {
+        log(true, "ManageUserDialog","validate subject 3");
         validateSubject(subject);
       }
   }
@@ -362,32 +379,48 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
   const dependencyRolesLoadedCallback = (subject: any, data: any[]) => {
     subject.roles.original = data;
 
+    log(true, "ManageUserDialog","for roles");
+
     if (subject.policies && subject.policies.selected && subject.policies.selected.length > 0) {
+      log(true, "ManageUserDialog","validate policies 2");
       loadDependencies(subject, "http://localhost:3000/api/iam/policies/dependencies", subject.policies.selected, dependencyPoliciesLoadedCallback);
     } else if (subject.groups && subject.groups.selected && subject.groups.selected.length > 0) {
+      log(true, "ManageUserDialog","validate groups 2");
       loadDependencies(subject, "http://localhost:3000/api/iam/groups/dependencies", subject.groups.selected, dependencyGroupsLoadedCallback);
     } else {
+      log(true, "ManageUserDialog","validate subject 2");
       validateSubject(subject);
     }
   }
 
-  const validateItems = (): boolean => {
-    let user: UserType = meta.subject;
-    if (user === undefined) {
-      if (metaForManageUserDialog.form && metaForManageUserDialog.form.getValues) {
-        user = prepareUser(metaForManageUserDialog.form.getValues());
+  const loggie = (): void => {
+    log(true, "ManageUserDialog", "LOGGGIIIIIEEEEE");
+  }
 
-        if (user.roles && user.roles.selected && user.roles.selected.length > 0) {
-          loadDependencies(user, "http://localhost:3000/api/iam/roles/dependencies", user.roles.selected, dependencyRolesLoadedCallback);
-        } else if (user.policies && user.policies.selected && user.policies.selected.length > 0) {
-          loadDependencies(user, "http://localhost:3000/api/iam/policies/dependencies", user.policies.selected, dependencyPoliciesLoadedCallback);
-        } else if (user.groups && user.groups.selected && user.groups.selected.length > 0) {
-          loadDependencies(user, "http://localhost:3000/api/iam/groups/dependencies", user.groups.selected, dependencyGroupsLoadedCallback);
-        }
+  const validateItems = (): void => {
+    let user: UserType = meta.subject;
+    if (metaForManageUserDialog.form && metaForManageUserDialog.form.getValues) {
+      user = prepareUser(metaForManageUserDialog.form.getValues());
+    }
+
+    log(true, "ManageUserDialog","VALIDATE USER", user, true);
+
+    if (user) {
+      log(true, "ManageUserDialog","validate start");
+      if (user.roles && user.roles.selected && user.roles.selected.length > 0) {
+        log(true, "ManageUserDialog","validate roles 1");
+        loadDependencies(user, "http://localhost:3000/api/iam/roles/dependencies", user.roles.selected, dependencyRolesLoadedCallback);
+      } else if (user.policies && user.policies.selected && user.policies.selected.length > 0) {
+        log(true, "ManageUserDialog","validate policies 1");
+        loadDependencies(user, "http://localhost:3000/api/iam/policies/dependencies", user.policies.selected, dependencyPoliciesLoadedCallback);
+      } else if (user.groups && user.groups.selected && user.groups.selected.length > 0) {
+        log(true, "ManageUserDialog","validate groups 1");
+
+        loadDependencies(user, "http://localhost:3000/api/iam/groups/dependencies", user.groups.selected, dependencyGroupsLoadedCallback);
       }
     }
 
-    return valid;
+    log(true, "ManageUserDialog","validate done");
   }
 
   const onTabChange = (value: string) => {
@@ -398,7 +431,7 @@ const  ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<
         id: metaForManageUserDialog.subject ? metaForManageUserDialog.subject.id : 0,
         name: metaForManageUserDialog.form.getValues().name,
         firstname: metaForManageUserDialog.form.getValues().firstname,
-        code: metaForManageUserDialog.data.country.dialCode,
+        code: metaForManageUserDialog.form.getValues().code,
         phone: metaForManageUserDialog.form.getValues().phone,
         address : {
           street: metaForManageUserDialog.form.getValues().street,

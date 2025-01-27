@@ -17,14 +17,6 @@ import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 import { FormSchemaType, Meta } from "../manage/tabs/data/meta";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
-  const renderToast = () => {
-    let {id} = toast({title: "Loading...", description: "Users"})
-    toastId = id;
-  }
-
   const [metaForUserDetails, setMetaForUserDetails] = useState<Meta<FormSchemaType>>();
   const [reload, setReload] = useState<number>(0);
 
@@ -35,8 +27,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const [user, setUser] = useState<UserType|undefined>();
 
   const usersLoadedCallback = (data: UserType[]) => {
-    dismiss(toastId);
-
     users.current = data;
     usersData.current = mapUsersToData(data);
     usersLoaded.current = true;
@@ -64,12 +54,10 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     log (true, "UD", "INIT META", meta.data, true);
     setMetaForUserDetails(meta);
 
-    renderToast();
     handleLoadUsers(usersLoadedCallback);
   }, []);
 
   useEffect(() => {
-    renderToast();
     handleLoadUsers(usersLoadedCallback);
   }, [reload, setReload]);
 
