@@ -113,7 +113,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     if  (groupsData && metaForGroupDetails) {
       return (
       <div>
-        <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/groups"}]} />
+        <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
         <PageTitle className="m-2" title={`Overview user groups`} />
 
         <div className="flex items-center justify-end">

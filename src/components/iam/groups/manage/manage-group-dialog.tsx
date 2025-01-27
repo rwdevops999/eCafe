@@ -3,7 +3,6 @@
 import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TabGroup from "./tabs/tab-group";
 import { useEffect, useRef, useState } from "react";
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import { GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
@@ -20,11 +19,11 @@ import { DataTable } from "@/components/datatable/data-table";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import { validateMappedData } from "@/lib/validate";
 import AlertTable from "@/components/ecafe/alert-table";
-import { Dialog, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DialogContent } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import TabRoles from "../../components/tabs/tab-roles";
 import TabPolicies from "../../components/tabs/tab-policies";
 import TabUsers from "../../components/tabs/tab-users";
+import TabGroup from "./tabs/tab-group";
 
 const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [metaForManageGroupDialog, setMetaForManageGroupDialog] = useState<Meta<FormSchemaType>>(meta);

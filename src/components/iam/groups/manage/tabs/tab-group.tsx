@@ -2,9 +2,7 @@
 
 import { GroupType } from "@/data/iam-scheme";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { FormSchema, FormSchemaType } from "./data/data";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { cancelButton, createButton, Meta, updateButton } from "@/components/iam/users/manage/dist/data/meta";
 import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@radix-ui/react-separator";
 import ActionButtons from "@/components/iam/users/manage/components/action-buttons";
@@ -12,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import { FormSchema, FormSchemaType, Meta } from "./data/meta";
+import { cancelButton, createButton, updateButton } from "@/data/meta";
 
 const groupName = "name";
 const groupDescription = "description";
