@@ -1,3 +1,5 @@
+import { MetaBase } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
 import { z } from "zod";
 
 export const FormSchema = z.object({
@@ -5,3 +7,7 @@ export const FormSchema = z.object({
     description: z.string().nullable(),
   });
 export type FormSchemaType = z.infer<typeof FormSchema>;
+  
+export interface Meta<T extends FieldValues> extends MetaBase<T> {
+    changeMeta?: (meta: Meta<T>) => void,
+}

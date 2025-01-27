@@ -1,16 +1,17 @@
 import { useToast } from "@/hooks/use-toast";
-import { cancelButton, createButton, issuer_users, Meta, updateButton, validateButton } from "../dist/data/meta";
 import { useEffect, useState } from "react";
 import { mapUsersToData } from "@/lib/mapping";
 import { handleLoadUsers } from "@/lib/db";
 import TabItems from "@/components/iam/components/tab-items";
 import { UserType } from "@/data/iam-scheme";
+import { cancelButton, createButton, issuer_users, MetaBase, updateButton, validateButton } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
 
-const TabUsers = ({meta}:{meta: Meta;}) => {
+const TabUsers = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabUsers, setMetaForTabUsers] = useState<Meta>();
+  const [metaForTabUsers, setMetaForTabUsers] = useState<MetaBase<T>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Users", description: "loading ..."})
@@ -32,7 +33,7 @@ const TabUsers = ({meta}:{meta: Meta;}) => {
     meta.items ? meta.items.data = mappedUsers : meta.items = {data: mappedUsers};
 
     setMetaForTabUsers(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
 
     dismiss(toastId);
   }

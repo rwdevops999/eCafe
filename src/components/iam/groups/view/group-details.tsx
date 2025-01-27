@@ -1,21 +1,19 @@
 'use client'
 
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useRef, useState } from "react";
+import { FormSchemaType, Meta } from "../manage/tabs/data/meta";
+import { GroupType } from "@/data/iam-scheme";
+import { Data, mapGroupsToData } from "@/lib/mapping";
+import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
+import { action_delete } from "@/data/constants";
+import { TableMeta } from "@tanstack/react-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import ManageGroupDialog from "../manage/manage-group-dialog";
-import { useEffect, useRef, useState } from "react";
-import { GroupType } from "@/data/iam-scheme";
-import { useToast } from "@/hooks/use-toast";
-import { Data, mapGroupsToData } from "@/lib/mapping";
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded } from "@/data/types";
-import { columns } from "./table/colums";
-import { action_delete } from "@/data/constants";
-import { TableMeta } from "@tanstack/react-table";
 import { DataTable } from "@/components/datatable/data-table";
+import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { handleDeleteGroup, handleDeleteUser, handleLoadGroups } from "@/lib/db";
-import { Meta } from "../../users/manage/dist/data/meta";
-import { FormSchemaType } from "../manage/tabs/data/data";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const { toast, dismiss } = useToast();

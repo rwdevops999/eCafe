@@ -5,14 +5,14 @@ import { mapGroupsToData } from "@/lib/mapping";
 import { handleLoadGroups } from "@/lib/db";
 import { GroupType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
-import { FormSchemaType, Meta } from "./data/meta";
-import { cancelButton, createButton, issuer_groups, updateButton, validateButton } from "@/data/meta";
+import { cancelButton, createButton, issuer_groups, MetaBase, updateButton, validateButton } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
 
-const TabGroups = ({meta}:{meta: Meta<FormSchemaType>;}) => {
+const TabGroups = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabGroups, setMetaForTabGroups] = useState<Meta<FormSchemaType>>();
+  const [metaForTabGroups, setMetaForTabGroups] = useState<MetaBase<T>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Groups", description: "loading ..."})
@@ -34,7 +34,7 @@ const TabGroups = ({meta}:{meta: Meta<FormSchemaType>;}) => {
     meta.items ? meta.items.data = mappedGroups : meta.items = {data: mappedGroups};
 
     setMetaForTabGroups(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
 
     dismiss(toastId);
   }
@@ -47,7 +47,7 @@ const TabGroups = ({meta}:{meta: Meta<FormSchemaType>;}) => {
   const renderComponent = () => {
     if (metaForTabGroups) {
       return (
-        <TabItems meta={metaForTabGroups}/>
+        <TabItems<T> meta={metaForTabGroups}/>
       );
     }
 

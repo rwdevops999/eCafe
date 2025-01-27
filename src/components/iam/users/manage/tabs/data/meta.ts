@@ -21,7 +21,6 @@ export const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
   
 export interface Meta<T extends FieldValues> extends MetaBase<T> {
-    changeMeta?: (meta: Meta<T>) => void,
     data: {
         country: {
             id: number,

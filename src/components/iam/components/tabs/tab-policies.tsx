@@ -6,14 +6,14 @@ import { ColumnMeta, RowData } from "@tanstack/react-table"
 import { handleLoadPolicies } from "@/lib/db";
 import { PolicyType, UserType } from "@/data/iam-scheme";
 import { log } from "@/lib/utils";
-import { FormSchemaType, Meta } from "./data/meta";
-import { cancelButton, createButton, issuer_policies, updateButton, validateButton } from "@/data/meta";
+import { cancelButton, createButton, issuer_policies, MetaBase, updateButton, validateButton } from "@/data/meta";
+import { FieldValues } from "react-hook-form";
 
-const TabPolicies = ({meta}:{meta: Meta<FormSchemaType>;}) => {
+const TabPolicies = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabPolicies, setMetaForTabPolicies] = useState<Meta<FormSchemaType>>();
+  const [metaForTabPolicies, setMetaForTabPolicies] = useState<MetaBase<T>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Policies", description: "loading ..."})
@@ -35,7 +35,7 @@ const TabPolicies = ({meta}:{meta: Meta<FormSchemaType>;}) => {
     meta.items ? meta.items.data = mappedPolicies : meta.items = {data: mappedPolicies};
 
     setMetaForTabPolicies(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
 
     dismiss(toastId);
   }
@@ -48,7 +48,7 @@ const TabPolicies = ({meta}:{meta: Meta<FormSchemaType>;}) => {
   const renderComponent = () => {
     if (metaForTabPolicies) {
       return (
-        <TabItems meta={metaForTabPolicies}/>
+        <TabItems<T> meta={metaForTabPolicies}/>
       );
     }
 

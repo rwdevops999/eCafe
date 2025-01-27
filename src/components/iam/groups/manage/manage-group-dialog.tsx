@@ -1,25 +1,30 @@
 'use client'
 
 import PageTitle from "@/components/ecafe/page-title";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TabGroup from "./tabs/tab-group";
 import { useEffect, useRef, useState } from "react";
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import { GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
-import { issuer_policies, issuer_roles, issuer_users, Meta } from "../../users/manage/dist/data/meta";
-import { AlertType, CallbackFunctionDefault } from "@/data/types";
-import { createGroup, updateGroup } from "@/lib/db";
-import { Data, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
+import { AlertTableType, AlertType, CallbackFunctionDefault } from "@/data/types";
+import { createGroup, loadDependencies, updateGroup } from "@/lib/db";
+import { Data, fullMapSubjectToData, mapPoliciesToData, mapRolesToData, mapUsersToData } from "@/lib/mapping";
 import { difference, log } from "@/lib/utils";
-import { FormSchema, FormSchemaType } from "./tabs/data/data";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { z } from "zod";
-import TabRoles from "../../users/manage/tabs/tab-roles";
-import TabPolicies from "../../users/manage/tabs/tab-policies";
-import TabUsers from "../../users/manage/tabs/tab-users";
+import { FormSchema, FormSchemaType, Meta } from "./tabs/data/meta";
+import { issuer_policies, issuer_roles, issuer_users } from "@/data/meta";
+import { DataTable } from "@/components/datatable/data-table";
+import { alertcolumns } from "@/components/ecafe/table/alert-columns";
+import { validateMappedData } from "@/lib/validate";
+import AlertTable from "@/components/ecafe/alert-table";
+import { Dialog, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
+import TabRoles from "../../components/tabs/tab-roles";
+import TabPolicies from "../../components/tabs/tab-policies";
+import TabUsers from "../../components/tabs/tab-users";
 
 const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
   const [metaForManageGroupDialog, setMetaForManageGroupDialog] = useState<Meta<FormSchemaType>>(meta);
@@ -53,23 +58,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
     handleReset();
   }
 
-  const [alert, setAlert] = useState<AlertType>();
-  
-  const handleRemoveAlert = () => {
-    setAlert(undefined);
-  }
-
-  const showAlert = (_title: string, _message: string) => {
-    const alert = {
-      open: true,
-      error: true,
-      title: _title,
-      message: _message,
-      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
-    };
-  
-    setAlert(alert);
-  }
+  const [valid, setValid] = useState<boolean>(false);
 
   const prepareGroup = (data: any): GroupType => {
     const roles: RoleType[] = selectedRoles.current.map(_role => {
@@ -123,12 +112,12 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
       return user;
     });
 
-    log(true, "MGD", "prepareGroup[roles]", roles, true);
-    log(true, "MGD", "prepareGroup[removedRoles]", removedRoles, true);
-    log(true, "MGD", "prepareGroup[policies]", policies, true);
-    log(true, "MGD", "prepareGroup[removedPolicies]", removedPolicies, true);
-    log(true, "MGD", "prepareGroup[users]", users, true);
-    log(true, "MGD", "prepareGroup[removedUsers]", removedUsers, true);
+    log(false, "MGD", "prepareGroup[roles]", roles, true);
+    log(false, "MGD", "prepareGroup[removedRoles]", removedRoles, true);
+    log(false, "MGD", "prepareGroup[policies]", policies, true);
+    log(false, "MGD", "prepareGroup[removedPolicies]", removedPolicies, true);
+    log(false, "MGD", "prepareGroup[users]", users, true);
+    log(false, "MGD", "prepareGroup[removedUsers]", removedUsers, true);
 
     return {
       id: (metaForManageGroupDialog.subject ? metaForManageGroupDialog.subject.id : 0),
@@ -158,13 +147,12 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
   }
 
   const handleManageGroup = (data: any): void => {
-   if  (metaForManageGroupDialog.subject) {
+    if  (metaForManageGroupDialog.subject) {
       const group: GroupType = prepareGroup(data);
       if  (group) {
         updateGroup(group, groupChangedCallback);
       }
     } else {
-      log(true, "MGD", "CREATE GROUP");
       const group: GroupType = prepareGroup(data);
 
       if  (group) {
@@ -172,7 +160,7 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
       }
     }
     handleReset();
-   }
+  }
 
   const setRelations = (group: GroupType|undefined): void => {
     if (group) {
@@ -207,66 +195,19 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-          showAlert("validation failed", "Group data is not correct");
+          showSimpleAlert("validation failed", "User data is not correct");
         } else {
         console.error("Unexpected error: ", error);
       }
     }
   }
-  
+
   const handleSubmitForm = () => {
     if (metaForManageGroupDialog.form?.getValues) {
       validateFormValues(metaForManageGroupDialog.form.getValues())
     }
   }
 
-    const setSelection = (type: string, data: Data[]) => {
-      switch (type) {
-        case issuer_roles:
-          selectedRoles.current = data;
-          break;
-        case issuer_policies:
-          selectedPolicies.current = data;
-          break;
-        case issuer_users:
-          selectedUsers.current = data;
-          break
-      }
-    }
-  
-    const getSelection = (type: string): Data[] => {
-      if (type === issuer_roles) {
-        return selectedRoles.current
-      }
-  
-      if (type === issuer_policies) {
-        return selectedPolicies.current
-      }
-  
-      if (type === issuer_users) {
-        return selectedUsers.current
-      }
-  
-      return [];
-    }
-  
-    const validateItems = (): boolean => {
-        // const policyStatements: Data[] = getPolicyStatements(selectedPolicies.current);
-        // const roleStatements: Data[] = getRoleStatements(selectedRoles.current);
-    
-        // const validationData: Data[] = [...policyStatements, ...roleStatements];
-    
-        // let validationResult: ValidationType = validateData(validationData);
-    
-        // if (validationResult.result === "error") {
-        //   showAlert("Validation Error", validationResult.message!);
-        // }
-    
-        // return (validationResult.result === "ok");
-        return true;
-    }
-    
-    
   useEffect(() => {
     if (metaForManageGroupDialog.subject) {
       setRelations(metaForManageGroupDialog.subject);
@@ -279,19 +220,129 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
     meta.control ? meta.control.closeDialog = closeDialog : meta.control = {closeDialog: closeDialog};
     meta.control ? meta.control.handleSubject = handleManageGroup : meta.control = {handleSubject: handleManageGroup};
     meta.form ? meta.form.submitForm = handleSubmitForm : meta.form = {submitForm: handleSubmitForm};
-    meta.sender = "ManageUserdialog";
+    meta.sender = "ManageGroupdialog";
     meta.items ? meta.items.setSelection = setSelection : meta.items = {setSelection: setSelection}
     meta.items ? meta.items.getSelection = getSelection : meta.items = {getSelection: getSelection}
     meta.items ? meta.items.validateItems = validateItems : meta.items = {validateItems: validateItems}
   
     setMetaForManageGroupDialog(meta);
-
+    
     meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
   }, [meta.subject]);
 
+  const setSelection = (type: string, data: Data[]) => {
+    switch (type) {
+      case issuer_roles:
+        selectedRoles.current = data;
+        break;
+      case issuer_policies:
+        selectedPolicies.current = data;
+        break;
+      case issuer_users:
+        selectedUsers.current = data;
+        break
+    }
+  }
+
+  const getSelection = (type: string): Data[] => {
+    if (type === issuer_roles) {
+      return selectedRoles.current
+    }
+
+    if (type === issuer_policies) {
+      return selectedPolicies.current
+    }
+
+    if (type === issuer_users) {
+      return selectedUsers.current
+    }
+
+    return [];
+  }
+
+  const [simpleAlert, setSimpleAlert] = useState<AlertType>();
+  const [tableAlert, setTableAlert] = useState<AlertType>();
+  
+  const handleRemoveAlert = () => {
+    setSimpleAlert(undefined);
+    setTableAlert(undefined);
+  }
+
+  const showSimpleAlert = (_title: string, _message: string) => {
+    const alert = {
+      open: true,
+      error: true,
+      title: _title,
+      message: _message,
+      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
+    };
+  
+    setSimpleAlert(alert);
+  }
+
+  const showTableAlert = (_title: string, _message: string, data: Data[]) => {
+    const alert: AlertTableType = {
+        open: true,
+        error: true,
+        title: _title,
+        message: _message,
+        table: <DataTable data={data} columns={alertcolumns}/>,
+        child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
+    };
+    
+    setTableAlert(alert);
+  }
+
+  const validateSubject = (subject: any) => {
+    const mappedSubject: Data[] = fullMapSubjectToData(subject);
+    const conflicts = validateMappedData(mappedSubject);
+
+    if (conflicts.length > 0) {
+      showTableAlert("Validation Error", "Conflicts", conflicts);
+    }
+
+    setValid(conflicts.length === 0);
+  }
+
+  const dependencyPoliciesLoadedCallback = (subject: any, data: any[]) => {
+      subject.policies.original = data;
+
+      validateSubject(subject);
+  }
+  
+  const dependencyRolesLoadedCallback = (subject: any, data: any[]) => {
+    subject.roles.original = data;
+
+    if (subject.policies && subject.policies.selected && subject.policies.selected.length > 0) {
+      loadDependencies(subject, "http://localhost:3000/api/iam/policies/dependencies", subject.policies.selected, dependencyPoliciesLoadedCallback);
+    } else {
+      validateSubject(subject);
+    }
+  }
+
+  const validateItems = (): boolean => {
+    let group: GroupType = meta.subject;
+    if (group === undefined) {
+      if (metaForManageGroupDialog.form && metaForManageGroupDialog.form.getValues) {
+        group = prepareGroup(metaForManageGroupDialog.form.getValues());
+
+        if (group.roles && group.roles.selected && group.roles.selected.length > 0) {
+          loadDependencies(group, "http://localhost:3000/api/iam/roles/dependencies", group.roles.selected, dependencyRolesLoadedCallback);
+        } else if (group.policies && group.policies.selected && group.policies.selected.length > 0) {
+          loadDependencies(group, "http://localhost:3000/api/iam/policies/dependencies", group.policies.selected, dependencyPoliciesLoadedCallback);
+        }
+      }
+    }
+
+    return valid;
+  }
+
   const renderComponent = () => {
-    if (alert && alert.open) {
-      return (<AlertMessage alert={alert}></AlertMessage>)
+    if (simpleAlert && simpleAlert.open) {
+      return (<AlertMessage alert={simpleAlert}></AlertMessage>)
+    }
+    if (tableAlert && tableAlert.open) {
+      return (<AlertTable alert={tableAlert}></AlertTable>)
     }
 
     if (metaForManageGroupDialog) {
@@ -322,17 +373,17 @@ const ManageGroupDialog = ({meta, _enabled, handleReset, setReload}:{meta:Meta<F
               </TabsContent>
             <TabsContent value="roles">
               <div className="m-1 container w-[99%]">
-              <TabRoles meta={metaForManageGroupDialog}/>
+              <TabRoles<FormSchemaType> meta={metaForManageGroupDialog}/>
               </div>
             </TabsContent>
             <TabsContent value="policies">
               <div className="m-1 container w-[99%]">
-              <TabPolicies meta={metaForManageGroupDialog} />
+              <TabPolicies<FormSchemaType> meta={metaForManageGroupDialog} />
               </div>
             </TabsContent>
             <TabsContent value="users">
               <div className="m-1 container w-[99%]">
-              <TabUsers meta={metaForManageGroupDialog}/>
+              <TabUsers<FormSchemaType> meta={metaForManageGroupDialog}/>
               </div>
             </TabsContent>
             </Tabs>

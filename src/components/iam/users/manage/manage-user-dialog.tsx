@@ -1,4 +1,4 @@
-'use client'
+ 'use client'
 
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageTitle from "@/components/ecafe/page-title";
@@ -7,9 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useEffect, useRef, useState } from "react";
 import TabUserDetails from "./tabs/tab-user-details";
-import TabRoles from "./tabs/tab-roles";
-import TabPolicies from "./tabs/tab-policies";
-import TabGroups from "./tabs/tab-groups";
 import { difference, log } from "@/lib/utils";
 import { AlertTableType, AlertType } from "@/data/types";
 import { CountryType, defaultCountry, GroupType, PolicyType, RoleType, UserType } from "@/data/iam-scheme";
@@ -25,10 +22,11 @@ import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import AlertTable from "@/components/ecafe/alert-table";
 import { FormSchema, FormSchemaType, Meta } from "./tabs/data/meta";
 import { issuer_groups, issuer_policies, issuer_roles } from "@/data/meta";
+import TabRoles from "../../components/tabs/tab-roles";
+import TabPolicies from "../../components/tabs/tab-policies";
+import TabGroups from "../../components/tabs/tab-groups";
 
 const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<FormSchemaType>; _enabled:boolean; handleReset(): void; setReload(x:any):void;}) => {
-  log (true, "MUD", "IN", meta.data, true);
-
   const [metaForManageUserDialog, setMetaForManageUserDialog] = useState<Meta<FormSchemaType>>(meta);
 
   const originalRoles = useRef<Data[]>([]);
@@ -456,17 +454,17 @@ const ManageUserDialog = ({meta, _enabled, handleReset, setReload}:{meta: Meta<F
               </TabsContent>
               <TabsContent value="roles">
                 <div className="m-1 container w-[99%]">
-                <TabRoles meta={metaForManageUserDialog} />
+                <TabRoles<FormSchemaType> meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               <TabsContent value="policies">
                 <div className="m-1 container w-[99%]">
-                <TabPolicies meta={metaForManageUserDialog} />
+                <TabPolicies<FormSchemaType> meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               <TabsContent value="groups">
                 <div className="m-1 container w-[99%]">
-                <TabGroups meta={metaForManageUserDialog} />
+                <TabGroups<FormSchemaType> meta={metaForManageUserDialog} />
                 </div>
               </TabsContent>
               </Tabs>

@@ -17,6 +17,7 @@ export type MetaBase<T extends FieldValues> = {
     sender: string
     subject: any
     buttons?: ButtonConfig[]
+    changeMeta?: (meta: MetaBase<T>) => void,
     control?:{
         closeDialog?: () => void
         handleSubject?: (data: any) => void

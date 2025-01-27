@@ -6,14 +6,14 @@ import { useEffect, useState } from "react"
 import { handleLoadRoles } from "@/lib/db"
 import { useToast } from "@/hooks/use-toast"
 import TabItems from "@/components/iam/components/tab-items"
-import { FormSchemaType, Meta } from "./data/meta"
-import { cancelButton, createButton, issuer_roles, updateButton, validateButton } from "@/data/meta"
+import { cancelButton, createButton, issuer_roles, MetaBase, updateButton, validateButton } from "@/data/meta"
+import { FieldValues } from "react-hook-form"
 
-const TabRoles = ({meta}:{meta: Meta<FormSchemaType>; }) => {
+const TabRoles = <T extends FieldValues,>({meta}:{meta: MetaBase<T>; }) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const [metaForTabRoles, setMetaForTabRoles] = useState<Meta<FormSchemaType>>();
+  const [metaForTabRoles, setMetaForTabRoles] = useState<MetaBase<T>>();
 
   const renderToast = () => {
       let {id} = toast({title: "Roles", description: "loading ..."})
@@ -35,7 +35,7 @@ const TabRoles = ({meta}:{meta: Meta<FormSchemaType>; }) => {
     meta.items ? meta.items.data = mappedRoles : meta.items = {data: mappedRoles};
 
     setMetaForTabRoles(meta);
-    meta.changeMeta ? meta.changeMeta(meta) : (_meta: Meta<FormSchemaType>) => {}
+    meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
 
     dismiss(toastId);
   }
@@ -48,7 +48,7 @@ const TabRoles = ({meta}:{meta: Meta<FormSchemaType>; }) => {
   const renderComponent = () => {
     if (metaForTabRoles) {
       return (
-        <TabItems<FormSchemaType> meta={metaForTabRoles}/>
+        <TabItems<T> meta={metaForTabRoles}/>
       );
     }
 

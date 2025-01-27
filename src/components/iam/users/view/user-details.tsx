@@ -1,4 +1,4 @@
-'use client'
+ 'use client'
 
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
@@ -98,12 +98,10 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleReset = () => {
-    log (true, "UD", "RESET");
     setUser(undefined);
 
     if (metaForUserDetails) {
       metaForUserDetails.subject = undefined;
-      
       setMetaForUserDetails(metaForUserDetails);
       setReload((x: number) => x+1);
     }
@@ -132,7 +130,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
             <ManageUserDialog meta={metaForUserDetails} _enabled={usersLoaded.current} handleReset={handleReset} setReload={setReload}/> 
             </div>
             <div className="block space-y-5">
-              <DataTable id="UserDetailsTable" data={usersData.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+              <DataTable data={usersData.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
             </div>
         </div>
       );
