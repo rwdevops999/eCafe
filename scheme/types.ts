@@ -11,7 +11,7 @@ type NewServiceType = {
     name: string,
     createDate: Date,
     updateDate: Date,
-    action?: NewActionType[],
+    actions?: NewActionType[],
     statements?: NewStatementType[],
 }  
 

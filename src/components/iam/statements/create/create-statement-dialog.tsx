@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionType, defaultAccess, defaultService, ServiceStatementType, ServiceType } from "@/data/iam-scheme";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -19,11 +18,10 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@/components/ui/separator";
-import { CallbackFunctionDefault, FunctionDefault } from "@/data/types";
 import { Data, mapServiceActionsToData } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table"
 import { createStatement, handleLoadServicesWithService } from "@/lib/db";
-import { log } from "@/lib/utils";
+
 
 const FormSchema = z.object({
   sid: z.string().min(3).max(25),
@@ -34,24 +32,6 @@ type FormSchemaType = z.infer<typeof FormSchema>;
 const debug = false;
 
 const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x:any): void;}) => {
-
-  const { toast, dismiss } = useToast()
-  let toastId: string;
-
-  const renderToast = (_title: string, _description: string): void => {
-      log(debug, "CreateStatementDetails", "render toast");
-      let {id} = toast({title: `${_title}`, description: `${_description}`});
-      toastId = id;
-    }
-    
-  const renderToastLoadServices = () => renderToast("Loading...", "services");
-  const renderToastCreateStatement = () => renderToast("Creating...", "statement");
-    
-  const closeToast = () => {
-    log(debug, "CreateStatementDetails", "dismiss toast");
-    dismiss(toastId);
-  }
-
   /**
    * state of the dialog
    */
@@ -84,8 +64,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
    */
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
-  const servicesLoadedCallback = (data: ServiceType[], _end: FunctionDefault) => {
-    _end();
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     services.current = data;
     setActionsData(mapServiceActionsToData(services.current));
   }
@@ -93,7 +72,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const resetAll = () => {
     access.current = defaultAccess;
     reset();
-    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, renderToastLoadServices, servicesLoadedCallback, closeToast);
+    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
@@ -102,7 +81,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }, [open]);
 
   useEffect(() => {
-    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, renderToastLoadServices, servicesLoadedCallback, closeToast);
+    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, []);
 
@@ -155,9 +134,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
       return undefined;
     }
 
-    const statementCreatedCallback = (_end: FunctionDefault) => {
-      _end();
-      
+    const statementCreatedCallback = () => {
       setReload((x:any) => x+1);
     };
 
@@ -165,7 +142,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
       const statement = prepareCreateStatement(data);
 
       if  (statement) {
-        createStatement(statement, renderToastCreateStatement, statementCreatedCallback, closeToast);
+        createStatement(statement, statementCreatedCallback);
         handleDialogState(false);
       }
     }
@@ -186,7 +163,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
 
     const handleChangeService = (_service: string) => {
       setSelectedService(_service);
-      handleLoadServicesWithService(_service, renderToastLoadServices, servicesLoadedCallback, closeToast);
+      handleLoadServicesWithService(_service, servicesLoadedCallback);
     }
 
     const renderDialog = () => {

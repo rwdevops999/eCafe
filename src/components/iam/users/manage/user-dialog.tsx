@@ -158,7 +158,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return result;
   }
 
-  const validateUser = (user: NewUserType): boolean => {
+  const validateUser = (): boolean => {
     let valid: boolean = false;
 
     return valid;

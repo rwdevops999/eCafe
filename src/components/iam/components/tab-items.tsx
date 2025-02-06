@@ -88,7 +88,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
                         <DataTable columns={columns} data={mappedDependencies} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={getSelectedItemIds()} />
                     </div>
                     <div className=" flex justify-end">
-                        <ActionButtons meta={_meta} buttonConfig={_buttonConfig} nrOfItemsToValidate={nrOfItemsToValidate} valid={true}/>
+                        <ActionButtons meta={_meta} buttonConfig={_buttonConfig} nrOfItemsToValidate={nrOfItemsToValidate}/>
                     </div>
                 </div>
             </>

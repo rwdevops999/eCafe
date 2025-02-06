@@ -19,103 +19,80 @@ export const initDB = async (table: string) => {
  /**
  * LANGUAGES
  */
-// ###
-const loadLanguages = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
   let data: LanguageType[]= [];
   
   await fetch("http://localhost:3000/api/languages")
     .then((response) => response.json())
-    .then((response) => _callback(response, _end));
+    .then((response) => _callback(response));
   
   return data;
 }
 
-// ###
-export const handleLoadLanguages = async (_start: FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-
-  await loadLanguages(_callback, _end);
+export const handleLoadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadLanguages(_callback);
 }
 
 /**
  * COUNTRIES
  */
-// ###
-const loadCountries = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadCountries = async (_callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/db?table=country")
     .then((response) => response.json())
-    .then((response) => _callback(response, _end));
+    .then((response) => _callback(response));
 }
 
-// ###
-export const handleLoadCountries = async (_start: FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-    _start();
-
-    await loadCountries(_callback, _end);
+export const handleLoadCountries = async (_callback: CallbackFunctionSubjectLoaded) => {
+    await loadCountries(_callback);
 }
 
 /**
  * SERVICES
  */
-// ###
-const loadServices = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadServices = async (_callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
     .then((response) => response.json())
-    .then((response) => _callback(response, _end));
+    .then((response) => _callback(response));
 }
 
-// ###
-export const handleLoadServices = async (_start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-  await loadServices(_callback, _end);
+export const handleLoadServices = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadServices(_callback);
 }
 
-// ###
-const loadServicesWithService = async (_service: string, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadServicesWithService = async (_service: string, _callback: CallbackFunctionSubjectLoaded) => {
   await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
     .then((response) => response.json())
     .then((response) => {
-      _callback(response, _end);
+      _callback(response);
     });
 }
 
-// ###
-export const handleLoadServicesWithService = async (_service: string, _start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-  await loadServicesWithService(_service, _callback, _end);
+export const handleLoadServicesWithService = async (_service: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadServicesWithService(_service, _callback);
 }
 
 /**
  * STATEMENTS
  */
-// ###
-const loadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
       .then((response) => response.json())
       .then((response) => {
-        _callback(response, _end);
+        _callback(response);
       });
 }
 
-// ###
-export const handleLoadStatements = async (_serviceId: number, _sid: string, _start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-
-  await loadStatements(_serviceId, _sid, _callback, _end);
+export const handleLoadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadStatements(_serviceId, _sid, _callback);
 }
 
-// ###
-export const handleDeleteStatement = async (id: number, _start: FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const handleDeleteStatement = async (id: number, _callback: CallbackFunctionDefault) => {
   await fetch("http://localhost:3000/api/iam/statements?statementId="+id,{
       method: 'DELETE',
-  }).then((response: Response) => _callback(_end));
+  }).then((response: Response) => _callback());
 }
 
-export const createStatement = async (_statement: ServiceStatementType, _start: FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const createStatement = async (_statement: ServiceStatementType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/statements',
     {
       method: 'POST',
@@ -123,54 +100,43 @@ export const createStatement = async (_statement: ServiceStatementType, _start: 
       headers: {
         'content-type': 'application/json'
         }
-    }).then(response => _callback(_end));
+    }).then(response => _callback());
 }
 
 /**
  * POLICIES
  */
-// ###
-const loadPolicies = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadPolicies = async (_callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/policies")
       .then((response) => response.json())
       .then((response) => {
-        _callback(response, _end);
+        _callback(response);
       });
 }
 
-// ###
-export const handleLoadPolicies = async (_start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-  await loadPolicies(_callback, _end);
+export const handleLoadPolicies = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadPolicies(_callback);
 }
 
-// ###
-const loadPoliciesWithName = async (_policy: string, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadPoliciesWithName = async (_policy: string, _callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/iam/policies?policy=" + _policy)
     .then((response) => response.json())
     .then((response) => {
-        _callback(response, _end);
+        _callback(response);
     });
 }
 
-// ###
-export const handleLoadPoliciesWithName = async (_policy: string, _start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-
-    await loadPoliciesWithName(_policy, _callback, _end);
+export const handleLoadPoliciesWithName = async (_policy: string, _callback: CallbackFunctionSubjectLoaded) => {
+    await loadPoliciesWithName(_policy, _callback);
 }
 
-export const handleDeletePolicy = async (id: number, _start: FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const handleDeletePolicy = async (id: number, _callback: CallbackFunctionDefault) => {
   const res = await fetch("http://localhost:3000/api/iam/policies?policyId="+id,{
       method: 'DELETE',
-  }).then((response: Response) => _callback(_end));
+  }).then((response: Response) => _callback());
 }
 
-export const createPolicy = async (_policy: PolicyType, _start: FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const createPolicy = async (_policy: PolicyType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/policies',
     {
       method: 'POST',
@@ -178,38 +144,31 @@ export const createPolicy = async (_policy: PolicyType, _start: FunctionDefault,
       headers: {
         'content-type': 'application/json'
       }
-    }).then((response) => _callback(_end));
+    }).then((response) => _callback());
 }
 
 /**
  * ROLES
  */
-// ###
-const loadRoles = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadRoles = async (_callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/iam/roles")
       .then((response) => response.json())
       .then((response) => {
-          _callback(response, _end);
+          _callback(response);
       });
 }
 
-// ###
-export const handleLoadRoles = async (_start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-  await loadRoles(_callback, _end);
+export const handleLoadRoles = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadRoles(_callback);
 }
 
-export const handleDeleteRole = async (id: number, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const handleDeleteRole = async (id: number, _callback: CallbackFunctionDefault) => {
   const res = await fetch("http://localhost:3000/api/iam/roles?roleId="+id,{
     method: 'DELETE',
-  }).then((response: Response) => _callback(_end));
+  }).then((response: Response) => _callback());
 }
 
-export const createRole = async (_role: RoleType, _start: FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-
+export const createRole = async (_role: RoleType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/roles',
     {
       method: 'POST',
@@ -217,23 +176,22 @@ export const createRole = async (_role: RoleType, _start: FunctionDefault, _call
       headers: {
         'content-type': 'application/json'
       }
-    }).then((response) => _callback(_end));
+    }).then((response) => _callback());
 }
 
 /**
  * GROUPS
  */
-const loadGroups = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadGroups = async (_callback: CallbackFunctionSubjectLoaded) => {
     await fetch("http://localhost:3000/api/iam/groups")
       .then((response) => response.json())
       .then((response) => {
-        _callback(response, _end);
+        _callback(response);
       });
 }
 
-export const handleLoadGroups = async (_start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-    _start();
-    await loadGroups(_callback, _end);
+export const handleLoadGroups = async (_callback: CallbackFunctionSubjectLoaded) => {
+    await loadGroups(_callback);
 }
 
 // export const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
@@ -267,31 +225,29 @@ export const handleLoadGroups = async (_start:FunctionDefault, _callback: Callba
 /**
  * USERS
  */
-const loadUsers = async (_callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
+const loadUsers = async (_callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/iam/users")
     .then((response) => response.json())
     .then((response) => {
-      _callback(response, _end);
+      _callback(response);
     });
 }
 
-export const handleLoadUsers = async (_start:FunctionDefault, _callback: CallbackFunctionSubjectLoaded, _end: FunctionDefault) => {
-  _start();
-  await loadUsers(_callback, _end);
+export const handleLoadUsers = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadUsers(_callback);
 }
 
-const deleteUser = async (_id: number, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+const deleteUser = async (_id: number, _callback: CallbackFunctionDefault) => {
   const res = await fetch("http://localhost:3000/api/iam/users?userId="+_id,{
     method: 'DELETE',
-  }).then((response: Response) => _callback(_end));
+  }).then((response: Response) => _callback());
 }
 
-export const handleDeleteUser = async (_id: number, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-  await deleteUser(_id, _callback, _end);
+export const handleDeleteUser = async (_id: number, _callback: CallbackFunctionDefault) => {
+  await deleteUser(_id, _callback);
 }
 
-export const createUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+export const createUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/users',
     {
       method: 'POST',
@@ -299,26 +255,14 @@ export const createUser = async (_user: NewExtendedUserType, _callback: Callback
       headers: {
         'content-type': 'application/json'
       }
-    }).then(response => _callback(_end));
+    }).then(response => _callback());
 }
 
-export const handleCreateUser = async (_user: NewExtendedUserType, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-  await createUser(_user, _callback, _end);
+export const handleCreateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault) => {
+  await createUser(_user, _callback);
 }
 
-// export const updateUser = async (_data: UserType, callback: CallbackFunctionDefault) => {
-//   await fetch('http://localhost:3000/api/iam/users',
-//     {
-//       method: 'PUT',
-//       body: JSON.stringify(_data),
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     }).then(response => callback());
-// }
-
-export const updateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+export const updateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/users',
     {
       method: 'PUT',
@@ -326,12 +270,11 @@ export const updateUser = async (_user: NewExtendedUserType, _callback: Callback
       headers: {
         'content-type': 'application/json'
       }
-    }).then(response => _callback(_end));
+    }).then(response => _callback());
 }
 
-export const handleUpdateUser = async (_user: NewExtendedUserType, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
-  _start();
-  await updateUser(_user, _callback, _end);
+export const handleUpdateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault) => {
+  await updateUser(_user, _callback);
 }
 
 // export const loadDependencies = async (subject: any, url: string, dependencies: any[], callback: CallbackFunctionDependencyLoaded) => {

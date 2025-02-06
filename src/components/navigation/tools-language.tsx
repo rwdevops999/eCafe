@@ -3,47 +3,24 @@ import { defaultLanguage } from "@/app/api/languages/route";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
-import { FunctionDefault } from "@/data/types";
-import { useToast } from "@/hooks/use-toast";
 import { handleLoadLanguages } from "@/lib/db";
-import { log } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-const debug: boolean = false;
 
 const ToolsLanguage = () => {
     const {open} = useSidebar();
     const {i18n} = useTranslation();
 
-    const { toast, dismiss } = useToast();
-    let toastId: string;
-  
-    const renderToast = (_title: string, _description: string): void => {
-        log(debug, "ToolsLanguage", "render toast");
-        let {id} = toast({title: `${_title}`, description: `${_description}`});
-        toastId = id;
-      }
-      
-    const renderToastLoadLanguages = () => renderToast("Loading...", "languages");
-      
-    const closeToast = () => {
-      log(debug, "ToolsLanguage", "dismiss toast");
-      dismiss(toastId);
-    }
-  
     const [languages, setLanguages] = useState<LanguageType[]>([]);
     const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage);
 
-    const languagesLoadedCallback = (data: LanguageType[], _end: FunctionDefault) => {
-        _end();
-        
+    const languagesLoadedCallback = (data: LanguageType[]) => {
         setLanguages(data);
     }
 
     useEffect(() => {
-        handleLoadLanguages(renderToastLoadLanguages, languagesLoadedCallback, closeToast); 
+        handleLoadLanguages(languagesLoadedCallback); 
     }, []);
 
     useEffect(() => {

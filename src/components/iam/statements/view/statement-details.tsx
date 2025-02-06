@@ -6,40 +6,19 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { action_delete, action_update, all } from "@/data/constants";
 import { useEffect, useRef, useState } from "react";
 import StatementCreateDialog from "../create/create-statement-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { isNumber, log } from "@/lib/utils";
+import { isNumber } from "@/lib/utils";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
-import { AlertType, FunctionDefault } from "@/data/types";
+import { AlertType } from "@/data/types";
 import { ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
 
-const debug = false;
-
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
-  const renderToast = (_title: string, _description: string): void => {
-      log(debug, "StatementDetails", "render toast");
-      let {id} = toast({title: `${_title}`, description: `${_description}`});
-      toastId = id;
-    }
-    
-  const renderToastLoadServices = () => renderToast("Loading...", "services");
-  const renderToastLoadStatements = () => renderToast("Loading...", "statements");
-  const renderToastDeteleStatement = () => renderToast("Deleting...", "statement");
-    
-  const closeToast = () => {
-    log(debug, "StatementDetails", "dismiss toast");
-    dismiss(toastId);
-  }
-    
   const [reload, setReload] = useState(0);
 
   const [selectedService, setSelectedService] = useState<number | string>(all);
@@ -80,16 +59,13 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return serviceId;
   }
 
-  const statementsLoadedCallback = (data: ServiceStatementType[], _end: FunctionDefault) => {
-    _end();
+  const statementsLoadedCallback = (data: ServiceStatementType[]) => {
     setStatements(data);
     setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
   }
 
-  const servicesLoadedCallback = (data: ServiceType[], _end: FunctionDefault) => {
-    _end();
-    
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     services.current = data;
 
     setSelectedService(_service);
@@ -97,30 +73,28 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     setSelectedSid(_sid);
 
     const serviceId: number = prepareStatementsLoad(_service, _sid);
-    handleLoadStatements(serviceId, _sid, renderToastLoadStatements, statementsLoadedCallback, closeToast);
+    handleLoadStatements(serviceId, _sid, statementsLoadedCallback);
   }
 
   useEffect(() => {
     if (_service && _sid) {
-      handleLoadServices(renderToastLoadServices, servicesLoadedCallback, closeToast);
+      handleLoadServices(servicesLoadedCallback);
     }
   }, []);
 
   useEffect(() => {
     const serviceId: number = prepareStatementsLoad(selectedService, selectedSid);
-    handleLoadStatements(serviceId, selectedSid, renderToastLoadStatements, statementsLoadedCallback, closeToast);
+    handleLoadStatements(serviceId, selectedSid, statementsLoadedCallback);
   }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
     const serviceId: number = prepareStatementsLoad(_service, '*');
-    handleLoadStatements(serviceId, '*', renderToastLoadStatements, statementsLoadedCallback, closeToast);
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
     setSelectedService(_service);
     serviceName.current = _service === all ? 'All' : _service;
   }
 
-  const statementDeletedCallback = (_end: FunctionDefault) => {
-    _end();
-    
+  const statementDeletedCallback = () => {
     setReload((x:any) => x+1);
   }
 
@@ -164,7 +138,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         if (alert.error) {
           setAlert(alert);
         } else {
-          handleDeleteStatement(statement.id, renderToastDeteleStatement, statementDeletedCallback, closeToast);
+          handleDeleteStatement(statement.id, statementDeletedCallback);
         }
       }
     } else if (action === action_update) {

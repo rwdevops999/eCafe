@@ -13,7 +13,7 @@ const dataScheme = z.object({
     id: z.number(),
     name: z.string(),
     description: z.string(),
-    children: z.array(z.any()),
+    children: z.array(z.any()).optional(),
     other: additionalScheme.optional()
 });
 export type Data = z.infer<typeof dataScheme>
@@ -50,7 +50,7 @@ const getServiceName = (serviceId: Number, services: any[]): string => {
     return '';
   }
 
-export const mapServicesToData = (_services: ServiceType[]): Data[] => {
+export const mapServicesToData = (_services: NewServiceType[]): Data[] => {
     const dataArray: Data[] = _services.map(service => {
         return {
             id: service.id,
