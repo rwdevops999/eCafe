@@ -97,6 +97,28 @@ type NewUserType = {
     groups?: NewGroupType[]
 }
 
+type NewExtendedUserType = {
+    id?: number,
+    name: string,
+    firstname: string,
+    phone: string,
+    email: string,
+    password: string,
+    address?: NewAddressType,
+    roles?: {
+        selected?: any[],
+        removed?: any[]
+    },
+    policies?: {
+        selected?: any[],
+        removed?: any[],
+    },
+    groups?: {
+        selected?: any[],
+        removed?: any[],
+    }
+}
+
 type NewGroupType = {
     id: number,
     name: string,

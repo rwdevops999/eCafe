@@ -1,3 +1,4 @@
+import { UseFormReturn } from "react-hook-form";
 import { CombinedType } from "./types";
 
 // subject is user or group
@@ -18,6 +19,9 @@ export type MetaBase = {
         name: string,
         dependency: string,
         getAllDependencies: () => CombinedType[]
+    },
+    form: {
+        validateForm: () => void
     }
 }
 
@@ -35,6 +39,9 @@ export const initMetaBase = {
         name: "",
         dependency: "",
         getAllDependencies: () => {return []}
+    },
+    form: {
+        validateForm: () => {}
     }
 }
   

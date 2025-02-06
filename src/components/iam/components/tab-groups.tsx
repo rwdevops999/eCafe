@@ -3,7 +3,7 @@ import { FunctionDefault, NewButtonConfig } from "@/data/types";
 import { useToast } from "@/hooks/use-toast";
 import { cloneObject, log } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { defineActionButtons, userCreated } from "../users/manage/data/util";
+import { defineActionButtons } from "../users/manage/data/util";
 import { Meta } from "../users/data/meta";
 import { dependency_groups } from "@/data/constants";
 import { handleLoadGroups } from "@/lib/db";
@@ -13,7 +13,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  logger.debug("TabGroups", "IN(_meta)", JSON.stringify(_meta))
+  // logger.debug("TabGroups", "IN(_meta)", JSON.stringify(_meta))
 
   const allGroups = useRef<NewGroupType[]>([]);
 

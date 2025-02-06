@@ -4,31 +4,35 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageTitle from "@/components/ecafe/page-title";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { cloneObject, log } from "@/lib/utils";
+import { cloneObject, difference, differenceBySomeType } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { Meta } from "../data/meta";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TabRoles from "../../components/tab-roles";
 import TabGroups from "../../components/tab-groups";
 import TabPolicies from "../../components/tab-policies";
-import { Button } from "@/components/ui/button";
 import TabUsers from "./components/tab-users";
-import { useToast } from "@/hooks/use-toast";
-import { handleCreateUser } from "@/lib/db";
+import { createUser, handleCreateUser, handleLoadCountries, handleLoadUsers, handleUpdateUser } from "@/lib/db";
 import { dependency_groups, dependency_policies, dependency_roles } from "@/data/constants";
-import { CombinedType } from "@/data/types";
+import { CombinedType, FunctionDefault } from "@/data/types";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { initMetaBase } from "@/data/meta";
-
-const debug = true;
+import { UseFormReturn } from "react-hook-form";
+import { Data } from "@/lib/mapping";
 
 type DependencyType = {
   initialised: boolean,
-  original?: any[],
-  selected?: any[]
+  original: any[],
+  selected: any[]
 }
 
-const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
+const initDependency: DependencyType = {
+  initialised: false,
+  original: [], 
+  selected: []
+};
+
+const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _setReload(x: any): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
   logger.debug("UserDialog", "IN(_open)", _open);
@@ -38,20 +42,18 @@ const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
   // const [metaOfUserDialog, setMetaOfUserDialog] = useState<Meta>(_meta);
   const [metaOfUserDialogState, setMetaOfUserDialogState] = useState<Meta>(initMetaBase);
 
-  const roleDependenciesRef = useRef<DependencyType>({initialised: false});
-  const policyDependenciesRef = useRef<DependencyType>({initialised: false});
-  const groupDependenciesRef = useRef<DependencyType>({initialised: false});
+  const roleDependenciesRef = useRef<DependencyType>(initDependency);
+  const policyDependenciesRef = useRef<DependencyType>(initDependency);
+  const groupDependenciesRef = useRef<DependencyType>(initDependency);
 
   const [tab, setTab] = useState<string>("user");
 
   // const [persistUser, setPeristUser] = useState<boolean>(false);
   const [userTabLeaveState, setUserTabLeaveState] = useState<boolean>(false);
 
-  const resetDependencies = (): void => {
-    const initDependency: DependencyType = {
-      initialised: false,
-    };
+  const formMethods = useRef<UseFormReturn<any>>(undefined);
 
+  const resetDependencies = (): void => {
     roleDependenciesRef.current = initDependency;
     policyDependenciesRef.current = initDependency;
     groupDependenciesRef.current = initDependency;
@@ -66,8 +68,8 @@ const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
   const calculateDependencies = (type: string, user: NewUserType | undefined): DependencyType => {
     let result: DependencyType = {
       initialised: true,
-      original: undefined,
-      selected: undefined
+      original: [],
+      selected: []
     }
 
     logger.debug("UserDialog", "calculateDependencies", type);
@@ -185,108 +187,267 @@ const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
     setTab(newtab);
   }
 
-  //   const selectedRoles = useRef<NewRoleType[]>([]);
-  //   const selectedPolicies = useRef<NewPolicyType[]>([]);
-  //   const selectedGroups = useRef<NewGroupType[]>([]);
+  const countries = useRef<NewCountryType[]>([])
+  const countriesLoadedCallback = (data: NewCountryType[], _end: FunctionDefault) => {
+    countries.current = data;
 
-  //   const setSelectedDependencies = (type: string, data: CombinedType[]) => {
-  //     log(debug, "UserDialog", "setSelectedDependencies", type);
-  //     if (type === dependency_roles) {
-  //       log(true, "UserDialog", "setSelectedRoles", data, true);
-  //       selectedRoles.current = data as NewRoleType[];
-  //     }
+    _end();
+  }
 
-  //     if (type === dependency_policies) {
-  //       log(debug, "UserDialog", "setSelectedPolicies", data, true);
-  //       selectedPolicies.current = data as NewPolicyType[];
-  //     }
-
-  //     if (type === dependency_groups) {
-  //       log(debug, "UserDialog", "setSelectedGroups", data, true);
-  //       selectedGroups.current = data as NewGroupType[];
-  //     }
-  //   }
-
-  //   const getSelectedDependencies = (type: string): CombinedType[] => {
-  //     log(debug, "UserDialog", "getSelectedDependencies", type);
-
-  //     let data: CombinedType[] = [];
-
-  //     if (type === dependency_roles) {
-  //       data = selectedRoles.current;
-  //       log(true, "UserDialog", "getSelectedRoles", data, true);
-  //     }
-
-  //     if (type === dependency_policies) {
-  //       data = selectedPolicies.current;
-  //     }
-
-  //     if (type === dependency_groups) {
-  //       data = selectedGroups.current;
-  //     }
-
-  //     return data;
-  //   }
-
-  //   const setUser = (user: NewUserType) => {
-  //     workingUser.current = user;
-
-  //     if (user) {
-  //       log(true, "UserDialog", "SET USER DEPENDENCIES");
-  //       setSelectedDependencies(dependency_roles, user.roles as NewRoleType[])
-  //       setSelectedDependencies(dependency_policies, user.policies as NewPolicyType[])
-  //       setSelectedDependencies(dependency_groups, user.groups as NewGroupType[])
-  //     }
-
-  //     const newmeta: Meta = cloneObject(metaForUserDialog);
-
-  //     newmeta.control.setSelection = setSelectedDependencies
-  //     newmeta.control.getSelection = getSelectedDependencies
-      
-  //     newmeta.currentSubject = user;
-
-  //     setMetaForUserDialog(newmeta);
-  //   }
-
-    useEffect(() => {
+  useEffect(() => {
       logger.debug("UserDialog", "useEffect[]");
-      // setUser(_meta.currentSubject as NewUserType);
+      handleLoadCountries(()=>{}, countriesLoadedCallback, ()=>{});
+  }, []);
 
-      /**
-       * meta set 
-       * - createSubject
-       * - updateSubject
-       * - getSelection
-       */
+  const handleInvalidForm = () => {
+    setTab("user");
+  }
 
-      // setMetaForUserDialog(_meta);
-    }, []);
+  type ApiType = {
+    id: number
+  }
 
-  // const userCreatedCallback = () => {
-  //   log(debug, "UserDetails", "userCreatedCallback", "User is created");
-  //   // setSelectedUser(undefined, false);
+  type ItemType = {
+    selected?: ApiType[],
+    removed?: ApiType[],
+  }
 
-  //   log(debug, "UserDetails", "userDeletedCallback", "Reloading users");
-  //   // handleLoadUsers(renderToastLoadUsers, usersLoadedCallback, closeToast);
-  // }
+  const prepareUser = (data: any, selectedUser?: NewUserType): NewExtendedUserType => {
+    const _country: NewCountryType = countries.current.find((country) => country.name === data.country)!;
+    logger.debug("UserDialog", "PrepareUser(country)", JSON.stringify(_country));
 
-  //   const handleManageUser = () => {
-  //     // const user: NewUserType;
-  //     // handleCreateUser(user, renderToastCreateUser, userCreatedCallback, closeToast);
-  //   }
+    let user: NewExtendedUserType = {
+      id: (selectedUser ? selectedUser.id : 0),
+      name: data.name,
+      firstname: data.firstname,
+      phone: data.phone,
+      email: data.email,
+      password: data.password,
+      address: {
+        id: (selectedUser ? selectedUser.address?.id! : 0),
+        street: data.street,
+        number: data.number,
+        box: data.box,
+        city: data.city,
+        postalcode: data.postalcode,
+        county: data.county,
+        country: _country
+      },
+      roles: {
+      },
+      policies: {
+      },
+      groups: {
+      }
+    }
 
-  //   const setDialogState = (state: boolean) => {
-  //     if (state) {
-  //       setTab("user");
-  //     }
+    let roles: ItemType = {
+    }
 
-  //     _setDialogState(state);
-  //   }
+    const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {
+        let role: ApiType = {
+          id: _role.id,
+        }
+
+        return role;
+    });
+    logger.debug("UserDialog", "PrepareUser(Original Roles)", JSON.stringify(originalRoles));
+
+    const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {
+      let role: ApiType = {
+        id: _role.id,
+      }
+
+      return role;
+    });
+    logger.debug("UserDialog", "PrepareUser(Selected Roles)", JSON.stringify(selectedRoles));
+
+    const diffRoles: number[] = difference(roleDependenciesRef.current.original, roleDependenciesRef.current.selected);
+    logger.debug("UserDialog", "PrepareUser(diffRoles)", JSON.stringify(diffRoles));
+
+    const removedRoles: ApiType[] = diffRoles.map(_id => {
+      let role: ApiType = {
+        id: _id
+      }
+
+      return role;
+    });
+    logger.debug("UserDialog", "PrepareUser(removedRoles)", JSON.stringify(removedRoles));
+
+    if (selectedRoles.length > 0) {
+      roles.selected = selectedRoles;
+    }
+
+    if (removedRoles.length > 0) {
+      roles.removed = removedRoles;
+    }
+    
+    user.roles = roles;
+
+    let policies: ItemType = {
+    }
+
+    const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {
+        let policy: ApiType = {
+          id: _policy.id,
+        }
+
+        return policy;
+    });
+    logger.debug("UserDialog", "PrepareUser(Original Policies)", JSON.stringify(originalPolicies));
+
+    const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {
+      let policy: ApiType = {
+        id: _policy.id,
+      }
+
+      return policy;
+    });
+    logger.debug("UserDialog", "PrepareUser(Selected Policies)", JSON.stringify(selectedPolicies));
+
+    const diffPolicies: number[] = difference(policyDependenciesRef.current.original, policyDependenciesRef.current.selected);
+    logger.debug("UserDialog", "PrepareUser(diffPolicies)", JSON.stringify(diffPolicies));
+
+    const removedPolicies: ApiType[] = diffPolicies.map(_id => {
+      let policy: ApiType = {
+        id: _id
+      }
+
+      return policy;
+    });
+
+    logger.debug("UserDialog", "PrepareUser(removedPolicies)", JSON.stringify(removedPolicies));
+
+    if (selectedPolicies.length > 0) {
+      policies.selected = selectedPolicies;
+    }
+
+    if (removedPolicies.length > 0) {
+      policies.removed = removedPolicies;
+    }
+    
+    user.policies = policies;
+
+    let groups: ItemType = {
+    }
+
+    const originalGroups: ApiType[] = groupDependenciesRef.current.original?.map((_group) => {
+        let group: ApiType = {
+          id: _group.id,
+        }
+
+        return group;
+    });
+    logger.debug("UserDialog", "PrepareUser(Original Groups)", JSON.stringify(originalGroups));
+
+    const selectedGroups: ApiType[] = groupDependenciesRef.current.selected?.map((_group) => {
+      let group: ApiType = {
+        id: _group.id,
+      }
+
+      return group;
+    });
+    logger.debug("UserDialog", "PrepareUser(Selected Groups)", JSON.stringify(selectedGroups));
+
+    const diffGroups: number[] = difference(groupDependenciesRef.current.original, groupDependenciesRef.current.selected);
+    logger.debug("UserDialog", "PrepareUser(diffGroups)", JSON.stringify(diffGroups));
+
+    const removedGroups: ApiType[] = diffPolicies.map(_id => {
+      let group: ApiType = {
+        id: _id
+      }
+
+      return group;
+    });
+
+    logger.debug("UserDialog", "PrepareUser(removedGroups)", JSON.stringify(removedGroups));
+
+    if (selectedGroups.length > 0) {
+      groups.selected = selectedGroups;
+    }
+
+    if (removedGroups.length > 0) {
+      groups.removed = removedGroups;
+    }
+    
+    user.groups = groups;
+
+    return user;
+  }
+
+  const userCreatedCallback = (_end: FunctionDefault) => {
+    clearDependencies();
+    metaOfUserDialogState.control.handleDialogState(false);
+    logger.debug("UserDetails", "CALL RELOAD");
+    _setReload((x: any) => x+1);
+    _end();
+  }
+
+  const userUpdatedCallback = (_end: FunctionDefault) => {
+    clearDependencies();
+    metaOfUserDialogState.control.handleDialogState(false);
+    _setReload((x: any) => x+1);
+    _end();
+  }
+
+  const onSubmitForm = (data: any) => {
+    logger.debug("UserDialog", "OnSubmitForm", JSON.stringify(data));
+
+    if (metaOfUserDialogState.currentSubject) {
+      logger.debug("UserDialog", "OnSubmitForm", "UPDATE?");
+      const user: NewExtendedUserType = prepareUser(data, metaOfUserDialogState.currentSubject as NewUserType);
+      logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
+      handleUpdateUser(user, ()=>{}, userUpdatedCallback, ()=>{});
+    } else {
+      logger.debug("UserDialog", "OnSubmitForm", "CREATE?");
+      const user: NewExtendedUserType = prepareUser(data);
+      logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
+      handleCreateUser(user, ()=>{}, userCreatedCallback, ()=>{});
+    }
+  }
+
+  const handleValidForm = () => {
+    logger.debug("UserDialog", "handleValidForm");
+    if (formMethods.current) {
+      logger.debug("UserDialog", "Submitting form");
+      const {getValues} = formMethods.current;
+
+      onSubmitForm(getValues());
+    }
+  }
+
+  const validate = async () => {
+    logger.debug("UserDialog", "VALIDATE");
+    if (formMethods.current) {
+      const {trigger} = formMethods.current;
+
+      await trigger().then((valid: boolean) => {
+        logger.debug("UserDialog", "form validatation(valid)", valid);
+        if (!valid) {
+          handleInvalidForm();
+        } else {
+          handleValidForm();
+        }
+      })
+   }
+  }
+
+  const setFormMethods = (methods: UseFormReturn<any>) => {
+    formMethods.current = methods;
+
+    setMetaOfUserDialogState((oldValue: Meta) => {
+      let newmeta: Meta = cloneObject(oldValue);
+      newmeta.form = {
+        validateForm: validate
+      }
+
+      return newmeta;
+    })
+  }
 
     const renderComponent = () => {
       logger.debug("UserDialog", "renderComponent(_open)", _open);
       logger.debug("UserDialog", "renderComponent(userTabLeaveState)", userTabLeaveState);
-      logger.debug("UserDialog", "renderComponent(TABBIE)", tab);
 
         return (
           <Dialog open={_open}>
@@ -313,7 +474,7 @@ const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
                 <>
                     <TabsContent value="user" forceMount={tab !== "user" ? true : undefined} hidden={tab !== "user"}>
                         <div className="m-1 container w-[99%]">
-                          <TabUsers _meta={metaOfUserDialogState} onTabLeave={userTabLeaveState}/>
+                          <TabUsers _meta={metaOfUserDialogState} onTabLeave={userTabLeaveState} setFormMethods={setFormMethods}/>
                         </div>
                     </TabsContent>
                     <TabsContent value="roles">
@@ -328,7 +489,7 @@ const UserDialog = ({_open, _meta}:{_open: boolean; _meta: Meta;}) => {
                     </TabsContent>
                     <TabsContent value="groups">
                         <div className="m-1 container w-[99%]">
-                        <TabGroups _meta={metaOfUserDialogState} />
+                          <TabGroups _meta={metaOfUserDialogState} />
                         </div>
                     </TabsContent>
                 </>

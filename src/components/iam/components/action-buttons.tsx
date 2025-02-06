@@ -8,11 +8,16 @@ const ActionButtons = ({buttonConfig, meta}:{buttonConfig:NewButtonConfig; meta:
         meta.control.handleDialogState(false);
     }
 
+    const handleSubmit = (dummy: boolean) => {
+        console.log("TAB ITEM => HANDLE SUBMIT");
+        meta.form.validateForm();
+    }
+
     return (
         <div className="space-y-1">
-            {buttonConfig.createButton && <EcafeButton id="createbutton" caption="Create&nbsp;&nbsp;" type="submit"/>} 
+            {buttonConfig.createButton && <EcafeButton id="createbutton" caption="Create&nbsp;&nbsp;" clickHandler={handleSubmit}/>} 
             {/* clickHandler={handleSetData} enabled={_meta.items?.validationResult || ! validateEnabled}/>} */}
-            {buttonConfig.updateButton && <EcafeButton id="updatebutton" caption="Update&nbsp;&nbsp;" />} 
+            {buttonConfig.updateButton && <EcafeButton id="updatebutton" caption="Update&nbsp;&nbsp;" clickHandler={handleSubmit}/>} 
             {buttonConfig.validateButton && <EcafeButton id="validatebutton" caption="Validate" />} 
             <EcafeButton id="cancelbutton" caption="Cancel&nbsp;&nbsp;" clickHandler={closeDialog}/> 
         </div>

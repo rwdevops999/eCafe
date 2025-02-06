@@ -1,17 +1,21 @@
 import { PolicyType, UserType } from "@/data/iam-scheme";
+import { ConsoleLogger } from "@/lib/console.logger";
 import prisma from "@/lib/prisma";
 import { decrypt, difference, encrypt, log } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { group } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
-const  setUserForCreate = (data: UserType) => {
+const logger = new ConsoleLogger({ level: 'debug' });
+
+const  setUserForCreate = (data: NewExtendedUserType) => {
   return ({
     name: data.name,
     firstname: data.firstname,
     phone: (data.phone ? data.phone : ""),
     email: data.email,
-    password: encrypt(data.password!),
+    // password: encrypt(data.password!),
+    password: data.password,
     address: {
       create: {
         street: (data.address?.street ? data.address.street : ""),
@@ -28,21 +32,21 @@ const  setUserForCreate = (data: UserType) => {
       },
     },
     roles: {
-      // disconnect: data.roles.removed,
-      connect: data.roles?.selected
+      disconnect: data.roles?.removed,
+      connect: data.roles?.selected,
     },
     policies: {
-      // disconnect: data.policies.removed,
-      connect: data.policies?.selected
+      disconnect: data.policies?.removed,
+      connect: data.policies?.selected,
     },
     groups: {
-      // disconnect: data.policies.removed,
-      connect: data.groups?.selected
+      disconnect: data.groups?.removed,
+      connect: data.groups?.selected,
     }
   });
 }
 
-const  setUserForUpdate = (data: UserType) => {
+const  setUserForUpdate = (data: NewExtendedUserType) => {
   return ({
     id: data.id,
     name: data.name,
@@ -82,9 +86,12 @@ const  setUserForUpdate = (data: UserType) => {
 }
 
 export async function POST(req: NextRequest) {
-    const data: UserType = await req.json();
+    const data: NewExtendedUserType = await req.json();
+
+    logger.debug("API", "USER TO CREATE", JSON.stringify(data));
 
     const user: any = setUserForCreate(data);
+    logger.debug("API", "PREPARED USER", JSON.stringify(user));
 
     const createdUser = await prisma.user.create({data: user});
 
@@ -268,7 +275,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const data: UserType = await req.json();
+  const data: NewExtendedUserType = await req.json();
 
   const  updatedUser = await prisma.user.update({
     where: {

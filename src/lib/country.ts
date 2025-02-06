@@ -1,7 +1,5 @@
 import * as  fs from 'fs';
 import * as path from 'path';
-import { parse } from 'csv-parse';
-import { log } from './utils';
 
 //COUNTRY,A2,A3,NUM,DIALINGCODE
 export type Country = {

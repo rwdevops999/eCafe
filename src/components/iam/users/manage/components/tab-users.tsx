@@ -1,5 +1,5 @@
 import { log } from "@/lib/utils";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { defaultCountry } from "@/data/constants";
 import { useEffect, useRef, useState } from "react";
@@ -15,10 +15,10 @@ import { defineActionButtons, initUserForm, storeUserFormValues } from "../data/
 import ActionButtons from "@/components/iam/components/action-buttons";
 import { ConsoleLogger } from "@/lib/console.logger";
 
-const TabUsers = ({_meta, onTabLeave}:{_meta: Meta; onTabLeave: boolean}) => {
+const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
+  // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
   logger.debug("TabUsers", "IN(onTabLeave)", onTabLeave);
 
   const storedUserRef = useRef<NewUserType|undefined>(undefined);
@@ -41,10 +41,10 @@ const TabUsers = ({_meta, onTabLeave}:{_meta: Meta; onTabLeave: boolean}) => {
      phone: "",
      email: "",
      password: "",
-     city: "",
      number: "",
      box: "",
      street: "",
+     city: "",
      postalcode: "",
      county: "",
      country: ""
@@ -80,6 +80,7 @@ const TabUsers = ({_meta, onTabLeave}:{_meta: Meta; onTabLeave: boolean}) => {
     logger.debug("TabUser", "useEffect[]", JSON.stringify(_meta.currentSubject));
 
     actionButtons.current = defineActionButtons(_meta.currentSubject as NewUserType)
+    setFormMethods(formMethods);
 
     // initUserForm(_meta.currentSubject as NewUserType, setValue);
   }, []);

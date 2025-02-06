@@ -17,7 +17,7 @@ const debug = true;
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  logger.debug("TabRoles", "IN(_meta)", JSON.stringify(_meta))
+  // logger.debug("TabRoles", "IN(_meta)", JSON.stringify(_meta))
 
   const allRoles = useRef<NewRoleType[]>([]);
 

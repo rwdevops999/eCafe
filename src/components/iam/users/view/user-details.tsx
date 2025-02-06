@@ -23,6 +23,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   logger.debug("UserDetails", "IN(_selectedUser)", _selectedUser);
 
   const [reloadState, setReloadState] = useState<number>(0);
+  const [rerender, setRerender] = useState<number>(0);
 
   const [dialogState, setDialogState] = useState<boolean>(false);
 
@@ -52,8 +53,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     //    children:     []
     // setDataUsers(mapUsersToData(_users));
     usersDataRef.current = mapUsersToData(_users);
-    logger.debug("UserDetails", "RELOAD");
-    setReloadState((x: number) => x+1);
+    setRerender((x:any) => x+1);
   //   _end();
   }
 
@@ -75,14 +75,17 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     handleLoadUsers(() => {}, usersLoadedCallback, () => {});
   }, []);
 
-  // on deletion of user, reload the component
-  // const userDeletedCallback = () => {
-  //   log(debug, "UserDetails", "userDeletedCallback", "User is deleted");
-  //   setSelectedUser(undefined, false);
+  useEffect(() => {
+    logger.debug("UserDetails", "LOAD USERS AFTER RELOAD");
 
-  //   log(debug, "UserDetails", "userDeletedCallback", "Reloading users");
-  //   handleLoadUsers(renderToastLoadUsers, usersLoadedCallback, closeToast);
-  // }
+    handleLoadUsers(() => {}, usersLoadedCallback, () => {});
+  }, [reloadState, setReloadState]);
+
+  // on deletion of user, reload the component
+  const userDeletedCallback = () => {
+    setSelectedUser(undefined);
+    handleLoadUsers(()=>{}, usersLoadedCallback, ()=>{});
+  }
 
   // const [reload, setReload] = useState<number>(0);
 
@@ -90,7 +93,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     logger.debug("UserDetails", "handleAction", _action);
     if (_action === action_delete) {
       logger.debug("UserDetails", "handleAction", "see VSCODE terminal for API messages");
-      // handleDeleteUser(_user.id, renderToastDeleteUser, userDeletedCallback, closeToast);
+      handleDeleteUser(_user.id, ()=>{}, userDeletedCallback, ()=>{});
     } else {
       logger.debug("UserDetails", "handleAction", _user);
       const selectedUser: NewUserType = usersRef.current.find((user) => user.id === _user.id)!;
@@ -118,7 +121,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
             <PageTitle className="m-2" title={`Overview users`} />
 
               <div className="flex items-center justify-end">
-                <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)}/>
+                <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)} _setReload={setReloadState}/>
               {/* <ManageUserDialog meta={metaForUserDetails} _enabled={usersLoaded.current} handleReset={handleReset} setReload={setReload}/>  */}
               </div>
               <div className="block space-y-5">

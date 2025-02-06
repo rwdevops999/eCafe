@@ -15,7 +15,7 @@ const debug: boolean = false;
 const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  logger.debug("TabPolicies", "IN(_meta)", JSON.stringify(_meta))
+  // logger.debug("TabPolicies", "IN(_meta)", JSON.stringify(_meta))
 
   const allPolicies = useRef<NewPolicyType[]>([]);
 

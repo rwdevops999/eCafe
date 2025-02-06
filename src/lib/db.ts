@@ -291,7 +291,7 @@ export const handleDeleteUser = async (_id: number, _start:FunctionDefault, _cal
   await deleteUser(_id, _callback, _end);
 }
 
-export const createUser = async (_user: NewUserType, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+export const createUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/users',
     {
       method: 'POST',
@@ -302,7 +302,7 @@ export const createUser = async (_user: NewUserType, _callback: CallbackFunction
     }).then(response => _callback(_end));
 }
 
-export const handleCreateUser = async (_user: NewUserType, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+export const handleCreateUser = async (_user: NewExtendedUserType, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
   _start();
   await createUser(_user, _callback, _end);
 }
@@ -317,6 +317,22 @@ export const handleCreateUser = async (_user: NewUserType, _start:FunctionDefaul
 //       }
 //     }).then(response => callback());
 // }
+
+export const updateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/users',
+    {
+      method: 'PUT',
+      body: JSON.stringify(_user),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => _callback(_end));
+}
+
+export const handleUpdateUser = async (_user: NewExtendedUserType, _start:FunctionDefault, _callback: CallbackFunctionDefault, _end: FunctionDefault) => {
+  _start();
+  await updateUser(_user, _callback, _end);
+}
 
 // export const loadDependencies = async (subject: any, url: string, dependencies: any[], callback: CallbackFunctionDependencyLoaded) => {
 //     await fetch(url + "?ids="+JSON.stringify(dependencies))

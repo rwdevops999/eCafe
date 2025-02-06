@@ -114,6 +114,13 @@ export const difference = (original: Data[], selected: Data[]): number[] => {
   return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
 }
 
+export const differenceBySomeType = (original: any[], selected: any[]): number[] => {
+  const originalIds: number[] = original.map((original) => original.id);
+  const selectedIds: number[] = selected.map((selected) => selected.id);
+
+  return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
+}
+
 const addActionToResult = (_result: AccessResultType[], _action: string, _allowedPath: string[], _deniedPath: string[]): AccessResultType[] => {
 
   let art: AccessResultType|undefined = _result.find((item) => item.action === _action);
