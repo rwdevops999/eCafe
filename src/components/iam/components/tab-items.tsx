@@ -22,6 +22,14 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
     // const selectedDependencies = useRef<any[]|undefined>(undefined);
     const [mappedDependencies, setMappedDependencies] = useState<Data[]>([]);
 
+    const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
+
+    const getNrOfItemsToValidate = () => {
+        const itemsToValidate: number = _meta.control.calculateValidationItems();
+        logger.debug("TabItems", "ItemsToValidate", itemsToValidate);
+        setNrOfItemsToValidate(itemsToValidate);
+    }
+
     useEffect(() => {
         logger.debug("TabItems", "UseEffect[]");
         // selectedDependencies.current = _meta.control.getSelection(_meta.control.name);
@@ -31,6 +39,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
 
         // console.log("SET MAPPED DEPENDENCIES");
         setMappedDependencies(mapDependenciesToData(_dependencies));
+        getNrOfItemsToValidate();
     }, []);
 
     const tableMeta: TableMeta<Data[]> = {
@@ -49,6 +58,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
 
         logger.debug("TabItems", "handleChangeSelection: selectedItems", JSON.stringify(selectedItems));
         _meta.control.setSelection(_meta.subject.dependency, selectedItems);
+        getNrOfItemsToValidate();
     }
 
     const getSelectedItemIds = (): number[] => {
@@ -78,7 +88,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
                         <DataTable columns={columns} data={mappedDependencies} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={getSelectedItemIds()} />
                     </div>
                     <div className=" flex justify-end">
-                        <ActionButtons meta={_meta} buttonConfig={_buttonConfig}/>
+                        <ActionButtons meta={_meta} buttonConfig={_buttonConfig} nrOfItemsToValidate={nrOfItemsToValidate} valid={true}/>
                     </div>
                 </div>
             </>

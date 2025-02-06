@@ -139,6 +139,15 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     }
   }
   
+  const calculateValidationItems = (): number => {
+    let result: number = 0;
+
+    result += roleDependenciesRef.current.selected.length;
+    result += policyDependenciesRef.current.selected.length;
+
+    return result;
+  }
+
   useEffect(() => {
     logger.debug("UserDialog", "UseEffect[metaOfUserDialogRef.current]", JSON.stringify(_meta.currentSubject));
 
@@ -167,6 +176,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     _meta.control.clearDependencies = clearDependencies;
     _meta.control.setSelection = setSelectedDependencies;
     _meta.control.getSelection = getSelectedDependencies;
+    _meta.control.calculateValidationItems = calculateValidationItems;
 
     setMetaOfUserDialogState(_meta);
   }, [_meta]);

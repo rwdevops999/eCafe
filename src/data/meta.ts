@@ -14,6 +14,7 @@ export type MetaBase = {
         clearDependencies: () => void,
         setSelection: (type: string, data: (CombinedType[])) => void,
         getSelection: (type: string) => CombinedType[]|undefined
+        calculateValidationItems: () => number
     },
     subject: {
         name: string,
@@ -34,6 +35,7 @@ export const initMetaBase = {
         clearDependencies: () => {},
         setSelection: (type: string, data: (CombinedType[])) => {},
         getSelection: (type: string) => {return undefined},
+        calculateValidationItems: () => {return 0},
     },
     subject: {
         name: "",

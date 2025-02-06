@@ -15,10 +15,11 @@ const EcafeButton = (
         caption,
         url,
         enabled = true,
-        className = "bg-orange-400 hover:bg-orange-600",
+        className = "bg-orange-400 hover:bg-orange-600 w-[100%]",
         clickHandler,
         clickValue = false,
-        type = "button"
+        type = "button",
+        hidden = false,
     }:
     {
         id?: string;
@@ -29,17 +30,18 @@ const EcafeButton = (
         clickHandler?(value: boolean): void;
         clickValue?: boolean,
         type?: "submit" | "reset" | "button"
+        hidden?: boolean
     }) => {
   return (
         <div>
-            {!(url || clickHandler) &&  <Button type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>}
+            {!(url || clickHandler) &&  <Button hidden={hidden} type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>}
             {url && 
                 <Link href={url!}>
-                    <Button id={id} type={type} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>
+                    <Button hidden={hidden} id={id} type={type} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>
                 </Link>
             }    
             {!url && clickHandler && 
-                <Button type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" onClick={() => clickHandler(clickValue)} disabled={! enabled}>{caption}</Button>
+                <Button hidden={hidden} type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" onClick={() => clickHandler(clickValue)} disabled={! enabled}>{caption}</Button>
             }
         </div>
     )

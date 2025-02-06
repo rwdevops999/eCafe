@@ -75,12 +75,17 @@ const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   const actionButtons = useRef<NewButtonConfig>({})
 
   // const {getValues, setValue} = formMethods;
+  const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
 
   useEffect(() => {
     logger.debug("TabUser", "useEffect[]", JSON.stringify(_meta.currentSubject));
 
     actionButtons.current = defineActionButtons(_meta.currentSubject as NewUserType)
     setFormMethods(formMethods);
+
+    const itemsToValidate: number = _meta.control.calculateValidationItems();
+    logger.debug("TabUsers", "ItemsToValidate", itemsToValidate);
+    setNrOfItemsToValidate(itemsToValidate);
 
     // initUserForm(_meta.currentSubject as NewUserType, setValue);
   }, []);
@@ -114,7 +119,7 @@ const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
               <AddressSection formMethods={formMethods}/>
             </div>
             <div className="ml-5 col-span-1">
-              <ActionButtons buttonConfig={actionButtons.current} meta={_meta}/>
+              <ActionButtons buttonConfig={actionButtons.current} meta={_meta} nrOfItemsToValidate={nrOfItemsToValidate} valid={true}/>
             </div>
           </div>
         </form>
