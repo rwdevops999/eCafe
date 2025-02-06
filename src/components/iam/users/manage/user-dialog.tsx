@@ -145,7 +145,23 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     result += roleDependenciesRef.current.selected.length;
     result += policyDependenciesRef.current.selected.length;
 
+    groupDependenciesRef.current.selected.forEach((group: NewGroupType) => {
+      if (group.roles) {
+        result += group.roles.length;
+      }
+
+      if (group.policies) {
+        result += group.policies.length;
+      }
+    });
+
     return result;
+  }
+
+  const validateUser = (user: NewUserType): boolean => {
+    let valid: boolean = false;
+
+    return valid;
   }
 
   useEffect(() => {
@@ -177,6 +193,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     _meta.control.setSelection = setSelectedDependencies;
     _meta.control.getSelection = getSelectedDependencies;
     _meta.control.calculateValidationItems = calculateValidationItems;
+    _meta.subject.validateSubject = validateUser;
 
     setMetaOfUserDialogState(_meta);
   }, [_meta]);
