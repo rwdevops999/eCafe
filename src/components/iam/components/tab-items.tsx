@@ -1,64 +1,93 @@
 'use client'
 
-import PageTitle from "@/components/ecafe/page-title"
-import { Separator } from "@/components/ui/separator"
-import ActionButtons from "../users/manage/components/action-buttons"
-import { DataTable } from "@/components/datatable/data-table"
+import PageTitle from "@/components/ecafe/page-title";
+import { Separator } from "@/components/ui/separator";
+import { MetaBase } from "@/data/meta";
+import { Data, mapDependenciesToData } from "@/lib/mapping";
+import { log } from "@/lib/utils";
+import { Row, TableMeta } from "@tanstack/react-table";
+import { useEffect, useRef, useState } from "react";
+import { columns } from "./table/colums";
+import { DataTable } from "@/components/datatable/data-table";
+import { CombinedType,  NewButtonConfig } from "@/data/types";
+import ActionButtons from "./action-buttons";
+import { ConsoleLogger } from "@/lib/console.logger";
 
-import { ColumnMeta, Row, RowData, TableMeta } from "@tanstack/react-table"
-import { columns } from "./table/colums"
-import { Data } from "@/lib/mapping"
-import { useEffect, useState } from "react"
-import { log } from "@/lib/utils"
-import { MetaBase } from "@/data/meta"
-import { FormSchemaType } from "../users/manage/tabs/data/meta"
-import { FieldValues } from "react-hook-form"
+const debug = true;
 
-const TabItems = <T extends FieldValues,>({meta}:{meta:MetaBase<T>}) => {
-  const [validateEnabled, setValidateEnabled] = useState<boolean>(false);
+const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButtonConfig}) => {
+  const logger = new ConsoleLogger({ level: 'debug' });
 
-  const tableMeta: TableMeta<Data[]> = {
-    title: meta.items?.columnname
-  };
+    const dependencies = useRef<CombinedType[]>([]);
+    // const selectedDependencies = useRef<any[]|undefined>(undefined);
+    const [mappedDependencies, setMappedDependencies] = useState<Data[]>([]);
 
-  const handleChangeSelection = (selection: Row<Data>[]) => {
-    if (meta.items && meta.items.setSelection) {
-      meta.items.setSelection(meta.items.issuer!, selection.map((row) => row.original));
-      meta.items.validationResult = false;
-      setValidateEnabled(selection.length > 0);
-      meta.changeMeta ? meta.changeMeta(meta) : (_meta: MetaBase<T>) => {}
+    useEffect(() => {
+        logger.debug("TabItems", "UseEffect[]");
+        // selectedDependencies.current = _meta.control.getSelection(_meta.control.name);
+        const _dependencies: CombinedType[] = _meta.subject.getAllDependencies();
+        dependencies.current = _dependencies;
+        // log(debug, "TabItems", "UseEffect[]: dependencies", _dependencies, true);
+
+        // console.log("SET MAPPED DEPENDENCIES");
+        setMappedDependencies(mapDependenciesToData(_dependencies));
+    }, []);
+
+    const tableMeta: TableMeta<Data[]> = {
+        title: `Available ${_meta.subject.name}`
+    };
+
+    const handleChangeSelection = (selection: Row<Data>[]) => {
+        logger.debug("TabItems", "handleChangeSelection", JSON.stringify(selection));
+
+        const selectedItemIds: number[] = selection.map((row) => row.original.id);
+        logger.debug("TabItems", "handleChangeSelection: selectedItemIds", JSON.stringify(selectedItemIds));
+
+        const selectedItems: CombinedType[] = selectedItemIds.map((id) => {
+            return dependencies.current.find((d) => d.id === id)!;
+        })
+
+        logger.debug("TabItems", "handleChangeSelection: selectedItems", JSON.stringify(selectedItems));
+        _meta.control.setSelection(_meta.subject.dependency, selectedItems);
     }
-  }
 
-  const handleGetSelection = (): number[] => {
-    if (meta.items && meta.items.getSelection) {
-      const selected: Data[] = meta.items.getSelection(meta.items.issuer!);
-      const ids: number[] = selected.map((_select: Data) => _select.id);
-      return ids;
+    const getSelectedItemIds = (): number[] => {
+        logger.debug("TabItems", "handleGetSelection -> IDS");
+        let result: number[] = [];
+
+        const selection: CombinedType[]|undefined = _meta.control.getSelection(_meta.subject.dependency);
+        if (selection) {
+            result = selection.map((item) => item.id);
+        }
+
+        logger.debug("TabItems", "handleGetSelection: IDS", result, true);
+
+        return result;
     }
 
-    return [];
-  }
+    const renderComponent = () => {
+        logger.debug("TabItems", "RENDER");
+        
+        return (
+            <>
+                <PageTitle className="m-2" title={_meta.subject.name} />
+                <Separator />
 
-  const renderComponent = () => {
+                <div className="grid grid-cols-12">
+                    <div className="col-span-11 space-y-1">
+                        <DataTable columns={columns} data={mappedDependencies} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={getSelectedItemIds()} />
+                    </div>
+                    <div className=" flex justify-end">
+                        <ActionButtons meta={_meta} buttonConfig={_buttonConfig}/>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
-      <>
-          <PageTitle className="m-2" title={meta.items?.title!} />
-          <Separator />
-  
-          <div className="grid grid-cols-12">
-              <div className="col-span-11 space-y-1">
-                  <DataTable id="TabItemTable" columns={columns} data={meta.items?.data!} tablemeta={tableMeta} handleChangeSelection={handleChangeSelection} selectedItems={handleGetSelection()} />
-              </div>
-              <div className=" flex justify-end">
-              <ActionButtons _meta={meta} validateEnabled={validateEnabled}/>
-              </div>
-          </div>
-      </>
+        <>{renderComponent()}</>
     )
-  };
-
-  return (<>{renderComponent()}</>);
 }
 
 export default TabItems

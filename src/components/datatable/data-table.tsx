@@ -25,11 +25,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { log } from "@/lib/utils"
 import { ComponentType, Fragment, useEffect, useState } from "react"
 import { DataTablePagination } from "@/components/datatable/data-table-pagination"
 import { action_update } from "@/data/constants"
-import { Data } from "@/lib/mapping"
 
 export interface IDataSubRows<TData> {
   children?: any[]
@@ -97,7 +95,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     filterFromLeafRows: true,
     getPaginationRowModel: getPaginationRowModel(),
-    enableRowSelection: row => row.depth === 0,
+    enableRowSelection: (enableRowSelection && (row => row.depth === 0)),
     enableSubRowSelection: false,
     onRowSelectionChange: setRowSelection,
     getFacetedRowModel: getFacetedRowModel(),
@@ -126,6 +124,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   const calculateRowSelect = () => {
     
     const idExists: any = table.getAllColumns().find(x => x.id === 'id');
+    
     let state: MyObject = {}
 
     table.getRowModel().rows.map((row) => {
@@ -142,9 +141,13 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
 
   useEffect(() => {
     calculateRowSelect();
+  }, [data]);
+
+  useEffect(() => {
+    calculateRowSelect();
   }, []);
 
-  const handleRowClick = (row: Row<TData>, event?: MouseEvent): { row: Row<TData>; event?: MouseEvent } => {
+  const handleRowClick = (row: Row<TData>, event?: React.MouseEvent): { row: Row<TData>; event?: React.MouseEvent } => {
         event?.stopPropagation();
 
         if (rowSelecting && row.getCanSelect()) {

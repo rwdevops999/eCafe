@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Data } from "@/lib/mapping";
 import { log } from "@/lib/utils";

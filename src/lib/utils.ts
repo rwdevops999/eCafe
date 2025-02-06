@@ -42,11 +42,7 @@ export const log = (
         console.log(new Date() + `[${caller}]: ${message} => Object is  undefined`);
       }
     } else {
-      if  (object) {
-        console.log(new Date() + `[${caller}]: ${message}: => ${object}`);
-      } else {
-        console.log(new Date() + `[${caller}]: ${message}`);
-      }
+      console.log(new Date() + `[${caller}]: ${message}: => ${object}`);
     }
   }
 };
@@ -156,3 +152,10 @@ const operation = (allowed: AccessType[], denied: AccessType[]): AccessResultTyp
 export const intersection = (source: AccessType[], destination: AccessType[]): AccessResultType[] => {
   return operation(source, destination);
 }
+
+export const cloneObject = (_o: any): any => {
+  const newObject = Object.assign(Object.create(_o), _o);
+  
+  return newObject;
+};
+

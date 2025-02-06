@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { all } from "@/data/constants";
-import { CallbackFunctionSubjectLoaded } from "@/data/types";
+import { CallbackFunctionSubjectLoaded, FunctionDefault } from "@/data/types";
 import { ServiceType } from "@/data/iam-scheme";
 import { handleLoadServices } from "@/lib/db";
 import { useToast } from "@/hooks/use-toast";
@@ -20,40 +20,48 @@ import { useToast } from "@/hooks/use-toast";
  * @param handleSetService: callback method for service change
  * @param service: the default selected service
  */
+const debug: boolean = false;
+
 const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
   const { toast, dismiss } = useToast()
   let toastId: string;
 
-  const renderToast = () => {
-    let {id} = toast({title: "Services", description: "loading ..."})
-    toastId = id;
-  }
+    const renderToast = (_title: string, _description: string): void => {
+      log(debug, "ServiceSelect", "render toast");
+      let {id} = toast({title: `${_title}`, description: `${_description}`});
+      toastId = id;
+    }
+    
+    const renderToastLoadServices = () => renderToast("Loading...", "services");
+    
+    const closeToast = () => {
+        log(debug, "ServiceSelect", "dismiss toast");
+        dismiss(toastId);
+    }
 
   const serviceToDisplay = useRef<string>(defaultService === all ? 'All' : defaultService);
 
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
+  const servicesLoadedCallback = (data: ServiceType[], _end: FunctionDefault) => {
+    _end();
+
     if (defaultService === all || forceAll) {
       setServices(["All", ...data.map(service => service.name)]);
     } else {
       setServices(data.map(service => service.name));
     }
-
-    dismiss(toastId);
   }
 
   useEffect(() => {
-    renderToast();
-    handleLoadServices(servicesLoadedCallback); 
+    handleLoadServices(renderToastLoadServices, servicesLoadedCallback, closeToast); 
   }, []);
 
   useEffect(() => {
-    renderToast();
     serviceToDisplay.current = (defaultService === all ? 'All' : defaultService);
 
-    handleLoadServices(servicesLoadedCallback); 
+    handleLoadServices(renderToastLoadServices, servicesLoadedCallback, closeToast); 
   }, [defaultService]);
 
   return (

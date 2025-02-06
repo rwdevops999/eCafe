@@ -1,73 +1,41 @@
-import { Data } from "@/lib/mapping";
-import { FieldErrors, FieldValues, UseFormGetValues, UseFormRegister, UseFormReset } from "react-hook-form";
+import { CombinedType } from "./types";
 
-export const createButton = "create";
-export const updateButton = "update";
-export const cancelButton = "cancel";
-export const validateButton = "validate";
-
-export type ButtonConfig = "create" | "cancel" | "validate" | "update";
-
-export const issuer_roles = "Roles";
-export const issuer_policies = "Policies";
-export const issuer_groups = "Groups";
-export const issuer_users = "Users";
-
-export type MetaBase<T extends FieldValues> = {
-    sender: string
-    subject: any
-    buttons?: ButtonConfig[]
-    changeMeta?: (meta: MetaBase<T>) => void,
-    control?:{
-        closeDialog?: () => void
-        handleSubject?: (data: any) => void
+// subject is user or group
+export type MetaBase = {
+    currentSubject?: NewUserType|NewGroupType,
+    // handleManageSubject: () => void,
+    // validateSubject: () => void,
+    // selectedItems: number,
+    control: {
+        // name: string,
+        // dependency: string,
+        handleDialogState: (b: boolean) => void,
+        clearDependencies: () => void,
+        setSelection: (type: string, data: (CombinedType[])) => void,
+        getSelection: (type: string) => CombinedType[]|undefined
     },
-    form?: {
-        submitForm?: () => void,
-        register?: UseFormRegister<T>,
-        errors?: FieldErrors<T>,
-        getValues?: UseFormGetValues<T>,
-        reset?: UseFormReset<T>
-    },
-    items?: {
-        issuer?: string,
-        title?: string,
-        columnname?: string,
-        data?: Data[],
-
-        setSelection?: (type: string, data: Data[]) => void,
-        getSelection?: (type:string) => Data[],
-        validateItems?: () => void
-        validationResult?: boolean,
-        loggie?: (sender: string) => void
-    },
-    data: {}
+    subject: {
+        name: string,
+        dependency: string,
+        getAllDependencies: () => CombinedType[]
+    }
 }
 
-// export interface MetaBase<T extends FieldValues> {
-//     sender: string
-//     subject?: any
-//     buttons?: ButtonConfig[]
-//     control?:{
-//         closeDialog?: () => void
-//         handleSubject?: (data: any) => void,
-//     },
-//     form?: {
-//         submitForm?: () => void
-//         register?: UseFormRegister<T>,
-//         errors?: FieldErrors<T>,
-//         getValues?: UseFormGetValues<T>
-//         reset?: UseFormReset<T>
-//     },
-//     items?: {
-//         issuer?: string
-//         title?: string
-//         columnname?: string
-//         data?: Data[]
-
-//         setSelection?: (type: string, data: Data[]) => void
-//         getSelection?: (type:string) => Data[]
-//         validateItems?: () => boolean
-//     },
-//     data?: undefined
-// }
+export const initMetaBase = {
+    // handleManageSubject: () => {},
+    // validateSubject: () => {},
+    // selectedItems: 0,
+    control: {
+        handleDialogState: (b: boolean) => {},
+        clearDependencies: () => {},
+        setSelection: (type: string, data: (CombinedType[])) => {},
+        getSelection: (type: string) => {return undefined},
+    },
+    subject: {
+        name: "",
+        dependency: "",
+        getAllDependencies: () => {return []}
+    }
+}
+  
+    

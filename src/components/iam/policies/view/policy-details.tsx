@@ -11,15 +11,31 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { AlertType } from "@/data/types";
+import { AlertType, FunctionDefault } from "@/data/types";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { PolicyType } from "@/data/iam-scheme";
 import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
 
+const debug: boolean = false;
+
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const { toast, dismiss } = useToast()
     let toastId: string;
+
+    const renderToast = (_title: string, _description: string): void => {
+      log(debug, "PolicyDetails", "render toast");
+      let {id} = toast({title: `${_title}`, description: `${_description}`});
+      toastId = id;
+    }
+    
+    const renderToastLoadPolicies = () => renderToast("Loading...", "policies");
+    const renderToastDeletePolicy = () => renderToast("Deleting...", "policy");
+    
+    const closeToast = () => {
+        log(debug, "CreateStatementDetails", "dismiss toast");
+        dismiss(toastId);
+    }
 
     const [selectedPolicy, setSelectedPolicy] = useState<string>(all)
     const [policies, setPolicies] = useState<PolicyType[]>([]);
@@ -30,12 +46,9 @@ import AlertMessage from "@/components/ecafe/alert-message";
     const [alert, setAlert] = useState<AlertType>();
     const [reload, setReload] = useState(0);
     
-    const renderToast = () => {
-        let {id} = toast({title: "Policies", description: "loading ..."})
-        toastId = id;
-    }
+    const policiesLoadedCallback = (data: PolicyType[], _end: FunctionDefault) => {
+        _end();
 
-    const policiesLoadedCallback = (data: PolicyType[]) => {
         setPolicies(data);
 
         let mappedPolicies: Data[] = mapPoliciesToData(data);
@@ -49,21 +62,20 @@ import AlertMessage from "@/components/ecafe/alert-message";
         if (_policy) {
           setSelectedPolicy(_policy);
 
-          renderToast();
-          handleLoadPoliciesWithName(_policy, policiesLoadedCallback);
+          handleLoadPoliciesWithName(_policy, renderToastLoadPolicies, policiesLoadedCallback, closeToast);
         }
     }, []);
 
     useEffect(() => {
-        renderToast();
-        handleLoadPoliciesWithName(selectedPolicy, policiesLoadedCallback);
+        handleLoadPoliciesWithName(selectedPolicy, renderToastLoadPolicies, policiesLoadedCallback, closeToast);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {
         setAlert(undefined);
     }
   
-    const policyDeletedCallback = () => {
+    const policyDeletedCallback = (_end: FunctionDefault) => {
+        _end();
         setReload((x:any) => x+1);
     }
 
@@ -80,7 +92,7 @@ import AlertMessage from "@/components/ecafe/alert-message";
   
               setAlert(alert);
             } else {
-              handleDeletePolicy(policy.id, policyDeletedCallback);
+              handleDeletePolicy(policy.id, renderToastDeletePolicy, policyDeletedCallback, closeToast);
             }
       }
     }

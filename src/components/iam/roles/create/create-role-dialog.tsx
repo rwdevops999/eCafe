@@ -5,7 +5,7 @@ import PageTitle from "@/components/ecafe/page-title";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTableType, AlertType } from "@/data/types";
+import { AlertTableType, AlertType, FunctionDefault } from "@/data/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@radix-ui/react-separator";
@@ -33,13 +33,24 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
+const debug: boolean = false;
+
 const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
   const { toast, dismiss } = useToast();
   let toastId: string;
 
-  const renderToast = (title: string) => {
-    let {id} = toast({title: title, description: "loading ..."})
+  const renderToast = (_title: string, _description: string): void => {
+    log(debug, "RoleCreateDialog", "render toast");
+    let {id} = toast({title: `${_title}`, description: `${_description}`});
     toastId = id;
+  }
+    
+  const renderToastLoadPolicies = () => renderToast("Loading...", "policies");
+  const renderToastCreateRole = () => renderToast("Creating...", "role");
+    
+  const closeToast = () => {
+    log(debug, "RoleCreateDialog", "dismiss toast");
+    dismiss(toastId);
   }
 
   /**
@@ -60,8 +71,8 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setOpen(state);
   }
 
-  const policiesLoadedCallback = (policies: PolicyType[]) => {
-    dismiss(toastId);
+  const policiesLoadedCallback = (policies: PolicyType[], _end: FunctionDefault) => {
+    _end();
     setPolicies(policies);
     const mappedPolicies: Data[] = mapPoliciesToData(policies);
     setPolicyData(mappedPolicies);
@@ -70,8 +81,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   useEffect(() => {
     if (open) {
       resetAll();
-      renderToast("Loading policies");
-      handleLoadPolicies(policiesLoadedCallback);
+      handleLoadPolicies(renderToastLoadPolicies, policiesLoadedCallback, closeToast);
     }
   }, [open]);
 
@@ -112,7 +122,9 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     }
   }
 
-  const roleCreatedCallback = () => {
+  const roleCreatedCallback = (_end: FunctionDefault) => {
+    _end();
+    
     if (setReload) {
       setReload((x: any) => x+1);
     }
@@ -121,7 +133,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     const role = prepareCreateRole(data);
 
-    createRole(role, roleCreatedCallback);
+    createRole(role, renderToastCreateRole, roleCreatedCallback, closeToast);
 
     handleDialogState(false);
   }

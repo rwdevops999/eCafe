@@ -160,9 +160,9 @@ const findAllUsers = async () => {
     }
   );
 
-  users.forEach(user => {
-    user.password = decrypt(user.password);
-  });
+  // users.forEach(user => {
+  //   user.password = decrypt(user.password);
+  // });
 
   return users;
 }
@@ -172,65 +172,63 @@ export async function GET(request: NextRequest) {
 
     const users = await findAllUsers();
 
-    const _users: UserType[] = users.map((_user) => {
-      let user: any = {
-        id: _user.id,
-        firstname: _user.firstname,
-        name: _user.name,
-        email: _user.email,
-        password: _user.password,
-        phone: _user.phone,
-        phonecode: "",
-        address: {
-          id: (_user.address ? _user.address.id : 0),
-          street: (_user.address ? _user.address.street : ""),
-          number: (_user.address ? _user.address.number : ""),
-          box: (_user.address ? _user.address.box : ""),
-          city: (_user.address ? _user.address.city : ""),
-          postalcode: (_user.address ? _user.address.postalcode : ""),
-          county: (_user.address ? _user.address.county : ""),
-          country: {
-            id: (_user.address ? _user.address.country.id : 0),
-            name: (_user.address ? (_user.address.country.name ? _user.address.country.name : "") : ""),
-            dialCode: (_user.address ? (_user.address.country.dialCode ? _user.address.country.dialCode : "") : ""),
-            code: (_user.address ? (_user.address.country.code ? _user.address.country.code : "") : "")
-          }
-        },
-        roles: {
-          original: _user.roles,
-        },
-        policies: {
-          original: _user.policies
-        },
-        groups: {
-          original: _user.groups,
-        }
-      };
+    // const _users: UserType[] = users.map((_user) => {
+    //   let user: any = {
+    //     id: _user.id,
+    //     firstname: _user.firstname,
+    //     name: _user.name,
+    //     email: _user.email,
+    //     password: _user.password,
+    //     phone: _user.phone,
+    //     phonecode: "",
+    //     address: {
+    //       id: (_user.address ? _user.address.id : 0),
+    //       street: (_user.address ? _user.address.street : ""),
+    //       number: (_user.address ? _user.address.number : ""),
+    //       box: (_user.address ? _user.address.box : ""),
+    //       city: (_user.address ? _user.address.city : ""),
+    //       postalcode: (_user.address ? _user.address.postalcode : ""),
+    //       county: (_user.address ? _user.address.county : ""),
+    //       country: {
+    //         id: (_user.address ? _user.address.country.id : 0),
+    //         name: (_user.address ? (_user.address.country.name ? _user.address.country.name : "") : ""),
+    //         dialCode: (_user.address ? (_user.address.country.dialCode ? _user.address.country.dialCode : "") : ""),
+    //         code: (_user.address ? (_user.address.country.code ? _user.address.country.code : "") : "")
+    //       }
+    //     },
+    //     roles: {
+    //       original: _user.roles,
+    //     },
+    //     policies: {
+    //       original: _user.policies
+    //     },
+    //     groups: {
+    //       original: _user.groups,
+    //     }
+    //   };
 
-      return user;
-    });
+    //   return user;
+    // });
 
-    return Response.json(_users);
+    return Response.json(users);
   }
 
-  const deleteUser = async (userId: number) => {
+  const deleteUserById = async (userId: number) => {
     let user: any;
   
     await prisma.user.delete(
       {
         where: {id: userId},
-        // include: {
-        //   address: true
-        // }
       }
     ).then((response) => {
       user = response;
+      log(true, "API(users)", "User deleted", user.id);
     });
   
     return user;
   }
   
-  const deleteAddressByUser = async (_userId: number) => {
+  const deleteAddressByUserId = async (_userId: number) => {
     let address: any;
   
     await prisma.address.delete(
@@ -239,12 +237,9 @@ export async function GET(request: NextRequest) {
           userId: _userId,
         }
       },
-    //     include: {
-    //       address: true
-    //     }
-    //   }
     ).then((response) => {
       address = response;
+      log(true, "API(users)", "Address deleted", address.id);
     });
   
     return address;
@@ -255,8 +250,10 @@ export async function GET(request: NextRequest) {
   const userId = urlParams.get('userId');
 
   if  (userId) {
-    const address = await deleteAddressByUser(parseInt(userId));
-    const user = await deleteUser(parseInt(userId));
+    log(true, "API(users)", "DELETING Address from userId", userId);
+    log(true, "API(users)", "DELETING User by Id", userId);
+    const address = await deleteAddressByUserId(parseInt(userId));
+    const user = await deleteUserById(parseInt(userId));
 
     return new Response(JSON.stringify(`deleted ${user}`), {
       headers: { "content-type": "application/json" },
@@ -264,7 +261,7 @@ export async function GET(request: NextRequest) {
    });
   }
 
-  return new Response(JSON.stringify(`not deleted: policy id undefined`), {
+  return new Response(JSON.stringify(`user not deleted`), {
       headers: { "content-type": "application/json" },
       status: 400,
    });

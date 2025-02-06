@@ -1,0 +1,107 @@
+type NewActionType = {
+    id: number,
+    name: string,
+    createDate: Date,
+    updateDate: Date,
+    service?: NewServiceType
+}  
+
+type NewServiceType = {
+    id: number,
+    name: string,
+    createDate: Date,
+    updateDate: Date,
+    action?: NewActionType[],
+    statements?: NewStatementType[],
+}  
+
+type NewStatementActionType = {
+    id: number,
+    name: string,
+    createData: Date,
+    updateData: Date,
+    statement?: NewStatementType,
+    actionId: number
+}
+
+type NewStatementType = {
+    id: number,
+    sid: string,
+    description: string,
+    permission: string,
+    managed: boolean,
+    createDate: Date,
+    updateDate: Date,
+    service?: NewServiceType,
+    actions?: NewStatementActionType[],
+    policies?: NewPolicyType[]
+}   
+
+type NewCountryType = {
+    id: number,
+    name: string,
+    dialCode: string,
+    code: string,
+    addresses?: NewAddressType[]
+}
+
+type NewAddressType = {
+    id: number,
+    street: string,
+    number: string,
+    box: string,
+    city: string,
+    postalcode: string,
+    county: string,
+    countryId?: number,
+    country: NewCountryType,
+    userId?: number
+    user?: NewUserType    
+}
+  
+type NewPolicyType = {
+    id: number,
+    name: string,
+    description: string,
+    managed: boolean,
+    createDate: Date,
+    updateDate: Date,
+    statements?: NewStatementType[],
+    roles?: NewRoleType[],
+    groups?: NewGroupType[],
+    users?: NewUserType[],
+}
+
+type NewRoleType = {
+    id: number,
+    name: string,
+    description: string,
+    managed: boolean
+    createDate: Date,
+    updateDate: Date,
+    policies?: NewPolicyType[],
+    groups?: NewGroupType[],
+    users?: NewUserType[]
+}
+
+type NewUserType = {
+    id?: number,
+    name: string,
+    firstname: string,
+    phone: string,
+    email: string,
+    password: string,
+    address?: NewAddressType,
+    roles?: NewRoleType[],
+    policies?: NewPolicyType[],
+    groups?: NewGroupType[]
+}
+
+type NewGroupType = {
+    id: number,
+    name: string,
+    description: string,
+    roles?: NewRoleType[],
+    policies?: NewPolicyType[],
+    users?: NewUserType[],
+}

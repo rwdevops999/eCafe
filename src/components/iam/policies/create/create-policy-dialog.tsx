@@ -21,7 +21,7 @@ import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTableType, AlertType } from "@/data/types";
+import { AlertTableType, AlertType, FunctionDefault } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { createPolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
@@ -36,15 +36,26 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
-const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
+const debug: boolean = false;
 
+const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
   const { toast, dismiss } = useToast()
   let toastId: string;
 
-  const renderToast = (title: string) => {
-    let {id} = toast({title: title, description: "loading ..."})
-    toastId = id;
-  }
+    const renderToast = (_title: string, _description: string): void => {
+      log(debug, "PolicyCreateDialog", "render toast");
+      let {id} = toast({title: `${_title}`, description: `${_description}`});
+      toastId = id;
+    }
+    
+    const renderToastLoadServices = () => renderToast("Loading...", "services");
+    const renderToastLoadStatements = () => renderToast("Loading...", "statements");
+    const renderToastCreatePolicy = () => renderToast("Creating...", "policy");
+    
+    const closeToast = () => {
+        log(debug, "PolicyCreateDialog", "dismiss toast");
+        dismiss(toastId);
+    }
 
   /**
    * state of the dialog
@@ -120,27 +131,31 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     setSelectedService(_service);
     
     const serviceId = prepareStatementsLoad(_service, '*');
-    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
+    handleLoadStatements(serviceId, '*', renderToastLoadStatements, statementsLoadedCallback, closeToast);
   }
 
   const services = useRef<ServiceType[]>([]);
 
-  const statementsLoadedCallback = (data: ServiceStatementType[]) => {
+  const statementsLoadedCallback = (data: ServiceStatementType[], _end: FunctionDefault) => {
+    _end();
+
     setStatements(data);
 
     const sd: Data[] = mapStatementsToData(data, services.current);
     setStatementData(sd);
   }
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
+  const servicesLoadedCallback = (data: ServiceType[], _end: FunctionDefault) => {
+    _end();
+    
     services.current = data;
     setSelectedService(all);
     const serviceId = prepareStatementsLoad(all, '*');
-    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
+    handleLoadStatements(serviceId, '*', renderToastLoadStatements, statementsLoadedCallback, closeToast);
   }
 
   useEffect(() => {
-    handleLoadServices(servicesLoadedCallback);
+    handleLoadServices(renderToastLoadServices, servicesLoadedCallback, closeToast);
   }, []);
 
   const {
@@ -170,7 +185,9 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       }
     }
 
-    const policyCreatedCallback = () => {
+    const policyCreatedCallback = (_end: FunctionDefault) => {
+      _end();
+      
       if (setReload) {
         setReload((x: any) => x+1);
       }
@@ -179,7 +196,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
       const policy = prepareCreatePolicy(data);
 
-      createPolicy(policy, policyCreatedCallback);
+      createPolicy(policy, renderToastCreatePolicy, policyCreatedCallback, closeToast);
 
       handleDialogState(false);
     }

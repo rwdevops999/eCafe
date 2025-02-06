@@ -2,7 +2,7 @@
 
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { AlertType } from "@/data/types";
+import { AlertType, FunctionDefault } from "@/data/types";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
@@ -14,14 +14,26 @@ import { TableMeta } from "@tanstack/react-table";
 import { action_delete } from "@/data/constants";
 import { Button } from "@/components/ui/button";
 import { handleDeleteRole, handleLoadRoles } from "@/lib/db";
+import { log } from "@/lib/utils";
+
+const debug: boolean = false;
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const { toast, dismiss } = useToast();
     let toastId: string;
 
-    const renderToast = () => {
-        let {id} = toast({title: "Roles", description: "loading ..."})
-        toastId = id;
+    const renderToast = (_title: string, _description: string): void => {
+      log(debug, "PolicyDetails", "render toast");
+      let {id} = toast({title: `${_title}`, description: `${_description}`});
+      toastId = id;
+    }
+    
+    const renderToastLoadRoles = () => renderToast("Loading...", "roles");
+    const renderToastDeleteRole = () => renderToast("Deleting...", "role");
+    
+    const closeToast = () => {
+        log(debug, "CreateStatementDetails", "dismiss toast");
+        dismiss(toastId);
     }
 
     const [reload, setReload] = useState(0);
@@ -41,20 +53,20 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     }
 
     useEffect(() => {
-        renderToast();
-        handleLoadRoles(rolesLoadedCallback);
+        handleLoadRoles(renderToastLoadRoles, rolesLoadedCallback, closeToast);
     }, []);
 
     useEffect(() => {
-        renderToast();
-        handleLoadRoles(rolesLoadedCallback);
+        handleLoadRoles(renderToastLoadRoles, rolesLoadedCallback, closeToast);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {
         setAlert(undefined);
     }
   
-    const roleDeletedCallback = () => {
+    const roleDeletedCallback = (_end: FunctionDefault) => {
+        _end();
+        
         setReload((x:any) => x+1);
     }
 
@@ -71,7 +83,7 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
   
               setAlert(alert);
             } else {
-              handleDeleteRole(role.id, roleDeletedCallback);
+              handleDeleteRole(role.id, renderToastDeleteRole, roleDeletedCallback, closeToast);
             }
       }
     }

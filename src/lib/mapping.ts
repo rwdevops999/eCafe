@@ -63,14 +63,14 @@ export const mapServicesToData = (_services: ServiceType[]): Data[] => {
     return dataArray;
 }
 
-export const mapUsersToData = (users:  UserType[]): Data[] => {
+export const mapUsersToData = (users: NewUserType[]): Data[] => {
     let data: Data[] = [];
 
     data = users.map(user => {
         return {
-            id: user.id,
-            name: user.name ? user.name : "",
-            description: user.firstname ? user.firstname : "",
+            id: user.id!,
+            name: user.name,
+            description: user.firstname,
             children: []
         }
     })
@@ -277,3 +277,24 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
 
     return result;
   }
+
+export const mapDependenciesToData = (dependencies: any[]|undefined): Data[] => {
+  let result: Data[] = [];
+
+  if (dependencies) {
+    result = dependencies.map((dependency: any) => {
+      const data: Data = {
+        id: dependency.id,
+        name: dependency.name,
+        description: dependency.description,
+        children: []
+      }
+
+      return data;
+    });
+  }
+
+  log(debug, "MAPPING", "mapDependenciesToData", result, true);
+
+  return result;
+}
