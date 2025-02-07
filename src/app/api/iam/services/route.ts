@@ -1,8 +1,8 @@
-import { all } from "@/data/constants";
+import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
-const setIncludes = (depth: number): any => {
+const determineIncludes = (depth: number): any => {
     let includes = {};
 
     if (depth === 1) {
@@ -14,8 +14,8 @@ const setIncludes = (depth: number): any => {
     return includes;
 }
 
-const findService = async (_service: string, depth: number) => {
-    let includes = setIncludes(depth);
+const findServiceFromServiceName = async (_service: string, depth: number) => {
+    let includes = determineIncludes(depth);
 
     const service = await prisma.service.findMany({
         where: { 
@@ -28,7 +28,7 @@ const findService = async (_service: string, depth: number) => {
 }
 
 const findAllServices = async (depth: number) => {
-    let includes = setIncludes(depth);
+    let includes = determineIncludes(depth);
 
     const services = await prisma.service.findMany({include: includes});
 
@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (paramService) {
-        if  (paramService !== all) {
-            const service = await findService(paramService, depth);
+        if  (paramService !== allItems) {
+            const service = await findServiceFromServiceName(paramService, depth);
             if (service) {
                 return Response.json(service);
             }

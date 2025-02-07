@@ -1,9 +1,9 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { ColumnDef } from "@tanstack/react-table";
-import { Data } from "@/lib/mapping";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { Data } from "@/types/ecafe";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -46,9 +46,9 @@ export const columns: ColumnDef<Data>[] = [
 
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
-          ),
+        ),
       
-          cell: ({ row, getValue }) => {
+        cell: ({ row, getValue }) => {
             return(
                 <div className="flex items-center h-[10px]">
                     {getValue<string>()}

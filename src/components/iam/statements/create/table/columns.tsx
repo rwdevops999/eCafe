@@ -1,7 +1,7 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
 import { Button } from "@/components/ui/button";
-import { Data } from "@/lib/mapping";
+import { Data } from "@/types/ecafe";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const initialTableState = {
@@ -13,66 +13,62 @@ export const initialTableState = {
 
 export const columns: ColumnDef<Data>[] = [
     {
-        id: "select",
+      id: "select",
 
-        header: ({ header, table }) => {
-            return (<div className="w-1">
-              <IndeterminateCheckbox
-                {...{
-                    checked: table.getIsAllRowsSelected(),
-                    indeterminate: table.getIsSomeRowsSelected(),
-                    onChange: table.getToggleAllRowsSelectedHandler(),
-                }}
-              />
-            </div>)
+      header: ({ header, table }) => {
+        return (
+          <div className="w-1">
+            <IndeterminateCheckbox
+              {...{
+                checked: table.getIsAllRowsSelected(),
+                indeterminate: table.getIsSomeRowsSelected(),
+                onChange: table.getToggleAllRowsSelectedHandler(),
+              }}
+            />
+          </div>
+          );
         },
 
-          cell: ({ row }) => (
-            <div className="w-1">
-              <IndeterminateCheckbox
-                {...{
-                  checked: row.getIsSelected(),
-                  indeterminate: row.getIsSomeSelected(),
-                  onChange: row.getToggleSelectedHandler(),
-                }}
-              />
-            </div>
-          ),
+        cell: ({ row }) => (
+          <div className="w-1">
+            <IndeterminateCheckbox
+              {...{
+                checked: row.getIsSelected(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler(),
+              }}
+            />
+          </div>
+        ),
   
-          enableSorting: false
+        enableSorting: false
       },
     {
-        accessorKey: "name",
+      accessorKey: "name",
 
-        // filterFn: "includesString",
-        
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Actions" />
-          ),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Actions" />
+      ),
       
-        cell: ({row, getValue}) => {
-          return (
-            <div
-            style={{
-              paddingLeft: `${row.depth * 4}rem`,
-            }}
-          >
+      cell: ({row, getValue}) => {
+        return (
+          <div style={{paddingLeft: `${row.depth * 4}rem`}}>
             <div className="flex items-center h-[10px]">
               {row.original.children && row.original.children?.length > 0 ? (
                 <Button variant="ghost" className="border-0 hover:bg-muted/10"
-                {...{
-                    onClick: row.getToggleExpandedHandler(),
-                }}
-            >
-            {row.getIsExpanded() ? '📭' : '📬'}
-            </Button>
-          ) : ('')}
-              {row.original.name}
+                  {...{
+                      onClick: row.getToggleExpandedHandler(),
+                  }}
+                >
+                  {row.getIsExpanded() ? '📭' : '📬'}
+                </Button>
+              ) : ('')}
+                {row.original.name}
             </div>
-            </div>
+          </div>
         );
-        },
+      },
 
-        footer: props => props.column.id,
+      footer: props => props.column.id,
     },
 ]

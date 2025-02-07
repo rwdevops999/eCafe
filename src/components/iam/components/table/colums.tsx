@@ -1,11 +1,7 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { access } from "@/data/iam-scheme";
-import { ColumnDef, RowData, Table } from "@tanstack/react-table";
-import { Data } from "@/lib/mapping";
-import { log } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
+import { Data } from "@/types/ecafe";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -23,7 +19,6 @@ export const columns: ColumnDef<Data>[] = [
         accessorKey: 'name',
 
         header: ({ column, header, table }) => (
-            // <DataTableColumnHeader column={column} title={table.options.meta?.title!}/>
             <div className="flex w-[300px]">
                 <IndeterminateCheckbox
                     {...{
@@ -33,26 +28,21 @@ export const columns: ColumnDef<Data>[] = [
                 }}
                 />
                 <DataTableColumnHeader column={column} title={table.options.meta?.title!}/>
-                </div>
+            </div>
         ),
 
         cell: ({row, getValue}) => {
             return (
-                <div
-                className="w-[300px]"
-                style={{
-                  paddingLeft: `${row.depth * 4}rem`,
-                }}
-              >
-              <IndeterminateCheckbox
-                className="mr-4"
-                {...{
-                  checked: row.getIsSelected(),
-                  indeterminate: row.getIsSomeSelected(),
-                  onChange: row.getToggleSelectedHandler(),
-                }}
-              />
-                {row.original.name}
+                <div className="w-[300px]" style={{paddingLeft: `${row.depth * 4}rem`}}>
+                    <IndeterminateCheckbox
+                        className="mr-4"
+                        {...{
+                        checked: row.getIsSelected(),
+                        indeterminate: row.getIsSomeSelected(),
+                        onChange: row.getToggleSelectedHandler(),
+                        }}
+                    />
+                    {row.original.name}
                 </div>
             );
         },

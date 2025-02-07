@@ -2,17 +2,12 @@ import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import jsonStringifySafe from "json-stringify-safe"
 import crypto from 'crypto';
-import { Data } from "./mapping";
+
+import * as  fs from 'fs';
+import * as path from 'path';
+import { Country, Data } from "@/types/ecafe";
 
 
-/**
- * ClassName merge
- * 
- * @returns 
- */
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
 
 /**
  * log info
@@ -23,7 +18,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param object : an object (primitive or JSON object)
  * @param isJSON : object is a JSON object
  */
-export const log = (
+const log = (
   debug: boolean,
   caller: string,
   message: string,
@@ -52,7 +47,7 @@ export const log = (
  * 
  * @returns 
  */
-export function uuidv4(prefix:string): string {
+function uuidv4(prefix:string): string {
   return prefix+'-'+'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c)=> {
     const r = (Math.random() * 16) | 0;
     const v = c ==='x'? r :(r & 0x3) | 0x8;
@@ -60,61 +55,31 @@ export function uuidv4(prefix:string): string {
   })
 }
 
-export function serviceUUID(): string {
+function serviceUUID(): string {
   return uuidv4("srv");
 }
 
-export function resourceUUID(): string {
+function resourceUUID(): string {
   return uuidv4("res");
 }
 
-export function actionUUID(): string {
+function actionUUID(): string {
   return uuidv4("act");
 }
 
-export function statementUUID(): string {
+function statementUUID(): string {
   return uuidv4("stmt");
 }
 
-export function policyUUID(): string {
+function policyUUID(): string {
   return uuidv4("pol");
 }
 
-export const showObjectArray = (caption: string, array: any[]): void => {
+const showObjectArray = (caption: string, array: any[]): void => {
   log(true, "INFO", caption, array, true);
 }
 
-export const isNumber = (n: string | Number): boolean => 
-  !isNaN(parseFloat(String(n))) && isFinite(Number(n));
-
-const ALGORITHM = 'aes-256-cbc';
-const ENCODING = 'hex';
-const IV_LENGTH = 16;
-const KEY = "azertyuiopqsdfghjkl&éjgfljgFLUg";
-
-export const encrypt = (data: string) => {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, new Buffer(KEY), iv);
-  return Buffer.concat([cipher.update(data,), cipher.final(), iv]).toString(ENCODING);
-}
-
-export const decrypt = (data: string) => {
-  const binaryData = new Buffer(data, ENCODING);
-  const iv = binaryData.slice(-IV_LENGTH);
-  const encryptedData = binaryData.slice(0, binaryData.length - IV_LENGTH);
-  const decipher = crypto.createDecipheriv(ALGORITHM, new Buffer(KEY), iv);
-
-  return Buffer.concat([decipher.update(encryptedData), decipher.final()]).toString();
-}
-
-export const difference = (original: Data[], selected: Data[]): number[] => {
-  const originalIds: number[] = original.map((original) => original.id);
-  const selectedIds: number[] = selected.map((selected) => selected.id);
-
-  return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
-}
-
-export const differenceBySomeType = (original: any[], selected: any[]): number[] => {
+const differenceBySomeType = (original: any[], selected: any[]): number[] => {
   const originalIds: number[] = original.map((original) => original.id);
   const selectedIds: number[] = selected.map((selected) => selected.id);
 
@@ -156,13 +121,66 @@ const operation = (allowed: AccessType[], denied: AccessType[]): AccessResultTyp
   return result;
 }
 
-export const intersection = (source: AccessType[], destination: AccessType[]): AccessResultType[] => {
+const intersection = (source: AccessType[], destination: AccessType[]): AccessResultType[] => {
   return operation(source, destination);
 }
 
-export const cloneObject = (_o: any): any => {
-  const newObject = Object.assign(Object.create(_o), _o);
-  
-  return newObject;
+
+
+
+
+
+/******** NEW FROM HERE */
+export const loadCountriesFromFile = (filename: string): Country[] => {
+    const csvFilePath = path.resolve(filename);
+    const fileContent = fs.readFileSync(csvFilePath);
+    var decoder = new TextDecoder("utf-8");
+    let str = decoder.decode(fileContent);
+
+    let countries: Country[] = JSON.parse(str);
+
+    return countries;
 };
+
+const ALGORITHM = 'aes-256-cbc';
+const ENCODING = 'hex';
+const IV_LENGTH = 16;
+const KEY = "azertyuiopqsdfghjkl&éjgfljgFLUg";
+
+export const encrypt = (data: string) => {
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, new Buffer(KEY), iv);
+  return Buffer.concat([cipher.update(data,), cipher.final(), iv]).toString(ENCODING);
+}
+
+export const decrypt = (data: string) => {
+  const binaryData = new Buffer(data, ENCODING);
+  const iv = binaryData.slice(-IV_LENGTH);
+  const encryptedData = binaryData.slice(0, binaryData.length - IV_LENGTH);
+  const decipher = crypto.createDecipheriv(ALGORITHM, new Buffer(KEY), iv);
+
+  return Buffer.concat([decipher.update(encryptedData), decipher.final()]).toString();
+}
+
+/**
+ * ClassName merge
+ * 
+ * @returns 
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export const cloneObject = (_o: any): any => {
+  return Object.assign(Object.create(_o), _o);
+};
+
+export const difference = (original: Data[], selected: Data[]): number[] => {
+  const originalIds: number[] = original.map((original) => original.id);
+  const selectedIds: number[] = selected.map((selected) => selected.id);
+
+  return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
+}
+
+export const isNumber = (n: string | Number): boolean => !isNaN(parseFloat(String(n))) && isFinite(Number(n));
 

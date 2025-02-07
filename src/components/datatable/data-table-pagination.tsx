@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { paginationSizes } from "@/data/constants"
 import { Table } from "@tanstack/react-table"
 import {
   ChevronLeft,
@@ -38,7 +39,7 @@ export function DataTablePagination<TData>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((pageSize) => (
+              {paginationSizes.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

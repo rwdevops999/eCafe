@@ -8,9 +8,8 @@ import { PopoverContent } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { all } from "@/data/constants";
-import { ServiceType } from "@/data/iam-scheme";
-import { handleLoadServices } from "@/lib/db";
+import { allItems } from "@/data/constants";
+import { ServiceType } from "@/types/ecafe";
 
 /**
  * Loads the services from API and let us select a service through a combo
@@ -20,13 +19,13 @@ import { handleLoadServices } from "@/lib/db";
  */
 
 const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
-  const serviceToDisplay = useRef<string>(defaultService === all ? 'All' : defaultService);
+  const serviceToDisplay = useRef<string>(defaultService === allItems ? 'All' : defaultService);
 
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
-    if (defaultService === all || forceAll) {
+    if (defaultService === allItems || forceAll) {
       setServices(["All", ...data.map(service => service.name)]);
     } else {
       setServices(data.map(service => service.name));
@@ -38,7 +37,7 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
   }, []);
 
   useEffect(() => {
-    serviceToDisplay.current = (defaultService === all ? 'All' : defaultService);
+    serviceToDisplay.current = (defaultService === allItems ? 'All' : defaultService);
 
     handleLoadServices(servicesLoadedCallback); 
   }, [defaultService]);
@@ -48,16 +47,16 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
       <Label className="mr-1">{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-          <Button
-              variant="outline"
-              size="sm"
-              role="combobox"
-              aria-expanded={open}
-              className="w-[200px] justify-between"
-            >
-              {services.find((s) => s === serviceToDisplay.current)}
-              <ChevronsUpDown className="opacity-50" />
-          </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                role="combobox"
+                aria-expanded={open}
+                className="w-[200px] justify-between"
+              >
+                {services.find((s) => s === serviceToDisplay.current)}
+                <ChevronsUpDown className="opacity-50" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0 z-10">
             <Command>
@@ -72,7 +71,7 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
                       onSelect={(currentValue) => {
                         serviceToDisplay.current = currentValue;
                         setOpen(false);
-                        (handleChangeService ? handleChangeService(currentValue === 'All' ? all : currentValue) : null)
+                        (handleChangeService ? handleChangeService(currentValue === 'All' ? allItems : currentValue) : null)
                       }}
                     >
                       {service}

@@ -2,26 +2,25 @@
 
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { AlertType } from "@/data/types";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import RoleCreateDialog from "../create/create-role-dialog";
-import { Data, mapRolesToData } from "@/lib/mapping";
 import { TableMeta } from "@tanstack/react-table";
 import { action_delete } from "@/data/constants";
 import { Button } from "@/components/ui/button";
-import { handleDeleteRole, handleLoadRoles } from "@/lib/db";
+import { AlertType, Data, RoleType } from "@/types/ecafe";
+import { mapRolesToData } from "@/lib/mapping";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const [reload, setReload] = useState(0);
     const [alert, setAlert] = useState<AlertType>();
 
-    const [roles, setRoles] = useState<NewRoleType[]>([]);
+    const [roles, setRoles] = useState<RoleType[]>([]);
     const [rolesData, setRolesData] = useState<Data[]>([]);
     const rolesLoaded = useRef<boolean>(false);
 
-    const rolesLoadedCallback = (data: NewRoleType[]) => {
+    const rolesLoadedCallback = (data: RoleType[]) => {
         setRoles(data);
         setRolesData(mapRolesToData(data));
         rolesLoaded.current = true;
@@ -111,9 +110,7 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
             </div>
         )
     }
-    return (
-        <div>{renderComponent()}</div>
-    )
+    return (<div>{renderComponent()}</div>);
 }
 
 export default RoleDetails;

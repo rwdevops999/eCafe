@@ -3,7 +3,7 @@
 import { Row, Table } from "@tanstack/react-table"
 import { Trash2 } from "lucide-react"
 import { action_delete } from "@/data/constants"
-import { Data } from "@/lib/mapping"
+import { Data } from "@/types/ecafe"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -25,22 +25,5 @@ export function DataTableRowActions<TData>({
 
   return (
     <Trash2 className="cursor-pointer w-[16px] h-[16px]" onClick={(e) => handleDelete(e)}/>
-    // <DropdownMenu>
-    //   <DropdownMenuTrigger asChild>
-    //     <Button
-    //       variant="ghost"
-    //       className="flex h-[10px] w-[10px] p-0 data-[state=open]:bg-muted"
-    //     >
-    //       <MoreHorizontal height={10} width={10}/>
-    //       <span className="sr-only">Open menu</span>
-    //     </Button>
-    //   </DropdownMenuTrigger>
-    //   <DropdownMenuContent align="end" className="w-[160px]">
-    //     <DropdownMenuItem onClick={handleDelete}>
-    //       Delete
-    //       <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-    //     </DropdownMenuItem>
-    //   </DropdownMenuContent>
-    // </DropdownMenu>
-  )
+  );
 }

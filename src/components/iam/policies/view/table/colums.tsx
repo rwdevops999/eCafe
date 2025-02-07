@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { Data } from "@/lib/mapping";
+import { Data } from "@/types/ecafe";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -46,9 +46,9 @@ export const columns: ColumnDef<Data>[] = [
 
         header: ({ column }) => (
             <>Description</>
-          ),
+        ),
       
-          cell: ({ row, getValue }) => {
+        cell: ({ row, getValue }) => {
             return(
                 <div className="flex items-center h-[10px]">
                     {getValue<string>()}
@@ -60,6 +60,7 @@ export const columns: ColumnDef<Data>[] = [
     },
     {
         id: "actions",
+
         cell: ({ table, row }) => {
             if (row.depth === 0) {
                 return(

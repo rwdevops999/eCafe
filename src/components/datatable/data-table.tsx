@@ -31,7 +31,7 @@ import { action_update } from "@/data/constants"
 
 export interface IDataSubRows<TData> {
   children?: any[]
-  }
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -122,7 +122,6 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   type MyObject = Record<string, boolean>;
 
   const calculateRowSelect = () => {
-    
     const idExists: any = table.getAllColumns().find(x => x.id === 'id');
     
     let state: MyObject = {}
@@ -166,7 +165,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
     return (
       <div className="space-y-4">
         <div>
-        {Toolbar && <Toolbar table={table} />}
+          {Toolbar && <Toolbar table={table} />}
         </div>
         <div>
           <Table>
@@ -174,40 +173,41 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
               {table.getHeaderGroups().map(group => (
                 <TableRow key={group.id}>
                   {group.headers.map(header => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>)
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>)
                   })}
                 </TableRow>
               ))}
             </TableHeader>
               <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => {
-                  return (
-                    <TableRow 
-                      key={row.id}
-                      onClick={(e) => handleRowClick(row, e)}
-                    >
-                      {row.getVisibleCells().map(cell => {
-                        return (<TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>);
-                      })}
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => {
+                    return (
+                      <TableRow 
+                        key={row.id}
+                        onClick={(e) => handleRowClick(row, e)}
+                      >
+                        {row.getVisibleCells().map(cell => {
+                          return (<TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>);
+                        })}
+                      </TableRow>
+                    )
+                  }))
+                  : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No data.
+                      </TableCell>
                     </TableRow>
                   )
-                }))
-                : (
-                  <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No data.
-                  </TableCell>
-                </TableRow>
-                )}
+                }
               </TableBody>
           </Table>
         </div>

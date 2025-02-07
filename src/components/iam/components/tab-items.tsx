@@ -2,19 +2,18 @@
 
 import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@/components/ui/separator";
-import { MetaBase } from "@/data/meta";
-import { Data, mapDependenciesToData } from "@/lib/mapping";
 import { Row, TableMeta } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
 import { DataTable } from "@/components/datatable/data-table";
-import { CombinedType,  NewButtonConfig } from "@/data/types";
 import ActionButtons from "./action-buttons";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { ButtonConfig, CombinedType, Data } from "@/types/ecafe";
+import { mapDependenciesToData } from "@/lib/mapping";
 
 const debug = true;
 
-const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConfig:NewButtonConfig}) => {
+const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConfig:ButtonConfig}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
     const dependencies = useRef<CombinedType[]>([]);

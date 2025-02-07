@@ -3,17 +3,17 @@
 import { DataTable } from "@/components/datatable/data-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
-import { Data, mapUsersToData } from "@/lib/mapping";
 import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { action_delete } from "@/data/constants";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { initUserMeta, Meta } from "../data/meta";
 import UserDialog from "../manage/user-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { Data, UserType } from "@/types/ecafe";
+import { initUserMeta, Meta } from "../meta/meta";
+import { mapUsersToData } from "@/lib/mapping";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -25,17 +25,17 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
 
   const [dialogState, setDialogState] = useState<boolean>(false);
 
-  const usersRef = useRef<NewUserType[]>([]);
+  const usersRef = useRef<UserType[]>([]);
   const usersDataRef = useRef<Data[]>([]);
 
   const metaUserDetails = useRef<Meta>(initUserMeta);
 
-  const setSelectedUser = (_user: NewUserType|undefined) => {
+  const setSelectedUser = (_user: UserType|undefined) => {
     logger.debug("UserDetails", "setSelectedUser => META currentSubject", JSON.stringify(_user));
     metaUserDetails.current.currentSubject = _user;
   }
 
-  const usersLoadedCallback = (_users: NewUserType[]) => {
+  const usersLoadedCallback = (_users: UserType[]) => {
     logger.debug("UserDetails", "usersLoadedCallback", JSON.stringify(_users));
 
     // Store all the users in ref
@@ -93,7 +93,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
       handleDeleteUser(_user.id, userDeletedCallback);
     } else {
       logger.debug("UserDetails", "handleAction", _user);
-      const selectedUser: NewUserType = usersRef.current.find((user) => user.id === _user.id)!;
+      const selectedUser: UserType = usersRef.current.find((user) => user.id === _user.id)!;
       setSelectedUser(selectedUser);
       logger.debug("UserDetails", "changeDialogState => true");
       setDialogState(true);
@@ -109,21 +109,18 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     if  (usersDataRef && metaUserDetails) {
       logger.debug("UserDetails", "RENDER");
       logger.debug("UserDetails", ">>> dialogState", dialogState);
-        // log(debug, "UserDetails", ">>> dataUsers", dataUsers, true);
-        // log(debug, "UserDetails", ">>> currentUser", metaUserDetails.current.currentSubject ?? "user is undefined", true);
 
       return (
         <div>
-            <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/users"}]} />
-            <PageTitle className="m-2" title={`Overview users`} />
+          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/users"}]} />
+          <PageTitle className="m-2" title={`Overview users`} />
 
-              <div className="flex items-center justify-end">
-                <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)} _setReload={setReloadState}/>
-              {/* <ManageUserDialog meta={metaForUserDetails} _enabled={usersLoaded.current} handleReset={handleReset} setReload={setReload}/>  */}
-              </div>
-              <div className="block space-y-5">
-                <DataTable data={usersDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
-              </div>
+          <div className="flex items-center justify-end">
+            <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)} _setReload={setReloadState}/>
+          </div>
+          <div className="block space-y-5">
+            <DataTable data={usersDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+          </div>
         </div>
       );
     }

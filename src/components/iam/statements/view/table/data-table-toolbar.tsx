@@ -5,8 +5,8 @@ import { X } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { access } from "@/data/iam-scheme"
 import { DataTableFacetedFilter } from "@/components/datatable/data-table-faceted-filter"
+import { access } from "@/data/constants"
 
 export function DataTableToolbar<TData>({
   table,

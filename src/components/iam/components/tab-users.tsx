@@ -1,28 +1,26 @@
-import { MetaBase } from "@/data/meta";
-import { NewButtonConfig } from "@/data/types";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useEffect, useRef, useState } from "react";
 import { defineActionButtons } from "../users/manage/data/util";
 import { Meta } from "../users/data/meta";
 import { cloneObject } from "@/lib/utils";
 import { dependency_users } from "@/data/constants";
-import { handleLoadUsers } from "@/lib/db";
 import TabItems from "./tab-items";
+import { ButtonConfig, GroupType, UserType } from "@/types/ecafe";
 
 const TabUsers = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  const allUsers = useRef<NewUserType[]>([]);
+  const allUsers = useRef<UserType[]>([]);
 
   const [metaOfTabUsers, setMetaOfTabUsers] = useState<MetaBase>();
-  const actionButtons = useRef<NewButtonConfig>({})
+  const actionButtons = useRef<ButtonConfig>({})
 
-  const usersLoadedCallback = (_data: NewUserType[]) => {
+  const usersLoadedCallback = (_data: UserType[]) => {
     logger.debug("TabUsers", "usersLoadedCallback", JSON.stringify(_data));
    
     allUsers.current = _data;
    
-    actionButtons.current = defineActionButtons(_meta.currentSubject as NewGroupType);
+    actionButtons.current = defineActionButtons(_meta.currentSubject as GroupType);
    
     const newMeta: Meta = cloneObject(_meta);
     newMeta.subject.name = "Users";
@@ -33,7 +31,7 @@ const TabUsers = ({_meta}:{_meta: MetaBase}) => {
     setMetaOfTabUsers(newMeta);
   }
   
-   const getAllUsers = (): NewUserType[] => {
+   const getAllUsers = (): UserType[] => {
      logger.debug("TabUsers", "getAllUsers", JSON.stringify(allUsers.current));
  
      return allUsers.current;

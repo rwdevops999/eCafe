@@ -1,9 +1,10 @@
-import { all } from "@/data/constants";
+import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
+import { StatementType } from "@/types/ecafe";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 
-const findAllStatementsOfService = async (_serviceId: number) => {
+const findAllStatementsByServiceId = async (_serviceId: number) => {
   const statements = await prisma.serviceStatement.findMany(
     {
       where: { serviceId: _serviceId },
@@ -17,7 +18,7 @@ const findAllStatementsOfService = async (_serviceId: number) => {
   return statements;
 }
 
-const findSidOfService = async (_serviceId: number, _sid: string) => {
+const findStatementsByServiceIdAndSidName = async (_serviceId: number, _sid: string) => {
   const statements = await prisma.serviceStatement.findMany(
     {
       where: { 
@@ -53,12 +54,12 @@ export async function GET(request: NextRequest) {
     const sid = searchParams.get('sid');  // passed as ...?service=Stock => service = "Stock"
 
     if  (serviceId && parseInt(serviceId) !== 0) {
-      if (sid === all) {
-      const statements = await findAllStatementsOfService(parseInt(serviceId));
+      if (sid === allItems) {
+      const statements = await findAllStatementsByServiceId(parseInt(serviceId));
 
       return Response.json(statements);
       } else if (sid) {
-        const statements = await findSidOfService(parseInt(serviceId), sid);
+        const statements = await findStatementsByServiceIdAndSidName(parseInt(serviceId), sid);
         return Response.json(statements);
       }
     }
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
     return Response.json(statements);
   }
 
-const provisionStatementActions = (statement: NewStatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {
+const provisionStatementActions = (statement: StatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {
   let actions: Prisma.StatementActionCreateWithoutStatementInput[] = [];
 
   statement.actions?.map(async (action) => {
@@ -85,7 +86,7 @@ const provisionStatementActions = (statement: NewStatementType): Prisma.Statemen
 }
 
 export async function POST(req: NextRequest) {
-    const data: NewStatementType = await req.json();
+    const data: StatementType = await req.json();
 
     let statement: Prisma.ServiceStatementCreateInput;
 

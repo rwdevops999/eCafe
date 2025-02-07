@@ -1,7 +1,6 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 

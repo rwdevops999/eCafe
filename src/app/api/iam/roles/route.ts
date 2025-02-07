@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { RoleType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
 const findAllRoles = async () => {
@@ -30,24 +31,7 @@ export async function GET(request: NextRequest) {
     return Response.json(roles);
 }
 
-const mapPolicies = (policies: NewPolicyType[]|undefined) => {
-  if (policies) {
-    let result: any[] = policies.map(policy => {
-      return {
-        id: policy?.id,
-        name: policy?.name,
-        description: policy?.description,
-        managed: policy?.managed,
-      };
-    });
-
-    return result;
-  }
-
-  return [];
-}
-
-const createRole = async (data: NewRoleType) => {
+const createRole = async (data: RoleType) => {
   let role: any;
 
    await prisma.role.create({
@@ -56,7 +40,7 @@ const createRole = async (data: NewRoleType) => {
       description: data.description,
       managed: data.managed,
       policies: {
-        connect: mapPolicies(data.policies)
+        connect: data.policies?.map(policy => {return {id: policy.id}})
       }
     }
   }).then((response) => {
@@ -67,7 +51,7 @@ const createRole = async (data: NewRoleType) => {
 }
 
 export async function POST(req: NextRequest) {
-    const _data: NewRoleType = await req.json();
+    const _data: RoleType = await req.json();
 
     const role = await createRole(_data);
 
@@ -77,7 +61,7 @@ export async function POST(req: NextRequest) {
    });
 }
 
-const deleteRole = async (roleId: number) => {
+const deleteRoleById = async (roleId: number) => {
   let role: any;
 
   await prisma.role.delete(
@@ -96,7 +80,7 @@ export async function DELETE(request: NextRequest) {
   const roleId = urlParams.get('roleId');
 
   if  (roleId) {
-    const role = await deleteRole(parseInt(roleId));
+    const role = await deleteRoleById(parseInt(roleId));
 
     return new Response(JSON.stringify(`deleted ${role}`), {
       headers: { "content-type": "application/json" },

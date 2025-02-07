@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { FormSchemaType } from "../data/form-scheme";
+import { FormSchemaType } from "./data/form-scheme";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

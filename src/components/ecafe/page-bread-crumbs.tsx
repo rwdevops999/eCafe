@@ -1,5 +1,5 @@
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb"
-import { BreadCrumbsType } from "@/data/bread-crumb-scheme"
+import { BreadCrumbsType } from "@/types/ecafe"
 
 const PageBreadCrumbs = ({crumbs}:{crumbs:BreadCrumbsType[]}) => {
   return (

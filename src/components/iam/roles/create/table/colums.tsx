@@ -1,54 +1,56 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
-import { Data } from "@/lib/mapping";
-import { ColumnDef, RowData, Table } from "@tanstack/react-table";
+import { Data } from "@/types/ecafe";
+import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Data>[] = [
     {
-        id: "select",
+      id: "select",
 
-        header: ({ header, table }) => {
-            return (<div className="w-1">
-              <IndeterminateCheckbox
-                {...{
-                    checked: table.getIsAllRowsSelected(),
-                    indeterminate: table.getIsSomeRowsSelected(),
-                    onChange: table.getToggleAllRowsSelectedHandler(),
-                }}
-              />
-            </div>)
-        },
+      header: ({ header, table }) => {
+        return (
+          <div className="w-1">
+            <IndeterminateCheckbox
+              {...{
+                  checked: table.getIsAllRowsSelected(),
+                  indeterminate: table.getIsSomeRowsSelected(),
+                  onChange: table.getToggleAllRowsSelectedHandler(),
+              }}
+            />
+          </div>
+        );
+      },
 
-          cell: ({ row }) => (
-            <div className="w-1">
-              <IndeterminateCheckbox
-                {...{
-                  checked: row.getIsSelected(),
-                  indeterminate: row.getIsSomeSelected(),
-                  onChange: row.getToggleSelectedHandler(),
-                }}
-              />
-            </div>
-          ),
+      cell: ({ row }) => (
+        <div className="w-1">
+          <IndeterminateCheckbox
+            {...{
+              checked: row.getIsSelected(),
+              indeterminate: row.getIsSomeSelected(),
+              onChange: row.getToggleSelectedHandler(),
+            }}
+          />
+        </div>
+      ),
   
-          enableSorting: false
+      enableSorting: false
     },
     {
-        accessorKey: 'name',
+      accessorKey: 'name',
 
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Policies" />
-        ),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Policies" />
+      ),
 
-        cell: ({row, getValue}) => {
-            return (
-              <div className="flex items-center h-[10px] ml-4">
-                {getValue<string>()}
-              </div>
-            );
-        },
+      cell: ({row, getValue}) => {
+        return (
+          <div className="flex items-center h-[10px] ml-4">
+            {getValue<string>()}
+          </div>
+        );
+      },
 
-        footer: props => props.column.id,
+      footer: props => props.column.id,
     },
     {
       accessorKey: 'description',

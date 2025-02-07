@@ -1,14 +1,15 @@
 import EcafeButton from "@/components/ecafe/ecafe-button";
-import { NewButtonConfig } from "@/data/types";
-import { MetaBase } from "@/data/meta";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { ButtonConfig } from "@/types/ecafe";
 import { useState } from "react";
 
-const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:NewButtonConfig; meta: MetaBase|undefined; nrOfItemsToValidate: number;}) => {
+const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:ButtonConfig; meta: MetaBase|undefined; nrOfItemsToValidate: number;}) => {
     const logger = new ConsoleLogger({ level: 'debug' });
 
     logger.debug("ActionButtons", "IN", nrOfItemsToValidate);
     logger.debug("ActionButtons", "IN", "HIDDEN", (nrOfItemsToValidate <= 1));
+
+    const [valid, setValid] = useState<boolean>(false);
 
     const closeDialog = (_dummy: boolean) => {
         if (meta) {
@@ -18,13 +19,8 @@ const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:N
     }
 
     const handleSubmit = (dummy: boolean) => {
-        console.log("TAB ITEM => HANDLE SUBMIT");
-        if (meta) {
-            meta.form.validateForm();
-        }
+        meta ? meta.form.validateForm() : null;
     }
-
-    const [valid, setValid] = useState<boolean>(false);
 
     const handleValidateSubject = (dummy: boolean) => {
         let isValid: boolean = false;
@@ -40,7 +36,6 @@ const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:N
     return (
         <div className="space-y-1">
             {buttonConfig.createButton && <EcafeButton id="createbutton" caption="Create&nbsp;&nbsp;" clickHandler={handleSubmit} enabled={nrOfItemsToValidate <= 1 || valid}/>} 
-            {/* clickHandler={handleSetData} enabled={_meta.items?.validationResult || ! validateEnabled}/>} */}
             {buttonConfig.updateButton && <EcafeButton id="updatebutton" caption="Update&nbsp;&nbsp;" clickHandler={handleSubmit} enabled={nrOfItemsToValidate <= 1 || valid}/>} 
             <EcafeButton id="validatebutton" caption="Validate" enabled={nrOfItemsToValidate > 1} clickHandler={handleValidateSubject}/>
             <EcafeButton id="cancelbutton" caption="Cancel&nbsp;&nbsp;" clickHandler={closeDialog}/> 

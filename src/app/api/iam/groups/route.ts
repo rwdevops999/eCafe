@@ -1,10 +1,8 @@
-import { GroupType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
-import { log } from "@/lib/utils";
-import { Prisma } from "@prisma/client";
+import { ExtendedGroupType } from "@/types/ecafe";
 import { NextRequest, NextResponse } from "next/server";
 
-const  setGroupForCreate = (data: GroupType) => {
+const  setGroupForCreate = (data: ExtendedGroupType) => {
   return ({
     name: data.name,
     description: data.description,
@@ -23,7 +21,7 @@ const  setGroupForCreate = (data: GroupType) => {
   });
 }
 
-const  setGroupForUpdate = (data: GroupType) => {
+const  setGroupForUpdate = (data: ExtendedGroupType) => {
   return ({
     id: data.id,
     name: data.name,
@@ -44,7 +42,7 @@ const  setGroupForUpdate = (data: GroupType) => {
 }
 
 export async function POST(req: NextRequest) {
-  const data: GroupType = await req.json();
+  const data: ExtendedGroupType = await req.json();
 
   const group: any = setGroupForCreate(data);
 
@@ -54,11 +52,6 @@ export async function POST(req: NextRequest) {
       headers: { "content-type": "application/json" },
       status: 201,
    });
-
-  // return new Response(JSON.stringify("OK"), {
-  //     headers: { "content-type": "application/json" },
-  //     status: 201,
-  //  });
 }
 
 const findAllGroups = async () => {
@@ -80,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     const groups = await findAllGroups();
 
-    const _groups: GroupType[] = groups.map((_group) => {
+    const _groups: ExtendedGroupType[] = groups.map((_group) => {
       let group: any = {
         id: _group.id,
         name: _group.name,
@@ -108,9 +101,6 @@ export async function GET(request: NextRequest) {
     await prisma.group.delete(
       {
         where: {id: groupId},
-        // include: {
-        //   address: true
-        // }
       }
     ).then((response) => {
       group = response;
@@ -139,7 +129,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const data: GroupType = await req.json();
+  const data: ExtendedGroupType = await req.json();
 
   const  updatedGroup = await prisma.group.update({
     where: {

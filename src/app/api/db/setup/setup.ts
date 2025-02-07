@@ -1,4 +1,3 @@
-import { log } from "@/lib/utils";
 import { z } from "zod";
 
 export type ServiceMappingType = {

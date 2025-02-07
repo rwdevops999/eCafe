@@ -7,13 +7,13 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { useEffect, useState } from "react";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { Data, mapServicesToData } from "@/lib/mapping";
-import { handleLoadServicesWithService } from "@/lib/db";
+import { Data, ServiceType } from "@/types/ecafe";
+import { mapServicesToData } from "@/lib/mapping";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
   const [servicesData, setServicesData] = useState<Data[]>([]);
     
-  const servicesLoadedCallback = (data: NewServiceType[]) => {
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     setServicesData(mapServicesToData(data));
   }
     
@@ -27,18 +27,18 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
 
   const renderComponent = () => {
     return (
-        <div>
+      <div>
         <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "services", url: "/iam/services/service=*"}]} />
         <PageTitle className="m-2" title={`Services`} />
 
         <div className="block space-y-5">
-            <div className="ml-5">
-                <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
-            </div>
-            <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>
+          <div className="ml-5">
+            <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
+          </div>
+          <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>
         </div>
-    </div>
-    )
+      </div>
+    );
   };
 
   return (<>{renderComponent()}</>);

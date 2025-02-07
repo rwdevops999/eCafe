@@ -3,37 +3,35 @@
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import ServiceSelect from "@/components/ecafe/service-select";
-import { action_delete, action_update, all } from "@/data/constants";
 import { useEffect, useRef, useState } from "react";
 import StatementCreateDialog from "../create/create-statement-dialog";
-import { isNumber } from "@/lib/utils";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
-import { AlertType } from "@/data/types";
-import { ServiceStatementType, ServiceType } from "@/data/iam-scheme";
-import { Data, mapStatementsToData } from "@/lib/mapping";
-import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
+import { action_delete, allItems } from "@/data/constants";
+import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
+import { mapStatementsToData } from "@/lib/mapping";
+import { isNumber } from "@/lib/utils";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
   const [reload, setReload] = useState(0);
 
-  const [selectedService, setSelectedService] = useState<number | string>(all);
-  const [selectedSid, setSelectedSid] = useState<string>(all);
+  const [selectedService, setSelectedService] = useState<number | string>(allItems);
+  const [selectedSid, setSelectedSid] = useState<string>(allItems);
 
-  const services = useRef<NewServiceType[]>([]);
+  const services = useRef<ServiceType[]>([]);
 
-  const [statements, setStatements] = useState<NewStatementType[]>([]);
+  const [statements, setStatements] = useState<StatementType[]>([]);
   const [statementData, setStatementData] = useState<Data[]>();
 
   const statementsLoaded = useRef<boolean>(false);
 
   const [alert, setAlert] = useState<AlertType>();
 
-  const serviceName = useRef<string>(all);
+  const serviceName = useRef<string>(allItems);
 
   const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
     let serviceId: number = 0;
@@ -45,7 +43,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         serviceName.current = service.name;
       }
   } else {
-      if (_service !== all) {
+      if (_service !== allItems) {
         const service = services.current.find((service) => service.name === _service);
         if (service) {
           serviceId = service.id;
@@ -59,13 +57,13 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return serviceId;
   }
 
-  const statementsLoadedCallback = (data: NewStatementType[]) => {
+  const statementsLoadedCallback = (data: StatementType[]) => {
     setStatements(data);
     setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
   }
 
-  const servicesLoadedCallback = (data: NewServiceType[]) => {
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     services.current = data;
 
     setSelectedService(_service);
@@ -91,7 +89,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     const serviceId: number = prepareStatementsLoad(_service, '*');
     handleLoadStatements(serviceId, '*', statementsLoadedCallback);
     setSelectedService(_service);
-    serviceName.current = _service === all ? 'All' : _service;
+    serviceName.current = _service === allItems ? 'All' : _service;
   }
 
   const statementDeletedCallback = () => {

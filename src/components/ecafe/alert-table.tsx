@@ -1,6 +1,6 @@
 import { Alert } from "@/components/ui/alert"
-import { AlertTableType } from "@/data/types";
 import PageTitle from "./page-title";
+import { AlertTableType } from "@/types/ecafe";
 
 const AlertTable = ({alert}:{alert: AlertTableType}) => {
   return (

@@ -3,42 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormSchemaType } from "../data/form-scheme";
-import { CountryType } from "@/data/iam-scheme";
-import { handleLoadCountries } from "@/lib/db";
 import { useEffect, useState } from "react";
-
-export const countries: CountryType[] = [
-  {
-    id: 1,
-    name: "Albania",
-    dialCode: "+355",
-    code: "AL"
-  },
-  {
-    id: 2,
-    name: "Algeria",
-    dialCode: "+213",
-    code: "DZ"
-  },
-  {
-    id: 3,
-    name: "Antigua",
-    dialCode: "+1268",
-    code: "AG"
-  },
-  {
-    id: 4,
-    name: "Bahrain",
-    dialCode: "+973",
-    code: "BH"
-  },
-  {
-    id: 5,
-    name: "Belgium",
-    dialCode: "+32",
-    code: "BE"
-  },
-];
+import { CountryType } from "@/types/ecafe";
 
 const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
   const {register, setValue} = formMethods;
@@ -51,9 +17,9 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
     setValue("dialcode", `${country.dialCode}`)
   };
 
-  const [countries, setCountries] = useState<NewCountryType[]>([]);
+  const [countries, setCountries] = useState<CountryType[]>([]);
 
-  const countriesLoadedCallback = (data: NewCountryType[]) => {
+  const countriesLoadedCallback = (data: CountryType[]) => {
     setCountries(data);
   }
 

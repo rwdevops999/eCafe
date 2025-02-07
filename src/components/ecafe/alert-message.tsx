@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertType } from "@/data/types";
+import { AlertType } from "@/types/ecafe";
 import { Terminal } from "lucide-react"
 
 const AlertMessage = ({alert}:{alert: AlertType}) => {

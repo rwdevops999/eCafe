@@ -1,5 +1,3 @@
-import { initMetaBase, MetaBase } from "@/data/meta"
-
 export interface Meta extends MetaBase {
 }
 

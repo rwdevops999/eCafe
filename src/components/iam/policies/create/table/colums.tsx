@@ -1,7 +1,7 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Data } from "@/lib/mapping";
+import { Data } from "@/types/ecafe";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Data>[] = [
@@ -9,7 +9,8 @@ export const columns: ColumnDef<Data>[] = [
         id: "select",
 
         header: ({ header, table }) => {
-            return (<div className="w-1">
+          return (
+            <div className="w-1">
               <IndeterminateCheckbox
                 {...{
                     checked: table.getIsAllRowsSelected(),
@@ -17,22 +18,23 @@ export const columns: ColumnDef<Data>[] = [
                     onChange: table.getToggleAllRowsSelectedHandler(),
                 }}
               />
-            </div>)
+            </div>
+          );
         },
 
-          cell: ({ row }) => (
-            <div className="w-1">
-              <IndeterminateCheckbox
-                {...{
-                  checked: row.getIsSelected(),
-                  indeterminate: row.getIsSomeSelected(),
-                  onChange: row.getToggleSelectedHandler(),
-                }}
-              />
-            </div>
-          ),
+        cell: ({ row }) => (
+          <div className="w-1">
+            <IndeterminateCheckbox
+              {...{
+                checked: row.getIsSelected(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler(),
+              }}
+            />
+          </div>
+        ),
   
-          enableSorting: false
+        enableSorting: false
     },
     {
         accessorKey: 'name',
@@ -42,17 +44,17 @@ export const columns: ColumnDef<Data>[] = [
         ),
 
         cell: ({row, getValue}) => {
-            return (
-                <div style={{paddingLeft: `${row.depth * 4}rem`}}>
-                    <div className="flex items-center h-[10px]">
-                        <Badge className="ml-2 text-foreground/50" variant="outline">{row.original.other?.serviceName}</Badge>&nbsp;
-                        {getValue<string>()}
-                        <Badge className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`} variant="outline">
-                            {row.original.other?.access}
-                        </Badge>
-                    </div>
-                </div>
-            );
+          return (
+            <div style={{paddingLeft: `${row.depth * 4}rem`}}>
+              <div className="flex items-center h-[10px]">
+                <Badge className="ml-2 text-foreground/50" variant="outline">{row.original.other?.serviceName}</Badge>&nbsp;
+                {getValue<string>()}
+                <Badge className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`} variant="outline">
+                  {row.original.other?.access}
+                </Badge>
+              </div>
+            </div>
+          );
         },
 
         footer: props => props.column.id,

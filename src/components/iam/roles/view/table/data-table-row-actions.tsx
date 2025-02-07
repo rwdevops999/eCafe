@@ -3,7 +3,7 @@
 import { Row, Table } from "@tanstack/react-table"
 import { Trash2 } from "lucide-react"
 import { action_delete } from "@/data/constants"
-import { Data } from "@/lib/mapping"
+import { Data } from "@/types/ecafe"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>

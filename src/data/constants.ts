@@ -1,20 +1,29 @@
-import { LanguageType } from "./types";
+import { CountryType, LanguageType, ServiceType } from "@/types/ecafe";
 
-export const separator_equals = '%3D';
-export const separator_ampersand = '%26';
+export const allItems = '*';
 
-export const all = '*';
+export const paginationSizes = [10, 15, 20, 25, 30, 35, 40, 45, 50];
+
+export const accessAllow: string = "Allow";
+export const accessDeny: string = "Deny";
+export const access = ["Allow", "Deny"];
+
+export const defaultAccess: string = "Allow";
+export const defaultService: ServiceType = {id: 0, name: "Stock", actions: [], statements: []};
 
 export const action_delete = "DELETE";
 export const action_update = "UPDATE";
 
-export const defaultCountry: NewCountryType = {
-    id: 0,
-    code: "BE",
-    dialCode: "+32",
-    name: "Belgium",
-  }
-  
+export const defaultCountry: CountryType = {
+  id: 0,
+  code: "BE",
+  dialCode: "+32",
+  name: "Belgium",
+}
+
+export const separator_equals = '%3D';
+export const separator_ampersand = '%26';
+
 export const dependency_roles = "roles";
 export const dependency_policies = "policies";
 export const dependency_groups = "groups";
@@ -44,3 +53,4 @@ export const languages: LanguageType[] = [
       icon: "/flags/fr.svg"
   }
 ]
+

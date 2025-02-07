@@ -4,22 +4,21 @@ import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
 import { useEffect, useRef, useState } from "react";
 import PolicyCreateDialog from "../create/create-policy-dialog";
-import { action_delete, all } from "@/data/constants";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { AlertType } from "@/data/types";
-import { Data, mapPoliciesToData } from "@/lib/mapping";
-import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { action_delete, allItems } from "@/data/constants";
+import { AlertType, Data, PolicyType } from "@/types/ecafe";
+import { mapPoliciesToData } from "@/lib/mapping";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const logger = new ConsoleLogger({ level: 'debug' });
 
-    const [selectedPolicy, setSelectedPolicy] = useState<string>(all)
-    const [policies, setPolicies] = useState<NewPolicyType[]>([]);
+    const [selectedPolicy, setSelectedPolicy] = useState<string>(allItems)
+    const [policies, setPolicies] = useState<PolicyType[]>([]);
     const [policiesData, setPoliciesData] = useState<Data[]>([]);
 
     const policiesLoaded = useRef<boolean>(false);
@@ -27,7 +26,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
     const [alert, setAlert] = useState<AlertType>();
     const [reload, setReload] = useState(0);
     
-    const policiesLoadedCallback = (data: NewPolicyType[]) => {
+    const policiesLoadedCallback = (data: PolicyType[]) => {
         logger.debug("PolicyDetails", "policiesLoadedCallback", JSON.stringify(data));
         
         setPolicies(data);
@@ -58,29 +57,27 @@ import { ConsoleLogger } from "@/lib/console.logger";
         setReload((x:any) => x+1);
     }
 
-  const policyInRole = (_policy: Data): AlertType => {
-      let alert = {
-        open: false,
-        error: false,
-        title: "",
-        message: "",
-        child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
-      };
+    const policyInRole = (_policy: Data): AlertType => {
+        let alert = {
+            open: false,
+            error: false,
+            title: "",
+            message: "",
+            child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+        };
 
-      let result: boolean = false;
-
-      const policy = policies.find(p => p.id === _policy.id);
-      if (policy && policy.roles) {
-        if (policy.roles.length > 0) {
-          alert.open = true;
-          alert.error = true;
-          alert.title = "Unable to delete policy";
-          alert.message = `Policy is in role '${policy.roles[0].name}'`;
+        const policy = policies.find(p => p.id === _policy.id);
+        if (policy && policy.roles) {
+            if (policy.roles.length > 0) {
+                alert.open = true;
+                alert.error = true;
+                alert.title = "Unable to delete policy";
+                alert.message = `Policy is in role '${policy.roles[0].name}'`;
+            }
         }
-      }
 
-      return alert;
-  }
+        return alert;
+    }
 
     const handleAction = (action: string, policy: Data) => {
         if (action === action_delete) {

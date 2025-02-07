@@ -1,7 +1,7 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { ColumnDef } from "@tanstack/react-table";
-import { Data } from "@/lib/mapping";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { Data } from "@/types/ecafe";
 
 export const columns: ColumnDef<Data>[] = [
     {

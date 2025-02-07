@@ -44,7 +44,7 @@ const EcafeButton = (
                 <Button hidden={hidden} type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" onClick={() => clickHandler(clickValue)} disabled={! enabled}>{caption}</Button>
             }
         </div>
-    )
+    );
 }
 
 export default EcafeButton;

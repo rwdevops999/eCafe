@@ -6,24 +6,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from "@/components/ui/separator";
 import { cloneObject, difference } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { Meta } from "../data/meta";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TabRoles from "../../components/tab-roles";
 import TabGroups from "../../components/tab-groups";
 import TabPolicies from "../../components/tab-policies";
-import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
 import { dependency_groups, dependency_policies, dependency_roles } from "@/data/constants";
-import { AlertTableType, AlertType, CombinedType } from "@/data/types";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { initMetaBase } from "@/data/meta";
 import { UseFormReturn } from "react-hook-form";
-import { Data, fullMapNoSubjectToData } from "@/lib/mapping";
-import { validateMappedData } from "@/lib/validate";
 import { DataTable } from "@/components/datatable/data-table";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import { Button } from "@/components/ui/button";
 import AlertTable from "@/components/ecafe/alert-table";
 import TabUser from "./components/tab-user";
+import { Meta } from "../meta/meta";
+import { AlertTableType, AlertType, CombinedType, CountryType, Data, ExtendedUserType, GroupType, UserType } from "@/types/ecafe";
+import { fullMapNoSubjectToData } from "@/lib/mapping";
 
 type DependencyType = {
   initialised: boolean,
@@ -36,6 +33,15 @@ const initDependency: DependencyType = {
   original: [], 
   selected: []
 };
+
+type ApiType = {
+  id: number
+}
+
+type ItemType = {
+  selected?: ApiType[],
+  removed?: ApiType[],
+}
 
 const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _setReload(x: any): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -52,8 +58,9 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   const groupDependenciesRef = useRef<DependencyType>(initDependency);
 
   const [tab, setTab] = useState<string>("user");
+  const [alert, setAlert] = useState<AlertType>();
+  const [valid, setValid] = useState<boolean>(false);
 
-  // const [persistUser, setPeristUser] = useState<boolean>(false);
   const [userTabLeaveState, setUserTabLeaveState] = useState<boolean>(false);
 
   const formMethods = useRef<UseFormReturn<any>>(undefined);
@@ -70,7 +77,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     resetDependencies();
   }
 
-  const calculateDependencies = (type: string, user: NewUserType | undefined): DependencyType => {
+  const calculateDependencies = (type: string, user: UserType|undefined): DependencyType => {
     let result: DependencyType = {
       initialised: true,
       original: [],
@@ -150,7 +157,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     result += roleDependenciesRef.current.selected.length;
     result += policyDependenciesRef.current.selected.length;
 
-    groupDependenciesRef.current.selected.forEach((group: NewGroupType) => {
+    groupDependenciesRef.current.selected.forEach((group: GroupType) => {
       if (group.roles) {
         result += group.roles.length;
       }
@@ -163,8 +170,6 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return result;
   }
 
-  const [alert, setAlert] = useState<AlertType>();
-  
   const handleRemoveAlert = () => {
     setAlert(undefined);
   }
@@ -181,8 +186,6 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   
     setAlert(alert);
   }
-
-  const [valid, setValid] = useState<boolean>(false);
 
   const validateUser = () => {
     const subject: {
@@ -236,17 +239,17 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     if (_open) {
       logger.debug("UserDialog", "UseEffect[_meta]", "set role dependencies", JSON.stringify(roleDependenciesRef.current));
       if (!roleDependenciesRef.current.initialised) {
-        roleDependenciesRef.current = calculateDependencies(dependency_roles, _meta.currentSubject as NewUserType);
+        roleDependenciesRef.current = calculateDependencies(dependency_roles, _meta.currentSubject as UserType);
       }
 
       logger.debug("UserDialog", "UseEffect[_meta]", "set policy dependencies");
       if (!policyDependenciesRef.current.initialised) {
-        policyDependenciesRef.current = calculateDependencies(dependency_policies, _meta.currentSubject as NewUserType);
+        policyDependenciesRef.current = calculateDependencies(dependency_policies, _meta.currentSubject as UserType);
       }
 
       logger.debug("UserDialog", "UseEffect[_meta]", "set group dependencies");
       if (!groupDependenciesRef.current.initialised) {
-        groupDependenciesRef.current = calculateDependencies(dependency_groups, _meta.currentSubject as NewUserType);
+        groupDependenciesRef.current = calculateDependencies(dependency_groups, _meta.currentSubject as UserType);
       }
 
       logger.debug("UserDialog", "ROLE DEPENDENCIES", JSON.stringify(roleDependenciesRef.current));
@@ -281,8 +284,8 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     setTab(newtab);
   }
 
-  const countries = useRef<NewCountryType[]>([])
-  const countriesLoadedCallback = (data: NewCountryType[]) => {
+  const countries = useRef<CountryType[]>([])
+  const countriesLoadedCallback = (data: CountryType[]) => {
     countries.current = data;
   }
 
@@ -295,20 +298,11 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     setTab("user");
   }
 
-  type ApiType = {
-    id: number
-  }
-
-  type ItemType = {
-    selected?: ApiType[],
-    removed?: ApiType[],
-  }
-
-  const prepareUser = (data: any, selectedUser?: NewUserType): NewExtendedUserType => {
-    const _country: NewCountryType = countries.current.find((country) => country.name === data.country)!;
+  const prepareUser = (data: any, selectedUser?: UserType): ExtendedUserType => {
+    const _country: CountryType = countries.current.find((country) => country.name === data.country)!;
     logger.debug("UserDialog", "PrepareUser(country)", JSON.stringify(_country));
 
-    let user: NewExtendedUserType = {
+    let user: ExtendedUserType = {
       id: (selectedUser ? selectedUser.id : 0),
       name: data.name,
       firstname: data.firstname,
@@ -333,37 +327,18 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       }
     }
 
-    let roles: ItemType = {
-    }
+    let roles: ItemType = {}
 
-    const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {
-        let role: ApiType = {
-          id: _role.id,
-        }
-
-        return role;
-    });
+    const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {return {id: _role.id}});
     logger.debug("UserDialog", "PrepareUser(Original Roles)", JSON.stringify(originalRoles));
 
-    const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {
-      let role: ApiType = {
-        id: _role.id,
-      }
-
-      return role;
-    });
+    const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {return {id: _role.id}});
     logger.debug("UserDialog", "PrepareUser(Selected Roles)", JSON.stringify(selectedRoles));
 
     const diffRoles: number[] = difference(roleDependenciesRef.current.original, roleDependenciesRef.current.selected);
     logger.debug("UserDialog", "PrepareUser(diffRoles)", JSON.stringify(diffRoles));
 
-    const removedRoles: ApiType[] = diffRoles.map(_id => {
-      let role: ApiType = {
-        id: _id
-      }
-
-      return role;
-    });
+    const removedRoles: ApiType[] = diffRoles.map(_id => {return {id: _id}});
     logger.debug("UserDialog", "PrepareUser(removedRoles)", JSON.stringify(removedRoles));
 
     if (selectedRoles.length > 0) {
@@ -376,38 +351,18 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     
     user.roles = roles;
 
-    let policies: ItemType = {
-    }
+    let policies: ItemType = {}
 
-    const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {
-        let policy: ApiType = {
-          id: _policy.id,
-        }
-
-        return policy;
-    });
+    const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {return {id: _policy.id}});
     logger.debug("UserDialog", "PrepareUser(Original Policies)", JSON.stringify(originalPolicies));
 
-    const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {
-      let policy: ApiType = {
-        id: _policy.id,
-      }
-
-      return policy;
-    });
+    const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {return {id: _policy.id}});
     logger.debug("UserDialog", "PrepareUser(Selected Policies)", JSON.stringify(selectedPolicies));
 
     const diffPolicies: number[] = difference(policyDependenciesRef.current.original, policyDependenciesRef.current.selected);
     logger.debug("UserDialog", "PrepareUser(diffPolicies)", JSON.stringify(diffPolicies));
 
-    const removedPolicies: ApiType[] = diffPolicies.map(_id => {
-      let policy: ApiType = {
-        id: _id
-      }
-
-      return policy;
-    });
-
+    const removedPolicies: ApiType[] = diffPolicies.map(_id => {return {id: _id}});
     logger.debug("UserDialog", "PrepareUser(removedPolicies)", JSON.stringify(removedPolicies));
 
     if (selectedPolicies.length > 0) {
@@ -420,38 +375,18 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     
     user.policies = policies;
 
-    let groups: ItemType = {
-    }
+    let groups: ItemType = {}
 
-    const originalGroups: ApiType[] = groupDependenciesRef.current.original?.map((_group) => {
-        let group: ApiType = {
-          id: _group.id,
-        }
-
-        return group;
-    });
+    const originalGroups: ApiType[] = groupDependenciesRef.current.original?.map((_group) => {return {id: _group.id}});
     logger.debug("UserDialog", "PrepareUser(Original Groups)", JSON.stringify(originalGroups));
 
-    const selectedGroups: ApiType[] = groupDependenciesRef.current.selected?.map((_group) => {
-      let group: ApiType = {
-        id: _group.id,
-      }
-
-      return group;
-    });
+    const selectedGroups: ApiType[] = groupDependenciesRef.current.selected?.map((_group) => {return {id: _group.id}});
     logger.debug("UserDialog", "PrepareUser(Selected Groups)", JSON.stringify(selectedGroups));
 
     const diffGroups: number[] = difference(groupDependenciesRef.current.original, groupDependenciesRef.current.selected);
     logger.debug("UserDialog", "PrepareUser(diffGroups)", JSON.stringify(diffGroups));
 
-    const removedGroups: ApiType[] = diffGroups.map(_id => {
-      let group: ApiType = {
-        id: _id
-      }
-
-      return group;
-    });
-
+    const removedGroups: ApiType[] = diffGroups.map(_id => {return {id: _id}});
     logger.debug("UserDialog", "PrepareUser(removedGroups)", JSON.stringify(removedGroups));
 
     if (selectedGroups.length > 0) {
@@ -467,16 +402,10 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return user;
   }
 
-  const userCreatedCallback = () => {
+  const userUpsetCallback = () => {
     clearDependencies();
     metaOfUserDialogState.control.handleDialogState(false);
     logger.debug("UserDetails", "CALL RELOAD");
-    _setReload((x: any) => x+1);
-  }
-
-  const userUpdatedCallback = () => {
-    clearDependencies();
-    metaOfUserDialogState.control.handleDialogState(false);
     _setReload((x: any) => x+1);
   }
 
@@ -485,14 +414,14 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
 
     if (metaOfUserDialogState.currentSubject) {
       logger.debug("UserDialog", "OnSubmitForm", "UPDATE?");
-      const user: NewExtendedUserType = prepareUser(data, metaOfUserDialogState.currentSubject as NewUserType);
+      const user: ExtendedUserType = prepareUser(data, metaOfUserDialogState.currentSubject as UserType);
       logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
-      handleUpdateUser(user, userUpdatedCallback);
+      handleUpdateUser(user, userUpsetCallback);
     } else {
       logger.debug("UserDialog", "OnSubmitForm", "CREATE?");
-      const user: NewExtendedUserType = prepareUser(data);
+      const user: ExtendedUserType = prepareUser(data);
       logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
-      handleCreateUser(user, userCreatedCallback);
+      handleCreateUser(user, userUpsetCallback);
     }
   }
 

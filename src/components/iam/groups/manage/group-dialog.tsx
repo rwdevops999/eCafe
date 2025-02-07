@@ -1,19 +1,12 @@
 'use client'
 
 import { ConsoleLogger } from "@/lib/console.logger";
-import { Meta } from "../data/meta";
 import { useEffect, useRef, useState } from "react";
-import { initMetaBase } from "@/data/meta";
 import { UseFormReturn } from "react-hook-form";
 import { dependency_policies, dependency_roles, dependency_users } from "@/data/constants";
-import { AlertTableType, AlertType, CombinedType } from "@/data/types";
 import { DataTable } from "@/components/datatable/data-table";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import { Button } from "@/components/ui/button";
-import { Data, fullMapNoSubjectToData } from "@/lib/mapping";
-import { validateMappedData } from "@/lib/validate";
-import { cloneObject, difference } from "@/lib/utils";
-import { handleCreateGroup, handleUpdateGroup } from "@/lib/db";
 import AlertTable from "@/components/ecafe/alert-table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import EcafeButton from "@/components/ecafe/ecafe-button";
@@ -23,9 +16,12 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import TabRoles from "../../components/tab-roles";
 import TabPolicies from "../../components/tab-policies";
-import TabGroups from "../../components/tab-groups";
 import TabGroup from "./components/tab-group";
 import TabUsers from "../../components/tab-users";
+import { Meta } from "../meta/meta";
+import { AlertTableType, AlertType, CombinedType, Data, ExtendedGroupType, GroupType, UserType } from "@/types/ecafe";
+import { fullMapNoSubjectToData } from "@/lib/mapping";
+import { cloneObject, difference } from "@/lib/utils";
 
 type DependencyType = {
   initialised: boolean,
@@ -38,6 +34,15 @@ const initDependency: DependencyType = {
   original: [], 
   selected: []
 };
+
+type ApiType = {
+  id: number
+}
+
+type ItemType = {
+  selected?: ApiType[],
+  removed?: ApiType[],
+}
 
 const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _setReload(x: any): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -54,6 +59,8 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   const userDependenciesRef = useRef<DependencyType>(initDependency);
 
   const [tab, setTab] = useState<string>("group");
+  const [alert, setAlert] = useState<AlertType>();
+  const [valid, setValid] = useState<boolean>(false);
 
   const [groupTabLeaveState, setGroupTabLeaveState] = useState<boolean>(false);
 
@@ -71,7 +78,7 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     resetDependencies();
   }
 
-  const calculateDependencies = (type: string, group: NewGroupType | undefined): DependencyType => {
+  const calculateDependencies = (type: string, group: GroupType | undefined): DependencyType => {
     let result: DependencyType = {
       initialised: true,
       original: [],
@@ -151,7 +158,7 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     result += roleDependenciesRef.current.selected.length;
     result += policyDependenciesRef.current.selected.length;
 
-    userDependenciesRef.current.selected.forEach((user: NewUserType) => {
+    userDependenciesRef.current.selected.forEach((user: UserType) => {
       if (user.roles) {
         result += user.roles.length;
       }
@@ -164,8 +171,6 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     return result;
   }
 
-  const [alert, setAlert] = useState<AlertType>();
-  
   const handleRemoveAlert = () => {
     setAlert(undefined);
   }
@@ -182,8 +187,6 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   
     setAlert(alert);
   }
-
-  const [valid, setValid] = useState<boolean>(false);
 
   const validateGroup = () => {
     const subject: {
@@ -237,17 +240,17 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     if (_open) {
       logger.debug("GroupDialog", "UseEffect[_meta]", "set role dependencies", JSON.stringify(roleDependenciesRef.current));
       if (!roleDependenciesRef.current.initialised) {
-        roleDependenciesRef.current = calculateDependencies(dependency_roles, _meta.currentSubject as NewGroupType);
+        roleDependenciesRef.current = calculateDependencies(dependency_roles, _meta.currentSubject as GroupType);
       }
 
       logger.debug("GroupDialog", "UseEffect[_meta]", "set policy dependencies");
       if (!policyDependenciesRef.current.initialised) {
-        policyDependenciesRef.current = calculateDependencies(dependency_policies, _meta.currentSubject as NewGroupType);
+        policyDependenciesRef.current = calculateDependencies(dependency_policies, _meta.currentSubject as GroupType);
       }
 
       logger.debug("GroupDialog", "UseEffect[_meta]", "set user dependencies");
       if (!userDependenciesRef.current.initialised) {
-        userDependenciesRef.current = calculateDependencies(dependency_users, _meta.currentSubject as NewGroupType);
+        userDependenciesRef.current = calculateDependencies(dependency_users, _meta.currentSubject as GroupType);
       }
 
       logger.debug("GroupDialog", "ROLE DEPENDENCIES", JSON.stringify(roleDependenciesRef.current));
@@ -287,59 +290,28 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     setTab("group");
   }
 
-  type ApiType = {
-    id: number
-  }
-
-  type ItemType = {
-    selected?: ApiType[],
-    removed?: ApiType[],
-  }
-
-  const prepareGroup = (data: any, selectedGroup?: NewGroupType): NewExtendedGroupType => {
-    let group: NewExtendedGroupType = {
+  const prepareGroup = (data: any, selectedGroup?: GroupType): ExtendedGroupType => {
+    let group: ExtendedGroupType = {
       id: (selectedGroup ? selectedGroup.id : 0),
       name: data.name,
       description: data.description,
-      roles: {
-      },
-      policies: {
-      },
-      users: {
-      }
+      roles: {},
+      policies: {},
+      users: {}
     }
 
-    let roles: ItemType = {
-    }
+    let roles: ItemType = {}
 
-    const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {
-        let role: ApiType = {
-          id: _role.id,
-        }
-
-        return role;
-    });
+    const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {return {id: _role.id}});
     logger.debug("GroupDialog", "PrepareGroup(Original Roles)", JSON.stringify(originalRoles));
 
-    const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {
-      let role: ApiType = {
-        id: _role.id,
-      }
-
-      return role;
-    });
+    const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {return {id: _role.id}});
     logger.debug("GroupDialog", "PrepareGroup(Selected Roles)", JSON.stringify(selectedRoles));
 
     const diffRoles: number[] = difference(roleDependenciesRef.current.original, roleDependenciesRef.current.selected);
     logger.debug("GroupDialog", "PrepareGroup(diffRoles)", JSON.stringify(diffRoles));
 
-    const removedRoles: ApiType[] = diffRoles.map(_id => {
-      let role: ApiType = {
-        id: _id
-      }
-
-      return role;
-    });
+    const removedRoles: ApiType[] = diffRoles.map(_id => {return {id: _id}});
     logger.debug("GroupDialog", "PrepareGroup(removedRoles)", JSON.stringify(removedRoles));
 
     if (selectedRoles.length > 0) {
@@ -352,38 +324,18 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     
     group.roles = roles;
 
-    let policies: ItemType = {
-    }
+    let policies: ItemType = {}
 
-    const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {
-        let policy: ApiType = {
-          id: _policy.id,
-        }
-
-        return policy;
-    });
+    const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {return {id: _policy.id}});
     logger.debug("GroupDialog", "PrepareGroup(Original Policies)", JSON.stringify(originalPolicies));
 
-    const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {
-      let policy: ApiType = {
-        id: _policy.id,
-      }
-
-      return policy;
-    });
+    const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {return {id: _policy.id}});
     logger.debug("GroupDialog", "PrepareGroup(Selected Policies)", JSON.stringify(selectedPolicies));
 
     const diffPolicies: number[] = difference(policyDependenciesRef.current.original, policyDependenciesRef.current.selected);
     logger.debug("GroupDialog", "PrepareGroup(diffPolicies)", JSON.stringify(diffPolicies));
 
-    const removedPolicies: ApiType[] = diffPolicies.map(_id => {
-      let policy: ApiType = {
-        id: _id
-      }
-
-      return policy;
-    });
-
+    const removedPolicies: ApiType[] = diffPolicies.map(_id => {return {id: _id}});
     logger.debug("GroupDialog", "PrepareGroup(removedPolicies)", JSON.stringify(removedPolicies));
 
     if (selectedPolicies.length > 0) {
@@ -396,38 +348,18 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     
     group.policies = policies;
 
-    let users: ItemType = {
-    }
+    let users: ItemType = {}
 
-    const originalUsers: ApiType[] = userDependenciesRef.current.original?.map((_user) => {
-        let user: ApiType = {
-          id: _user.id,
-        }
-
-        return user;
-    });
+    const originalUsers: ApiType[] = userDependenciesRef.current.original?.map((_user) => {return {id: _user.id}});
     logger.debug("GroupDialog", "PrepareGroup(Original Users)", JSON.stringify(originalUsers));
 
-    const selectedUsers: ApiType[] = userDependenciesRef.current.selected?.map((_user) => {
-      let user: ApiType = {
-        id: _user.id,
-      }
-
-      return user;
-    });
+    const selectedUsers: ApiType[] = userDependenciesRef.current.selected?.map((_user) => {return {id: _user.id}});
     logger.debug("GroupDialog", "PrepareGroup(Selected Users)", JSON.stringify(selectedUsers));
 
     const diffUsers: number[] = difference(userDependenciesRef.current.original, userDependenciesRef.current.selected);
     logger.debug("GroupDialog", "PrepareGroup(diffUsers)", JSON.stringify(diffUsers));
 
-    const removedUsers: ApiType[] = diffUsers.map(_id => {
-      let user: ApiType = {
-        id: _id
-      }
-
-      return user;
-    });
-
+    const removedUsers: ApiType[] = diffUsers.map(_id => {return {id: _id}});
     logger.debug("GroupDialog", "PrepareGroup(removedUSers)", JSON.stringify(removedUsers));
 
     if (selectedUsers.length > 0) {
@@ -443,16 +375,10 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     return group;
   }
 
-  const groupCreatedCallback = () => {
+  const groupUpsetCallback = () => {
     clearDependencies();
     metaOfGroupDialogState.control.handleDialogState(false);
     logger.debug("GroupDetails", "CALL RELOAD");
-    _setReload((x: any) => x+1);
-  }
-
-  const groupUpdatedCallback = () => {
-    clearDependencies();
-    metaOfGroupDialogState.control.handleDialogState(false);
     _setReload((x: any) => x+1);
   }
 
@@ -461,14 +387,14 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
 
     if (metaOfGroupDialogState.currentSubject) {
       logger.debug("GroupDialog", "OnSubmitForm", "UPDATE?");
-      const group: NewExtendedGroupType = prepareGroup(data, metaOfGroupDialogState.currentSubject as NewGroupType);
+      const group: ExtendedGroupType = prepareGroup(data, metaOfGroupDialogState.currentSubject as GroupType);
       logger.debug("GroupDialog", "OnSubmitForm(prepareGroup)", JSON.stringify(group));
-      handleUpdateGroup(group, groupUpdatedCallback);
+      handleUpdateGroup(group, groupUpsetCallback);
     } else {
       logger.debug("GroupDialog", "OnSubmitForm", "CREATE?");
-      const group: NewExtendedGroupType = prepareGroup(data);
+      const group: ExtendedGroupType = prepareGroup(data);
       logger.debug("GroupDialog", "OnSubmitForm(prepareGroup)", JSON.stringify(group));
-      handleCreateGroup(group, groupCreatedCallback);
+      handleCreateGroup(group, groupUpsetCallback);
     }
   }
 
@@ -511,68 +437,66 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     })
   }
 
-    const renderComponent = () => {
-      logger.debug("UserGroup", "renderComponent(_open)", _open);
-      logger.debug("UserGroup", "renderComponent(groupTabLeaveState)", groupTabLeaveState);
+  const renderComponent = () => {
+    logger.debug("UserGroup", "renderComponent(_open)", _open);
+    logger.debug("UserGroup", "renderComponent(groupTabLeaveState)", groupTabLeaveState);
 
-        if (alert && alert.open) {
-          return (<AlertTable alert={alert}></AlertTable>)
-        }
-  
-        return (
-          <Dialog open={_open}>
-            <DialogTrigger asChild>
-              <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage group" clickHandler={_meta.control.handleDialogState} clickValue={true}/>
-              {/* enabled={_enabled}/> */}
-            </DialogTrigger>
-            <DialogContent className="min-w-[75%]" aria-describedby="">
-              <DialogHeader className="mb-2">
-                <DialogTitle>
-                  <PageTitle title="Manage group" className="m-2 -ml-[2px]"/>
-                  <Separator className="bg-red-500"/>
-                </DialogTitle>
-              </DialogHeader>
-      
-              <Tabs className="w-[100%]" onValueChange={onTabChange} value={tab}>
-              <TabsList className="grid grid-cols-4">
-                <TabsTrigger value="group">👨‍👦‍👦 Group</TabsTrigger>
-                <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
-                <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
-                <TabsTrigger value="users" >🙍🏻‍♂️ Users</TabsTrigger>
-              </TabsList>
-              {_open &&
-                <>
-                    <TabsContent value="group" forceMount={tab !== "group" ? true : undefined} hidden={tab !== "group"}>
-                        <div className="m-1 container w-[99%]">
-                          <TabGroup _meta={metaOfGroupDialogState} onTabLeave={groupTabLeaveState} setFormMethods={setFormMethods}/>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="roles">
-                        <div className="m-1 container w-[99%]">
-                          <TabRoles _meta={metaOfGroupDialogState} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="policies">
-                        <div className="m-1 container w-[99%]">
-                          <TabPolicies _meta={metaOfGroupDialogState} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="users">
-                        <div className="m-1 container w-[99%]">
-                          <TabUsers _meta={metaOfGroupDialogState} />
-                        </div>
-                    </TabsContent>
-                </>
-              }
-              </Tabs>
-            </DialogContent>
-          </Dialog>
-        );
+    if (alert && alert.open) {
+      return (<AlertTable alert={alert}></AlertTable>)
     }
 
     return (
-        <>{renderComponent()}</>
+      <Dialog open={_open}>
+        <DialogTrigger asChild>
+          <EcafeButton id="dialogButton" className="bg-orange-400 hover:bg-orange-600 mr-3" caption="Manage group" clickHandler={_meta.control.handleDialogState} clickValue={true}/>
+          {/* enabled={_enabled}/> */}
+        </DialogTrigger>
+        <DialogContent className="min-w-[75%]" aria-describedby="">
+          <DialogHeader className="mb-2">
+            <DialogTitle>
+              <PageTitle title="Manage group" className="m-2 -ml-[2px]"/>
+              <Separator className="bg-red-500"/>
+            </DialogTitle>
+          </DialogHeader>
+  
+          <Tabs className="w-[100%]" onValueChange={onTabChange} value={tab}>
+          <TabsList className="grid grid-cols-4">
+            <TabsTrigger value="group">👨‍👦‍👦 Group</TabsTrigger>
+            <TabsTrigger value="roles" >🔖 Roles</TabsTrigger>
+            <TabsTrigger value="policies" >📜 Policies</TabsTrigger>
+            <TabsTrigger value="users" >🙍🏻‍♂️ Users</TabsTrigger>
+          </TabsList>
+          {_open &&
+            <>
+                <TabsContent value="group" forceMount={tab !== "group" ? true : undefined} hidden={tab !== "group"}>
+                    <div className="m-1 container w-[99%]">
+                      <TabGroup _meta={metaOfGroupDialogState} onTabLeave={groupTabLeaveState} setFormMethods={setFormMethods}/>
+                    </div>
+                </TabsContent>
+                <TabsContent value="roles">
+                    <div className="m-1 container w-[99%]">
+                      <TabRoles _meta={metaOfGroupDialogState} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="policies">
+                    <div className="m-1 container w-[99%]">
+                      <TabPolicies _meta={metaOfGroupDialogState} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="users">
+                    <div className="m-1 container w-[99%]">
+                      <TabUsers _meta={metaOfGroupDialogState} />
+                    </div>
+                </TabsContent>
+            </>
+          }
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     );
+  }
+
+  return (<>{renderComponent()}</>);
 }
 
 export default GroupDialog;

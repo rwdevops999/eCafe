@@ -1,10 +1,9 @@
 import { defaultCountry } from "@/data/constants";
-import { CountryType } from "@/data/iam-scheme";
-import { NewButtonConfig } from "@/data/types";
+import { CountryType, UserType } from "@/types/ecafe";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
-export const storeUserFormValues = (user: NewUserType|undefined, values: UseFormGetValues<any>, countries: CountryType[]): NewUserType => {
-    let storedUser: NewUserType = {
+export const storeUserFormValues = (user: UserType|undefined, values: UseFormGetValues<any>, countries: CountryType[]): UserType => {
+    let storedUser: UserType = {
         name: "",
         firstname: "",
         email: "",
@@ -65,7 +64,7 @@ export const storeUserFormValues = (user: NewUserType|undefined, values: UseForm
     return storedUser;
 }
 
-export const initUserForm = (user: NewUserType|undefined, values: UseFormSetValue<any>) => {
+export const initUserForm = (user: UserType|undefined, values: UseFormSetValue<any>) => {
     values("name", user?.name??"");
     values("firstname", user?.firstname??"");
     values("email", user?.email??"");
@@ -83,25 +82,5 @@ export const initUserForm = (user: NewUserType|undefined, values: UseFormSetValu
     values("country", user?.address?.country.name??defaultCountry.name);
 }
 
-const isSubjectCreated = (subject: NewUserType|NewGroupType): boolean => {
-    if (subject === undefined || subject.id === undefined) {
-        return false;
-    }
 
-    return true;
-}
-
-export const defineActionButtons = (subject: NewUserType|NewGroupType): NewButtonConfig => {
-    let actionButtons: NewButtonConfig = {
-        cancelButton: true
-    };
-
-    if (isSubjectCreated(subject)) {
-        actionButtons.updateButton = true;
-    } else {
-        actionButtons.createButton = true;
-    }
-
-    return actionButtons;
-}
 

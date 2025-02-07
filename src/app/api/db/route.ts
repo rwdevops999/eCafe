@@ -1,10 +1,10 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
-import { serviceMappings, ServiceMappingType } from "./data/setup";
-import { log } from "@/lib/utils";
 import { all } from "@/data/constants";
-import { Country, loadCountries } from "@/lib/country";
+import { Country } from "@/types/ecafe";
+import { loadCountriesFromFile } from "@/lib/utils";
+import { serviceMappings, ServiceMappingType } from "./setup/setup";
 
 const provisionServiceActions = (_service: ServiceMappingType) => {
   let actions: Prisma.ActionCreateInput[] = [];
@@ -29,8 +29,6 @@ const provisionServices = (_services: ServiceMappingType[]) => {
 
     service = {
       name: _service.service,
-      // createDate: new Date(),
-      // updateDate: new Date(),
       actions: {
         create: actions
       }
@@ -41,28 +39,23 @@ const provisionServices = (_services: ServiceMappingType[]) => {
 }
 
 const clearServices = async () => {
-  log(true, "INITDB", "clear Services");
   await prisma.service.deleteMany({});
 }
 
 const clearActions = async () => {
-  log(true, "INITDB", "clear Actions");
   await prisma.action.deleteMany({});
 }
 
 const clearPolicies = async () => {
-  log(true, "INITDB", "clear Policies");
   await prisma.policy.deleteMany({});
 };
 
 const clearStatements = async () => {
-  log(true, "INITDB", "clear Statements");
   await prisma.statementAction.deleteMany({});
   await prisma.serviceStatement.deleteMany({});
 };
 
 const clearCountryTable = async () => {
-  log(true, "INITDB", "clear Countries");
   await prisma.country.deleteMany({});
 };
 
@@ -74,7 +67,7 @@ const clearDB = async() => {
 };
 
 const provisionCountries = (filename: string) => {
-  const countries: Country[] = loadCountries(filename);
+  const countries: Country[] = loadCountriesFromFile(filename);
 
   countries.map(async (_country: Country) => {
     let country: Prisma.CountryCreateInput;
@@ -98,7 +91,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (table === 'country') {
-      log(true, "INIT DB", "Setup countries");
       await clearCountryTable();
       provisionCountries('./public/country/country-codes.json');
     }

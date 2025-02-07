@@ -1,10 +1,7 @@
  'use client'
 
 import { ConsoleLogger } from "@/lib/console.logger";
-import { Data, mapGroupsToData } from "@/lib/mapping";
 import { useEffect, useRef, useState } from "react";
-import { initGrouprMeta, Meta } from "../data/meta";
-import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
 import { action_delete } from "@/data/constants";
 import { TableMeta } from "@tanstack/react-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
@@ -14,6 +11,9 @@ import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import GroupDialog from "../manage/group-dialog";
 import { cloneObject } from "@/lib/utils";
+import { Data, GroupType } from "@/types/ecafe";
+import { initGroupMeta, Meta } from "../meta/meta";
+import { mapGroupsToData } from "@/lib/mapping";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -25,17 +25,17 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
   const [dialogState, setDialogState] = useState<boolean>(false);
 
-  const groupsRef = useRef<NewGroupType[]>([]);
+  const groupsRef = useRef<GroupType[]>([]);
   const groupsDataRef = useRef<Data[]>([]);
 
-  const metaGroupDetails = useRef<Meta>(initGrouprMeta);
+  const metaGroupDetails = useRef<Meta>(initGroupMeta);
 
-  const setSelectedGroup = (_group: NewGroupType|undefined) => {
+  const setSelectedGroup = (_group: GroupType|undefined) => {
     logger.debug("GroupDetails", "setSelectedGroup => META currentSubject", JSON.stringify(_group));
     metaGroupDetails.current.currentSubject = _group;
   }
 
-  const groupsLoadedCallback = (_groups: NewGroupType[]) => {
+  const groupsLoadedCallback = (_groups: GroupType[]) => {
     logger.debug("GroupDetails", "groupsLoadedCallback", JSON.stringify(_groups));
 
     groupsRef.current = _groups
@@ -84,7 +84,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
       handleDeleteGroup(_group.id, groupDeletedCallback);
     } else {
       logger.debug("GroupDetails", "handleAction", _group);
-      const selectedGroup: NewGroupType = groupsRef.current.find((group) => group.id === _group.id)!;
+      const selectedGroup: GroupType = groupsRef.current.find((group) => group.id === _group.id)!;
       setSelectedGroup(selectedGroup);
       logger.debug("GroupsDetails", "changeDialogState => true");
       setDialogState(true);
@@ -100,20 +100,18 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     if  (groupsDataRef && metaGroupDetails) {
       logger.debug("GroupDetails", "RENDER");
       logger.debug("GroupDetails", ">>> dialogState", dialogState);
-        // log(debug, "UserDetails", ">>> dataUsers", dataUsers, true);
-        // log(debug, "UserDetails", ">>> currentUser", metaUserDetails.current.currentSubject ?? "user is undefined", true);
 
       return (
         <div>
-            <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
-            <PageTitle className="m-2" title={`Overview group`} />
+          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
+          <PageTitle className="m-2" title={`Overview group`} />
 
-              <div className="flex items-center justify-end">
-                <GroupDialog _open={dialogState}  _meta={cloneObject(metaGroupDetails.current)} _setReload={setReloadState}/>
-              </div>
-              <div className="block space-y-5">
-                <DataTable data={groupsDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
-              </div>
+            <div className="flex items-center justify-end">
+              <GroupDialog _open={dialogState}  _meta={cloneObject(metaGroupDetails.current)} _setReload={setReloadState}/>
+            </div>
+            <div className="block space-y-5">
+              <DataTable data={groupsDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+            </div>
         </div>
       );
     }

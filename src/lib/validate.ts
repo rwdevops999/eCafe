@@ -1,7 +1,3 @@
-import { Data, mapConflictsToData } from "./mapping"
-import { intersection } from "./utils"
-
-/* ============== NEW VERSION ============= */
 type AccessPath = {
     path: string[]
 }
@@ -50,7 +46,7 @@ const validateData = (_data: Data[], _path: string[]) => {
     });
 }
 
-export const validateMappedData = (data: Data[]): Data[] => {
+const validateMappedData = (data: Data[]): Data[] => {
     resetValidationArrays();
     validateData(data, []);
     let result: AccessResultType[] = intersection(allowedActionsArray, deniedActionsArray);

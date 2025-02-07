@@ -8,7 +8,6 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { defaultAccess, defaultService } from "@/data/iam-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -18,9 +17,10 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Data, mapServiceActionsToData } from "@/lib/mapping";
 import { Row } from "@tanstack/react-table"
-import { createStatement, handleLoadServicesWithService } from "@/lib/db";
+import { Data, ServiceType, StatementType } from "@/types/ecafe";
+import { mapServiceActionsToData } from "@/lib/mapping";
+import { defaultAccess, defaultService } from "@/data/constants";
 
 
 const FormSchema = z.object({
@@ -53,7 +53,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   /**
    * the services (and their actions, dempth = 1)
    */
-  const services = useRef<NewServiceType[]>([]);
+  const services = useRef<ServiceType[]>([]);
   const [actionsData, setActionsData] = useState<Data[]>([]);
 
   /**
@@ -62,7 +62,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
    */
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
-  const servicesLoadedCallback = (data: NewServiceType[]) => {
+  const servicesLoadedCallback = (data: ServiceType[]) => {
     services.current = data;
     setActionsData(mapServiceActionsToData(services.current));
   }
@@ -87,86 +87,78 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, [_service]);
 
-    const {
-      register,
-      handleSubmit,
-      formState: { errors },
-      reset
-    } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const handleDialogState = (state: boolean) => {
-        setOpen(state);
-    }
+  const handleDialogState = (state: boolean) => {
+      setOpen(state);
+  }
 
-    const prepareCreateStatement = (data: any): NewStatementType | undefined => {
+  const prepareCreateStatement = (data: any): StatementType | undefined => {
+    if (selectedActions && selectedActions.length > 0) {
+      const _service = services.current.find(service => service.name === selectedService)!;
+      const _actions = selectedActions.map(action => {return {id: action.id, name: action.name}});
 
-      if (selectedActions && selectedActions.length > 0) {
-        const _service = services.current.find(service => service.name === selectedService)!;
-        const _actions = selectedActions.map(action => {
-          const act: NewStatementActionType = {
-            id: action.id,
-            name: action.name,
-          }
-
-          return act;
-        });
-
-        return {
-          id: 0,
-          serviceId: _service.id,
-          sid: data.sid,
-          description: data.description,
-          permission: access.current,
-          managed: managed.current,
-          actions: _actions,
-          service: {
-            id: _service.id,
-            name: _service.name,
-            actions: _service.actions,
-            statements: []
-          },
-          policies: []
-        }
-      }
-
-      return undefined;
-    }
-
-    const statementCreatedCallback = () => {
-      setReload((x:any) => x+1);
-    };
-
-    const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-      const statement = prepareCreateStatement(data);
-
-      if  (statement) {
-        createStatement(statement, statementCreatedCallback);
-        handleDialogState(false);
+      return {
+        id: 0,
+        serviceId: _service.id,
+        sid: data.sid,
+        description: data.description,
+        permission: access.current,
+        managed: managed.current,
+        actions: _actions,
+        service: {
+          id: _service.id,
+          name: _service.name,
+          actions: _service.actions,
+          statements: []
+        },
+        policies: []
       }
     }
 
-    const handleChangeSelection = (selection: Row<Data>[]) => {
-      setSelectedActions(selection.map((row) => row.original));
-    }
+    return undefined;
+  }
 
-    const changeAccessValue = (value: string) => {
-      access.current = value;
-    }
+  const statementCreatedCallback = () => {
+    setReload((x:any) => x+1);
+  };
 
-    const changeManaged = (checked: CheckedState) => {
-      if (typeof checked === 'boolean') {
-        managed.current = checked;
-      }
-    }
+  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    const statement = prepareCreateStatement(data);
 
-    const handleChangeService = (_service: string) => {
-      setSelectedService(_service);
-      handleLoadServicesWithService(_service, servicesLoadedCallback);
+    if  (statement) {
+      createStatement(statement, statementCreatedCallback);
+      handleDialogState(false);
     }
+  }
 
-    const renderDialog = () => {
-      if (selectedService) {
-        return (
+  const handleChangeSelection = (selection: Row<Data>[]) => {
+    setSelectedActions(selection.map((row) => row.original));
+  }
+
+  const changeAccessValue = (value: string) => {
+    access.current = value;
+  }
+
+  const changeManaged = (checked: CheckedState) => {
+    if (typeof checked === 'boolean') {
+      managed.current = checked;
+    }
+  }
+
+  const handleChangeService = (_service: string) => {
+    setSelectedService(_service);
+    handleLoadServicesWithService(_service, servicesLoadedCallback);
+  }
+
+  const renderDialog = () => {
+    if (selectedService) {
+      return (
         <Dialog open={open}>
           <DialogTrigger asChild>
             <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={handleDialogState} clickValue={true} />
@@ -215,13 +207,12 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
                       <span className="text-red-500">{errors.description.message}</span>
                     }
 
-                      <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
-                        <Label>Access Level</Label>
-                        <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
-                        <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
-                        <Label className="ml-4" htmlFor="managed">Managed</Label>
-                      </div>
-
+                    <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
+                      <Label>Access Level</Label>
+                      <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
+                      <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
+                      <Label className="ml-4" htmlFor="managed">Managed</Label>
+                    </div>
                   </div>
                 </div>
                 <div className="flex space-x-1">
@@ -231,16 +222,15 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
               </div>
             </form>
             <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
-            </DialogContent>
+          </DialogContent>
         </Dialog>
       );
     } else {
       return null;
     }
-    }
+  }
 
-    return (<>{renderDialog()}</>
-      )
+  return (<>{renderDialog()}</>);
 }
 
 export default StatementCreateDialog

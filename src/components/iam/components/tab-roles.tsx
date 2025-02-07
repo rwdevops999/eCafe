@@ -1,30 +1,28 @@
 'use client'
 
-import { MetaBase } from "@/data/meta";
 import { useEffect, useRef, useState } from "react";
 import { cloneObject } from "@/lib/utils";
-import { NewButtonConfig } from "@/data/types";
-import { handleLoadRoles } from "@/lib/db";
 import TabItems from "./tab-items";
 import { Meta } from "../users/data/meta";
 import { dependency_roles } from "@/data/constants";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { defineActionButtons } from "../users/manage/data/util";
+import { ButtonConfig, RoleType, UserType } from "@/types/ecafe";
 
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  const allRoles = useRef<NewRoleType[]>([]);
+  const allRoles = useRef<RoleType[]>([]);
 
   const [metaOfTabRoles, setMetaOfTabRoles] = useState<MetaBase>();
-  const actionButtons = useRef<NewButtonConfig>({})
+  const actionButtons = useRef<ButtonConfig>({})
 
-  const rolesLoadedCallback = (_data: NewRoleType[]) => {
+  const rolesLoadedCallback = (_data: RoleType[]) => {
     logger.debug("TabRoles", "rolesLoadedCallback", JSON.stringify(_data));
 
     allRoles.current = _data;
 
-    actionButtons.current = defineActionButtons(_meta.currentSubject as NewUserType);
+    actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
 
     const newMeta: Meta = cloneObject(_meta);
     newMeta.subject.name = "Roles";
@@ -35,7 +33,7 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
     setMetaOfTabRoles(newMeta);
   }
 
-  const getAllRoles = (): NewRoleType[] => {
+  const getAllRoles = (): RoleType[] => {
     logger.debug("TabRoles", "getAllRoles", JSON.stringify(allRoles.current));
 
     return allRoles.current;

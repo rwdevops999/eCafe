@@ -5,7 +5,6 @@ import PageTitle from "@/components/ecafe/page-title";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTableType, AlertType } from "@/data/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@radix-ui/react-separator";
@@ -15,14 +14,13 @@ import { z } from "zod";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { Row } from "@tanstack/react-table";
-import { validateMappedData } from "@/lib/validate";
 import { Button } from "@/components/ui/button";
-import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { createRole, handleLoadPolicies } from "@/lib/db";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import AlertTable from "@/components/ecafe/alert-table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertTableType, AlertType, Data, PolicyType, RoleType } from "@/types/ecafe";
+import { mapPoliciesToData } from "@/lib/mapping";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -40,7 +38,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const [valid, setValid] = useState<boolean>(false);
   const [alert, setAlert] = useState<AlertType>();
 
-  const [policies, setPolicies] = useState<NewPolicyType[]>([]);
+  const [policies, setPolicies] = useState<PolicyType[]>([]);
   const [selectedPolicies, setSelectedPolicies] = useState<Data[]>([]);
   const [policyData, setPolicyData] = useState<Data[]>([]);
     
@@ -48,7 +46,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setOpen(state);
   }
 
-  const policiesLoadedCallback = (policies: NewPolicyType[]) => {
+  const policiesLoadedCallback = (policies: PolicyType[]) => {
     setPolicies(policies);
     const mappedPolicies: Data[] = mapPoliciesToData(policies);
     setPolicyData(mappedPolicies);
@@ -74,16 +72,13 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       reset
     } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const mapPoliciesToRole = (_policies: Data[]): NewPolicyType[] => {
-      let res = _policies.map((_policy) => 
-        {
-          return policies.find((p) => p.id === _policy.id)
-        });
+    const mapPoliciesToRole = (_policies: Data[]): PolicyType[] => {
+      let res = _policies.map((_policy) => {return policies.find((p) => p.id === _policy.id)});
 
-      return res as NewPolicyType[];
+      return res as PolicyType[];
     }
 
-  const prepareCreateRole = (data: FormSchemaType): NewRoleType => {
+  const prepareCreateRole = (data: FormSchemaType): RoleType => {
     return {
       id: 0,
       name: data.name,
@@ -220,8 +215,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       );
     }
 
-    return (<>{renderDialog()}</>
-    )
+    return (<>{renderDialog()}</>);
 }
 
 export default RoleCreateDialog;
