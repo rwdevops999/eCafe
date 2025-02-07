@@ -5,40 +5,18 @@ import PageTitle from "@/components/ecafe/page-title";
 import { useEffect, useRef, useState } from "react";
 import PolicyCreateDialog from "../create/create-policy-dialog";
 import { action_delete, all } from "@/data/constants";
-import { useToast } from "@/hooks/use-toast";
-import { log } from "@/lib/utils";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { AlertType, FunctionDefault } from "@/data/types";
+import { AlertType } from "@/data/types";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
-import { PolicyType } from "@/data/iam-scheme";
 import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
 
-const debug: boolean = false;
-
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
-    const { toast, dismiss } = useToast()
-    let toastId: string;
-
-    const renderToast = (_title: string, _description: string): void => {
-      log(debug, "PolicyDetails", "render toast");
-      let {id} = toast({title: `${_title}`, description: `${_description}`});
-      toastId = id;
-    }
-    
-    const renderToastLoadPolicies = () => renderToast("Loading...", "policies");
-    const renderToastDeletePolicy = () => renderToast("Deleting...", "policy");
-    
-    const closeToast = () => {
-        log(debug, "CreateStatementDetails", "dismiss toast");
-        dismiss(toastId);
-    }
-
     const [selectedPolicy, setSelectedPolicy] = useState<string>(all)
-    const [policies, setPolicies] = useState<PolicyType[]>([]);
+    const [policies, setPolicies] = useState<NewPolicyType[]>([]);
     const [policiesData, setPoliciesData] = useState<Data[]>([]);
 
     const policiesLoaded = useRef<boolean>(false);
@@ -46,38 +24,58 @@ const debug: boolean = false;
     const [alert, setAlert] = useState<AlertType>();
     const [reload, setReload] = useState(0);
     
-    const policiesLoadedCallback = (data: PolicyType[], _end: FunctionDefault) => {
-        _end();
-
+    const policiesLoadedCallback = (data: NewPolicyType[]) => {
         setPolicies(data);
 
         let mappedPolicies: Data[] = mapPoliciesToData(data);
 
         setPoliciesData(mappedPolicies);
         policiesLoaded.current = true;
-        dismiss(toastId);
     }
 
     useEffect(() => {
         if (_policy) {
           setSelectedPolicy(_policy);
 
-          handleLoadPoliciesWithName(_policy, renderToastLoadPolicies, policiesLoadedCallback, closeToast);
+          handleLoadPoliciesWithName(_policy, policiesLoadedCallback);
         }
     }, []);
 
     useEffect(() => {
-        handleLoadPoliciesWithName(selectedPolicy, renderToastLoadPolicies, policiesLoadedCallback, closeToast);
+        handleLoadPoliciesWithName(selectedPolicy, policiesLoadedCallback);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {
         setAlert(undefined);
     }
   
-    const policyDeletedCallback = (_end: FunctionDefault) => {
-        _end();
+    const policyDeletedCallback = () => {
         setReload((x:any) => x+1);
     }
+
+  const policyInRole = (_policy: Data): AlertType => {
+      let alert = {
+        open: false,
+        error: false,
+        title: "",
+        message: "",
+        child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+      };
+
+      let result: boolean = false;
+
+      const policy = policies.find(p => p.id === _policy.id);
+      if (policy && policy.roles) {
+        if (policy.roles.length > 0) {
+          alert.open = true;
+          alert.error = true;
+          alert.title = "Unable to delete policy";
+          alert.message = `Policy is in role '${policy.roles[0].name}'`;
+        }
+      }
+
+      return alert;
+  }
 
     const handleAction = (action: string, policy: Data) => {
         if (action === action_delete) {
@@ -92,7 +90,12 @@ const debug: boolean = false;
   
               setAlert(alert);
             } else {
-              handleDeletePolicy(policy.id, renderToastDeletePolicy, policyDeletedCallback, closeToast);
+                let alert = policyInRole(policy);
+                if (alert.error) {
+                    setAlert(alert);
+                } else {
+                    handleDeletePolicy(policy.id, policyDeletedCallback);
+                }
             }
       }
     }
@@ -116,7 +119,6 @@ const debug: boolean = false;
     
                 <div className="block space-y-5">
                     <DataTable data={policiesData} columns={columns} tablemeta={meta} />
-                    {/* expandAll={_policy !== undefined}/> */}
                 </div>
             </div>
         )

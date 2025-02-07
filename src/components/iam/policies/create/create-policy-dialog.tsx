@@ -9,11 +9,9 @@ import { Input } from "@/components/ui/input";
 import {z} from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PolicyType, ServiceStatementType, ServiceType } from "@/data/iam-scheme";
 import { all } from "@/data/constants";
 import ServiceSelect from "@/components/ecafe/service-select";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
@@ -21,7 +19,7 @@ import { log } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTableType, AlertType, FunctionDefault } from "@/data/types";
+import { AlertTableType, AlertType } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { Data, mapStatementsToData } from "@/lib/mapping";
 import { createPolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
@@ -36,27 +34,7 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
-const debug: boolean = false;
-
 const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
-  const { toast, dismiss } = useToast()
-  let toastId: string;
-
-    const renderToast = (_title: string, _description: string): void => {
-      log(debug, "PolicyCreateDialog", "render toast");
-      let {id} = toast({title: `${_title}`, description: `${_description}`});
-      toastId = id;
-    }
-    
-    const renderToastLoadServices = () => renderToast("Loading...", "services");
-    const renderToastLoadStatements = () => renderToast("Loading...", "statements");
-    const renderToastCreatePolicy = () => renderToast("Creating...", "policy");
-    
-    const closeToast = () => {
-        log(debug, "PolicyCreateDialog", "dismiss toast");
-        dismiss(toastId);
-    }
-
   /**
    * state of the dialog
    */
@@ -72,7 +50,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
    */
   const [selectedService, setSelectedService] = useState<string>();
 
-  const [statements, setStatements] = useState<ServiceStatementType[]>([]);
+  const [statements, setStatements] = useState<NewStatementType[]>([]);
   const [selectedStatements, setSelectedStatements] = useState<Data[]>([]);
   const [statementData, setStatementData] = useState<Data[]>([]);
   /**
@@ -104,7 +82,6 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   }
 
   const handleValidate = (value: boolean): void => {
-    // const statements: Data[] = getStatements(selectedStatements);
     let conflicts: Data[] = validateMappedData(selectedStatements);
 
     if (conflicts.length > 0) {
@@ -131,31 +108,27 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     setSelectedService(_service);
     
     const serviceId = prepareStatementsLoad(_service, '*');
-    handleLoadStatements(serviceId, '*', renderToastLoadStatements, statementsLoadedCallback, closeToast);
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
   }
 
-  const services = useRef<ServiceType[]>([]);
+  const services = useRef<NewServiceType[]>([]);
 
-  const statementsLoadedCallback = (data: ServiceStatementType[], _end: FunctionDefault) => {
-    _end();
-
+  const statementsLoadedCallback = (data: NewStatementType[]) => {
     setStatements(data);
 
     const sd: Data[] = mapStatementsToData(data, services.current);
     setStatementData(sd);
   }
 
-  const servicesLoadedCallback = (data: ServiceType[], _end: FunctionDefault) => {
-    _end();
-    
+  const servicesLoadedCallback = (data: NewServiceType[]) => {
     services.current = data;
     setSelectedService(all);
     const serviceId = prepareStatementsLoad(all, '*');
-    handleLoadStatements(serviceId, '*', renderToastLoadStatements, statementsLoadedCallback, closeToast);
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
   }
 
   useEffect(() => {
-    handleLoadServices(renderToastLoadServices, servicesLoadedCallback, closeToast);
+    handleLoadServices(servicesLoadedCallback);
   }, []);
 
   const {
@@ -165,16 +138,16 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       reset
     } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const mapStatementsToPolicy = (_statements: Data[]): ServiceStatementType[] => {
+    const mapStatementsToPolicy = (_statements: Data[]): NewStatementType[] => {
       let res = _statements.map((_statement) => 
         {
           return statements.find((s) => s.id === _statement.id)
         });
 
-      return res as ServiceStatementType[];
+      return res as NewStatementType[];
     }
 
-    const prepareCreatePolicy = (data: FormSchemaType): PolicyType => {
+    const prepareCreatePolicy = (data: FormSchemaType): NewPolicyType => {
       return {
         id: 0,
         name: data.name,
@@ -185,9 +158,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       }
     }
 
-    const policyCreatedCallback = (_end: FunctionDefault) => {
-      _end();
-      
+    const policyCreatedCallback = () => {
       if (setReload) {
         setReload((x: any) => x+1);
       }
@@ -196,7 +167,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
       const policy = prepareCreatePolicy(data);
 
-      createPolicy(policy, renderToastCreatePolicy, policyCreatedCallback, closeToast);
+      createPolicy(policy, policyCreatedCallback);
 
       handleDialogState(false);
     }
@@ -303,8 +274,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
       );
     }
 
-    return (<>{renderDialog()}</>
-      )
+    return (<>{renderDialog()}</>)
 }
 
 export default PolicyCreateDialog;

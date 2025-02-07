@@ -136,7 +136,7 @@ export const handleDeletePolicy = async (id: number, _callback: CallbackFunction
   }).then((response: Response) => _callback());
 }
 
-export const createPolicy = async (_policy: PolicyType, _callback: CallbackFunctionDefault) => {
+export const createPolicy = async (_policy: NewPolicyType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/policies',
     {
       method: 'POST',
