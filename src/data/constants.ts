@@ -18,6 +18,7 @@ export const defaultCountry: NewCountryType = {
 export const dependency_roles = "roles";
 export const dependency_policies = "policies";
 export const dependency_groups = "groups";
+export const dependency_users = "users";
 
 export const defaultLanguage: LanguageType = {
   name: "English", 

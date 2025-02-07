@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TabRoles from "../../components/tab-roles";
 import TabGroups from "../../components/tab-groups";
 import TabPolicies from "../../components/tab-policies";
-import TabUsers from "./components/tab-users";
 import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
 import { dependency_groups, dependency_policies, dependency_roles } from "@/data/constants";
 import { AlertTableType, AlertType, CombinedType } from "@/data/types";
@@ -24,6 +23,7 @@ import { DataTable } from "@/components/datatable/data-table";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import { Button } from "@/components/ui/button";
 import AlertTable from "@/components/ecafe/alert-table";
+import TabUser from "./components/tab-user";
 
 type DependencyType = {
   initialised: boolean,
@@ -444,7 +444,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     const diffGroups: number[] = difference(groupDependenciesRef.current.original, groupDependenciesRef.current.selected);
     logger.debug("UserDialog", "PrepareUser(diffGroups)", JSON.stringify(diffGroups));
 
-    const removedGroups: ApiType[] = diffPolicies.map(_id => {
+    const removedGroups: ApiType[] = diffGroups.map(_id => {
       let group: ApiType = {
         id: _id
       }
@@ -568,7 +568,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
                 <>
                     <TabsContent value="user" forceMount={tab !== "user" ? true : undefined} hidden={tab !== "user"}>
                         <div className="m-1 container w-[99%]">
-                          <TabUsers _meta={metaOfUserDialogState} onTabLeave={userTabLeaveState} setFormMethods={setFormMethods}/>
+                          <TabUser _meta={metaOfUserDialogState} onTabLeave={userTabLeaveState} setFormMethods={setFormMethods}/>
                         </div>
                     </TabsContent>
                     <TabsContent value="roles">

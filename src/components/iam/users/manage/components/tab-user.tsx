@@ -14,7 +14,7 @@ import { defineActionButtons, storeUserFormValues } from "../data/util";
 import ActionButtons from "@/components/iam/components/action-buttons";
 import { ConsoleLogger } from "@/lib/console.logger";
 
-const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
+const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
   // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
@@ -131,4 +131,4 @@ const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   )
 }
 
-export default TabUsers;
+export default TabUser;

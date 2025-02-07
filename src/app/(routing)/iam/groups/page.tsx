@@ -20,5 +20,4 @@ const Groups = async ({ params }: { params: { details: string } }) => {
     <GroupDetails _selectedGroup={selectedGroup}/>
   )
 }
-
 export default Groups;

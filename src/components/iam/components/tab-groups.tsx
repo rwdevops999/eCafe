@@ -17,7 +17,7 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const [metaOfTabGroups, setMetaOfTabGroups] = useState<MetaBase>();
   const actionButtons = useRef<NewButtonConfig>({})
 
-  const groupsLoadedCallback = (_data: NewRoleType[]) => {
+  const groupsLoadedCallback = (_data: NewGroupType[]) => {
     logger.debug("TabGroups", "groupsLoadedCallback", JSON.stringify(_data));
    
     allGroups.current = _data;

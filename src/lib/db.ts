@@ -194,33 +194,41 @@ export const handleLoadGroups = async (_callback: CallbackFunctionSubjectLoaded)
     await loadGroups(_callback);
 }
 
-// export const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
-//   const res = await fetch("http://localhost:3000/api/iam/groups?groupId="+id,{
-//     method: 'DELETE',
-//   }).then((response: Response) => callback());
-// }
+export const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
+  const res = await fetch("http://localhost:3000/api/iam/groups?groupId="+id,{
+    method: 'DELETE',
+  }).then((response: Response) => callback());
+}
 
-// export const createGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
-//   await fetch('http://localhost:3000/api/iam/groups',
-//     {
-//       method: 'POST',
-//       body: JSON.stringify(_data),
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     }).then(response => callback());
-// }
+export const createGroup = async (_group: NewExtendedGroupType, _callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/groups',
+    {
+      method: 'POST',
+      body: JSON.stringify(_group),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => _callback());
+}
 
-// export const updateGroup = async (_data: GroupType, callback: CallbackFunctionDefault) => {
-//   await fetch('http://localhost:3000/api/iam/groups',
-//     {
-//       method: 'PUT',
-//       body: JSON.stringify(_data),
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//   }).then(response => callback());
-// }
+export const handleCreateGroup = async (_group: NewExtendedGroupType, _callback: CallbackFunctionDefault) => {
+  await createGroup(_group, _callback);
+}
+
+export const updateGroup = async (_group: NewExtendedGroupType, _callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/iam/groups',
+    {
+      method: 'PUT',
+      body: JSON.stringify(_group),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => _callback());
+}
+
+export const handleUpdateGroup = async (_group: NewExtendedGroupType, _callback: CallbackFunctionDefault) => {
+  await updateGroup(_group, _callback);
+}
 
 /**
  * USERS

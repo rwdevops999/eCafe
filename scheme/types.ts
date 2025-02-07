@@ -121,10 +121,29 @@ type NewExtendedUserType = {
 }
 
 type NewGroupType = {
-    id: number,
+    id?: number,
     name: string,
     description: string,
     roles?: NewRoleType[],
     policies?: NewPolicyType[],
     users?: NewUserType[],
 }
+
+type NewExtendedGroupType = {
+    id?: number,
+    name: string,
+    description: string,
+    roles?: {
+        selected?: any[],
+        removed?: any[]
+    },
+    policies?: {
+        selected?: any[],
+        removed?: any[],
+    },
+    users?: {
+        selected?: any[],
+        removed?: any[],
+    }
+}
+

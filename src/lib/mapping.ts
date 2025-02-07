@@ -82,7 +82,7 @@ export const mapUsersToData = (users: NewUserType[]): Data[] => {
     return data;
 }
 
-export const mapGroupsToData = (groups:  GroupType[]): Data[] => {
+export const mapGroupsToData = (groups:  NewGroupType[]): Data[] => {
     let data: Data[] = [];
 
     if (groups.length > 0) {

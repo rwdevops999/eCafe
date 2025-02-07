@@ -13,7 +13,7 @@ export type MetaBase = {
     subject: {
         name: string,
         dependency: string,
-        getAllDependencies: () => CombinedType[]
+        getAllDependencies: () => any[]
         validateSubject: () => void,
         getValidationResult: () => boolean,
     },

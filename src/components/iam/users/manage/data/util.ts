@@ -83,20 +83,20 @@ export const initUserForm = (user: NewUserType|undefined, values: UseFormSetValu
     values("country", user?.address?.country.name??defaultCountry.name);
 }
 
-const userCreated = (user: NewUserType|undefined): boolean => {
-    if (user == undefined || user.id === undefined) {
+const isSubjectCreated = (subject: NewUserType|NewGroupType): boolean => {
+    if (subject === undefined || subject.id === undefined) {
         return false;
     }
 
     return true;
 }
 
-export const defineActionButtons = (user: NewUserType): NewButtonConfig => {
+export const defineActionButtons = (subject: NewUserType|NewGroupType): NewButtonConfig => {
     let actionButtons: NewButtonConfig = {
         cancelButton: true
     };
 
-    if (userCreated(user)) {
+    if (isSubjectCreated(subject)) {
         actionButtons.updateButton = true;
     } else {
         actionButtons.createButton = true;
