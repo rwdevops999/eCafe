@@ -70,10 +70,10 @@ export async function GET(request: NextRequest) {
     return Response.json(statements);
   }
 
-const provisionStatementActions = (statement: ServiceStatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {
+const provisionStatementActions = (statement: NewStatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {
   let actions: Prisma.StatementActionCreateWithoutStatementInput[] = [];
 
-  statement.actions.map(async (action) => {
+  statement.actions?.map(async (action) => {
 
     let _action: Prisma.StatementActionCreateWithoutStatementInput = {
       name: action.name,
@@ -87,7 +87,7 @@ const provisionStatementActions = (statement: ServiceStatementType): Prisma.Stat
 }
 
 export async function POST(req: NextRequest) {
-    const data: ServiceStatementType = await req.json();
+    const data: NewStatementType = await req.json();
 
     let statement: Prisma.ServiceStatementCreateInput;
 

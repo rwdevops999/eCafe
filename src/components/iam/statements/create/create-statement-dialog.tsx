@@ -29,8 +29,6 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
-const debug = false;
-
 const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x:any): void;}) => {
   /**
    * state of the dialog
@@ -55,7 +53,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   /**
    * the services (and their actions, dempth = 1)
    */
-  const services = useRef<ServiceType[]>([]);
+  const services = useRef<NewServiceType[]>([]);
   const [actionsData, setActionsData] = useState<Data[]>([]);
 
   /**
@@ -64,7 +62,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
    */
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
+  const servicesLoadedCallback = (data: NewServiceType[]) => {
     services.current = data;
     setActionsData(mapServiceActionsToData(services.current));
   }
@@ -100,12 +98,12 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
         setOpen(state);
     }
 
-    const prepareCreateStatement = (data: any): ServiceStatementType | undefined => {
+    const prepareCreateStatement = (data: any): NewStatementType | undefined => {
 
       if (selectedActions && selectedActions.length > 0) {
         const _service = services.current.find(service => service.name === selectedService)!;
         const _actions = selectedActions.map(action => {
-          const act: ActionType = {
+          const act: NewStatementActionType = {
             id: action.id,
             name: action.name,
           }

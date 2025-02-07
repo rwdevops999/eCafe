@@ -20,13 +20,14 @@ export type Data = z.infer<typeof dataScheme>
 
 const debug: boolean = false;
 
-export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
-    let result: Data[] = [];
-
+export const mapServiceActionsToData = (services: NewServiceType[]): Data[] => {
+  let result: Data[] = [];
+  
     log(debug, "MAPPING", "Level", "ServiceActions");
 
     result = services.flatMap(service => {
-        return (service.actions.map(action => {
+        if (service.actions) {
+          return (service.actions?.map(action => {
             let data: Data = {
                 id: action.id,
                 name: action.name,
@@ -35,7 +36,10 @@ export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
             }
 
             return data;
-        }));
+         }));
+        }
+
+        return [];
     });
 
     return result;

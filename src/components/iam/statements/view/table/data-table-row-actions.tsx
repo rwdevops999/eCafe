@@ -27,26 +27,5 @@ export function DataTableRowActions<TData>({
 
   return (
     <Trash2 className="cursor-pointer w-[16px] h-[16px]" onClick={(e) => handleDelete(e)}/>
-    // <DropdownMenu>
-    //   <DropdownMenuTrigger asChild>
-    //   <Button
-    //       variant="ghost"
-    //       className="flex h-[10px] w-[10px] p-0 data-[state=open]:bg-muted"
-    //     >
-    //       <MoreHorizontal height={10} width={10}/>
-    //       <span className="sr-only">Open menu</span>
-    //     </Button>
-    //   </DropdownMenuTrigger>
-    //   <DropdownMenuContent align="end" className="w-[160px]">
-    //     <DropdownMenuItem onClick={handleUpdate}>
-    //       Update
-    //       {/* <DropdownMenuShortcut>⌘⏎</DropdownMenuShortcut> */}
-    //     </DropdownMenuItem>
-    //     <DropdownMenuItem onClick={handleDelete}>
-    //       Delete
-    //       {/* <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut> */}
-    //     </DropdownMenuItem>
-    //   </DropdownMenuContent>
-    // </DropdownMenu>
   )
 }

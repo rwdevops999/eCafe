@@ -92,7 +92,7 @@ export const handleDeleteStatement = async (id: number, _callback: CallbackFunct
   }).then((response: Response) => _callback());
 }
 
-export const createStatement = async (_statement: ServiceStatementType, _callback: CallbackFunctionDefault) => {
+export const createStatement = async (_statement: NewStatementType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/statements',
     {
       method: 'POST',

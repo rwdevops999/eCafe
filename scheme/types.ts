@@ -1,16 +1,16 @@
 type NewActionType = {
     id: number,
     name: string,
-    createDate: Date,
-    updateDate: Date,
+    createDate?: Date,
+    updateDate?: Date,
     service?: NewServiceType
 }  
 
 type NewServiceType = {
     id: number,
     name: string,
-    createDate: Date,
-    updateDate: Date,
+    createDate?: Date,
+    updateDate?: Date,
     actions?: NewActionType[],
     statements?: NewStatementType[],
 }  
@@ -18,20 +18,21 @@ type NewServiceType = {
 type NewStatementActionType = {
     id: number,
     name: string,
-    createData: Date,
-    updateData: Date,
+    createDate?: Date,
+    updateDate?: Date,
     statement?: NewStatementType,
-    actionId: number
+    actionId?: number
 }
 
 type NewStatementType = {
     id: number,
+    serviceId: number,
     sid: string,
     description: string,
     permission: string,
     managed: boolean,
-    createDate: Date,
-    updateDate: Date,
+    createDate?: Date,
+    updateDate?: Date,
     service?: NewServiceType,
     actions?: NewStatementActionType[],
     policies?: NewPolicyType[]
@@ -64,8 +65,8 @@ type NewPolicyType = {
     name: string,
     description: string,
     managed: boolean,
-    createDate: Date,
-    updateDate: Date,
+    createDate?: Date,
+    updateDate?: Date,
     statements?: NewStatementType[],
     roles?: NewRoleType[],
     groups?: NewGroupType[],
@@ -77,8 +78,8 @@ type NewRoleType = {
     name: string,
     description: string,
     managed: boolean
-    createDate: Date,
-    updateDate: Date,
+    createDate?: Date,
+    updateDate?: Date,
     policies?: NewPolicyType[],
     groups?: NewGroupType[],
     users?: NewUserType[]

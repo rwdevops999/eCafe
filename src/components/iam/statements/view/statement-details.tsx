@@ -24,9 +24,9 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   const [selectedService, setSelectedService] = useState<number | string>(all);
   const [selectedSid, setSelectedSid] = useState<string>(all);
 
-  const services = useRef<ServiceType[]>([]);
+  const services = useRef<NewServiceType[]>([]);
 
-  const [statements, setStatements] = useState<ServiceStatementType[]>([]);
+  const [statements, setStatements] = useState<NewStatementType[]>([]);
   const [statementData, setStatementData] = useState<Data[]>();
 
   const statementsLoaded = useRef<boolean>(false);
@@ -59,13 +59,13 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return serviceId;
   }
 
-  const statementsLoadedCallback = (data: ServiceStatementType[]) => {
+  const statementsLoadedCallback = (data: NewStatementType[]) => {
     setStatements(data);
     setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
   }
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
+  const servicesLoadedCallback = (data: NewServiceType[]) => {
     services.current = data;
 
     setSelectedService(_service);
@@ -106,7 +106,8 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         message: "",
         child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
       };
-    let result: boolean = false;
+
+      let result: boolean = false;
 
       const statement = statements.find(s => s.id === _statement.id);
       if (statement && statement.policies) {
@@ -141,7 +142,6 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
           handleDeleteStatement(statement.id, statementDeletedCallback);
         }
       }
-    } else if (action === action_update) {
     }
   }
 
@@ -168,9 +168,9 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
             </div>
           </div>
         )
-      } else {
-        return null;
       }
+        
+      return null;
     }
 
     return (<>{renderComponent()}</>);

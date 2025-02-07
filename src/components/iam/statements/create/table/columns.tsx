@@ -58,7 +58,7 @@ export const columns: ColumnDef<Data>[] = [
             }}
           >
             <div className="flex items-center h-[10px]">
-              {row.original.children?.length > 0 ? (
+              {row.original.children && row.original.children?.length > 0 ? (
                 <Button variant="ghost" className="border-0 hover:bg-muted/10"
                 {...{
                     onClick: row.getToggleExpandedHandler(),
