@@ -1,10 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Row, Table } from "@tanstack/react-table"
-import { MoreHorizontal, Trash2 } from "lucide-react"
-import { action_delete, action_update } from "@/data/constants"
+import { Trash2 } from "lucide-react"
+import { action_delete } from "@/data/constants"
 import { Data } from "@/lib/mapping"
 
 interface DataTableRowActionsProps<TData> {

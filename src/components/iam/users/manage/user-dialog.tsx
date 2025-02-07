@@ -4,7 +4,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageTitle from "@/components/ecafe/page-title";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { cloneObject, difference, differenceBySomeType } from "@/lib/utils";
+import { cloneObject, difference } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { Meta } from "../data/meta";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,13 +12,18 @@ import TabRoles from "../../components/tab-roles";
 import TabGroups from "../../components/tab-groups";
 import TabPolicies from "../../components/tab-policies";
 import TabUsers from "./components/tab-users";
-import { createUser, handleCreateUser, handleLoadCountries, handleLoadUsers, handleUpdateUser } from "@/lib/db";
+import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
 import { dependency_groups, dependency_policies, dependency_roles } from "@/data/constants";
-import { CombinedType, FunctionDefault } from "@/data/types";
+import { AlertTableType, AlertType, CombinedType } from "@/data/types";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { initMetaBase } from "@/data/meta";
 import { UseFormReturn } from "react-hook-form";
-import { Data } from "@/lib/mapping";
+import { Data, fullMapNoSubjectToData } from "@/lib/mapping";
+import { validateMappedData } from "@/lib/validate";
+import { DataTable } from "@/components/datatable/data-table";
+import { alertcolumns } from "@/components/ecafe/table/alert-columns";
+import { Button } from "@/components/ui/button";
+import AlertTable from "@/components/ecafe/alert-table";
 
 type DependencyType = {
   initialised: boolean,
@@ -158,9 +163,70 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return result;
   }
 
-  const validateUser = (): boolean => {
-    let valid: boolean = false;
+  const [alert, setAlert] = useState<AlertType>();
+  
+  const handleRemoveAlert = () => {
+    setAlert(undefined);
+  }
 
+  const showAlert = (_title: string, _message: string, data: Data[]) => {
+    const alert: AlertTableType = {
+      open: true,
+      error: true,
+      title: _title,
+      message: _message,
+      table: <DataTable data={data} columns={alertcolumns}/>,
+      child: <Button className="bg-orange-400 hover:bg-orange-600" size="sm" onClick={handleRemoveAlert}>close</Button>
+    };
+  
+    setAlert(alert);
+  }
+
+  const [valid, setValid] = useState<boolean>(false);
+
+  const validateUser = () => {
+    const subject: {
+      id: number,
+      name: string;
+      roles: {
+        original: any[]
+      },
+      policies: {
+        original: any[]
+      }
+      groups: {
+        original: any[]
+      }
+    } = {
+      id : 0,
+      name: "validation",
+      roles: {
+        original: []
+      },
+      policies: {
+        original: []
+      },
+      groups: {
+        original: []
+      },
+    }
+    let mappedData: Data[] = fullMapNoSubjectToData(
+      subject, 
+      roleDependenciesRef.current.selected,
+      policyDependenciesRef.current.selected,
+      groupDependenciesRef.current.selected
+    );
+
+    let conflicts: Data[] = validateMappedData(mappedData);
+
+    if (conflicts.length > 0) {
+      showAlert("Validation Error", "Conflicts", conflicts);
+    }
+
+    setValid(conflicts.length === 0);
+  }
+
+  const getValidationResult = (): boolean => {
     return valid;
   }
 
@@ -194,6 +260,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     _meta.control.getSelection = getSelectedDependencies;
     _meta.control.calculateValidationItems = calculateValidationItems;
     _meta.subject.validateSubject = validateUser;
+    _meta.subject.getValidationResult = getValidationResult;
 
     setMetaOfUserDialogState(_meta);
   }, [_meta]);
@@ -215,15 +282,13 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   }
 
   const countries = useRef<NewCountryType[]>([])
-  const countriesLoadedCallback = (data: NewCountryType[], _end: FunctionDefault) => {
+  const countriesLoadedCallback = (data: NewCountryType[]) => {
     countries.current = data;
-
-    _end();
   }
 
   useEffect(() => {
       logger.debug("UserDialog", "useEffect[]");
-      handleLoadCountries(()=>{}, countriesLoadedCallback, ()=>{});
+      handleLoadCountries(countriesLoadedCallback);
   }, []);
 
   const handleInvalidForm = () => {
@@ -402,19 +467,17 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return user;
   }
 
-  const userCreatedCallback = (_end: FunctionDefault) => {
+  const userCreatedCallback = () => {
     clearDependencies();
     metaOfUserDialogState.control.handleDialogState(false);
     logger.debug("UserDetails", "CALL RELOAD");
     _setReload((x: any) => x+1);
-    _end();
   }
 
-  const userUpdatedCallback = (_end: FunctionDefault) => {
+  const userUpdatedCallback = () => {
     clearDependencies();
     metaOfUserDialogState.control.handleDialogState(false);
     _setReload((x: any) => x+1);
-    _end();
   }
 
   const onSubmitForm = (data: any) => {
@@ -424,12 +487,12 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       logger.debug("UserDialog", "OnSubmitForm", "UPDATE?");
       const user: NewExtendedUserType = prepareUser(data, metaOfUserDialogState.currentSubject as NewUserType);
       logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
-      handleUpdateUser(user, ()=>{}, userUpdatedCallback, ()=>{});
+      handleUpdateUser(user, userUpdatedCallback);
     } else {
       logger.debug("UserDialog", "OnSubmitForm", "CREATE?");
       const user: NewExtendedUserType = prepareUser(data);
       logger.debug("UserDialog", "OnSubmitForm(prepareUser)", JSON.stringify(user));
-      handleCreateUser(user, ()=>{}, userCreatedCallback, ()=>{});
+      handleCreateUser(user, userCreatedCallback);
     }
   }
 
@@ -476,6 +539,10 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       logger.debug("UserDialog", "renderComponent(_open)", _open);
       logger.debug("UserDialog", "renderComponent(userTabLeaveState)", userTabLeaveState);
 
+        if (alert && alert.open) {
+          return (<AlertTable alert={alert}></AlertTable>)
+        }
+  
         return (
           <Dialog open={_open}>
             <DialogTrigger asChild>

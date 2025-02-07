@@ -3,11 +3,9 @@
 import { DataTable } from "@/components/datatable/data-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { FunctionDefault } from "@/data/types";
-import { useToast } from "@/hooks/use-toast";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 import { Data, mapUsersToData } from "@/lib/mapping";
-import { cloneObject, log } from "@/lib/utils";
+import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
@@ -37,7 +35,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     metaUserDetails.current.currentSubject = _user;
   }
 
-  const usersLoadedCallback = (_users: NewUserType[], _end: FunctionDefault) => {
+  const usersLoadedCallback = (_users: NewUserType[]) => {
     logger.debug("UserDetails", "usersLoadedCallback", JSON.stringify(_users));
 
     // Store all the users in ref
@@ -54,7 +52,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     // setDataUsers(mapUsersToData(_users));
     usersDataRef.current = mapUsersToData(_users);
     setRerender((x:any) => x+1);
-  //   _end();
   }
 
   const handleDialogState = (open: boolean) => {
@@ -72,19 +69,19 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     logger.debug("UserDetails", "USE EFFECT[] => META handleDialogState");
     metaUserDetails.current.control.handleDialogState = handleDialogState;
 
-    handleLoadUsers(() => {}, usersLoadedCallback, () => {});
+    handleLoadUsers(usersLoadedCallback);
   }, []);
 
   useEffect(() => {
     logger.debug("UserDetails", "LOAD USERS AFTER RELOAD");
 
-    handleLoadUsers(() => {}, usersLoadedCallback, () => {});
+    handleLoadUsers(usersLoadedCallback);
   }, [reloadState, setReloadState]);
 
   // on deletion of user, reload the component
   const userDeletedCallback = () => {
     setSelectedUser(undefined);
-    handleLoadUsers(()=>{}, usersLoadedCallback, ()=>{});
+    handleLoadUsers(usersLoadedCallback);
   }
 
   // const [reload, setReload] = useState<number>(0);
@@ -93,7 +90,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     logger.debug("UserDetails", "handleAction", _action);
     if (_action === action_delete) {
       logger.debug("UserDetails", "handleAction", "see VSCODE terminal for API messages");
-      handleDeleteUser(_user.id, ()=>{}, userDeletedCallback, ()=>{});
+      handleDeleteUser(_user.id, userDeletedCallback);
     } else {
       logger.debug("UserDetails", "handleAction", _user);
       const selectedUser: NewUserType = usersRef.current.find((user) => user.id === _user.id)!;

@@ -17,14 +17,12 @@ const debug = true;
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  // logger.debug("TabRoles", "IN(_meta)", JSON.stringify(_meta))
-
   const allRoles = useRef<NewRoleType[]>([]);
 
   const [metaOfTabRoles, setMetaOfTabRoles] = useState<MetaBase>();
   const actionButtons = useRef<NewButtonConfig>({})
 
-  const rolesLoadedCallback = (_data: NewRoleType[], _end: FunctionDefault) => {
+  const rolesLoadedCallback = (_data: NewRoleType[]) => {
     logger.debug("TabRoles", "rolesLoadedCallback", JSON.stringify(_data));
 
     allRoles.current = _data;
@@ -38,8 +36,6 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
     newMeta.subject.getAllDependencies = getAllRoles;
 
     setMetaOfTabRoles(newMeta);
-
-    _end();
   }
 
   const getAllRoles = (): NewRoleType[] => {
@@ -51,17 +47,17 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   useEffect(() => {
     logger.debug("TabRoles", "useEffect[]", "Loading Roles");
 
-    handleLoadRoles(() => {}, rolesLoadedCallback, () => {});
+    handleLoadRoles(rolesLoadedCallback);
   }, [])
 
   const renderComponent = () => {
     logger.debug("TabRoles", "RENDER")
-    if (metaOfTabRoles) {
+    // if (metaOfTabRoles) {
       logger.debug("TabRoles", "RENDER", "because meta is set");
       return (
         <TabItems _meta={metaOfTabRoles} _buttonConfig={actionButtons.current}/>
       );
-    }
+    // }
   }
 
   return (

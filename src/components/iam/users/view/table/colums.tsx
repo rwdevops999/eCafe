@@ -1,9 +1,5 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { access } from "@/data/iam-scheme";
-import { ColumnDef, RowData, Table } from "@tanstack/react-table";
-// import { DataTableRowActions } from "./data-table-row-actions";
+import { ColumnDef } from "@tanstack/react-table";
 import { Data } from "@/lib/mapping";
 import { DataTableRowActions } from "./data-table-row-actions";
 

@@ -15,7 +15,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 
 const debug = true;
 
-const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButtonConfig}) => {
+const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConfig:NewButtonConfig}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
     const dependencies = useRef<CombinedType[]>([]);
@@ -25,49 +25,57 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
     const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
 
     const getNrOfItemsToValidate = () => {
-        const itemsToValidate: number = _meta.control.calculateValidationItems();
-        logger.debug("TabItems", "ItemsToValidate", itemsToValidate);
-        setNrOfItemsToValidate(itemsToValidate);
+        if (_meta) {
+            const itemsToValidate: number = _meta.control.calculateValidationItems();
+            logger.debug("TabItems", "ItemsToValidate", itemsToValidate);
+            setNrOfItemsToValidate(itemsToValidate);
+        }
     }
 
     useEffect(() => {
         logger.debug("TabItems", "UseEffect[]");
-        // selectedDependencies.current = _meta.control.getSelection(_meta.control.name);
-        const _dependencies: CombinedType[] = _meta.subject.getAllDependencies();
-        dependencies.current = _dependencies;
+
+        if (_meta) {
+            const _dependencies: CombinedType[] = _meta.subject.getAllDependencies();
+            dependencies.current = _dependencies;
         // log(debug, "TabItems", "UseEffect[]: dependencies", _dependencies, true);
 
         // console.log("SET MAPPED DEPENDENCIES");
-        setMappedDependencies(mapDependenciesToData(_dependencies));
-        getNrOfItemsToValidate();
+            setMappedDependencies(mapDependenciesToData(_dependencies));
+            getNrOfItemsToValidate();
+        }
     }, []);
 
     const tableMeta: TableMeta<Data[]> = {
-        title: `Available ${_meta.subject.name}`
+        title: _meta ? `Available ${_meta.subject.name}` : ""
     };
 
     const handleChangeSelection = (selection: Row<Data>[]) => {
         logger.debug("TabItems", "handleChangeSelection", JSON.stringify(selection));
 
-        const selectedItemIds: number[] = selection.map((row) => row.original.id);
-        logger.debug("TabItems", "handleChangeSelection: selectedItemIds", JSON.stringify(selectedItemIds));
+        if (_meta) {
+            const selectedItemIds: number[] = selection.map((row) => row.original.id);
+            logger.debug("TabItems", "handleChangeSelection: selectedItemIds", JSON.stringify(selectedItemIds));
 
-        const selectedItems: CombinedType[] = selectedItemIds.map((id) => {
-            return dependencies.current.find((d) => d.id === id)!;
-        })
+            const selectedItems: CombinedType[] = selectedItemIds.map((id) => {
+                return dependencies.current.find((d) => d.id === id)!;
+            })
 
-        logger.debug("TabItems", "handleChangeSelection: selectedItems", JSON.stringify(selectedItems));
-        _meta.control.setSelection(_meta.subject.dependency, selectedItems);
-        getNrOfItemsToValidate();
+            logger.debug("TabItems", "handleChangeSelection: selectedItems", JSON.stringify(selectedItems));
+            _meta.control.setSelection(_meta.subject.dependency, selectedItems);
+            getNrOfItemsToValidate();
+        }
     }
 
     const getSelectedItemIds = (): number[] => {
         logger.debug("TabItems", "handleGetSelection -> IDS");
         let result: number[] = [];
 
-        const selection: CombinedType[]|undefined = _meta.control.getSelection(_meta.subject.dependency);
-        if (selection) {
-            result = selection.map((item) => item.id);
+        if (_meta) {
+            const selection: CombinedType[]|undefined = _meta.control.getSelection(_meta.subject.dependency);
+            if (selection) {
+                result = selection.map((item) => item.id);
+            }
         }
 
         logger.debug("TabItems", "handleGetSelection: IDS", result, true);
@@ -80,7 +88,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase; _buttonConfig:NewButt
         
         return (
             <>
-                <PageTitle className="m-2" title={_meta.subject.name} />
+                <PageTitle className="m-2" title={_meta ? _meta.subject.name : ""} />
                 <Separator />
 
                 <div className="grid grid-cols-12">

@@ -98,9 +98,9 @@ export const defineActionButtons = (user: NewUserType): NewButtonConfig => {
     };
 
     if (userCreated(user)) {
-      actionButtons.updateButton = true;
+        actionButtons.updateButton = true;
     } else {
-      actionButtons.createButton = true;
+        actionButtons.createButton = true;
     }
 
     return actionButtons;

@@ -4,27 +4,36 @@ import { MetaBase } from "@/data/meta";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useState } from "react";
 
-const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:NewButtonConfig; meta: MetaBase; nrOfItemsToValidate: number;}) => {
+const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:NewButtonConfig; meta: MetaBase|undefined; nrOfItemsToValidate: number;}) => {
     const logger = new ConsoleLogger({ level: 'debug' });
 
     logger.debug("ActionButtons", "IN", nrOfItemsToValidate);
     logger.debug("ActionButtons", "IN", "HIDDEN", (nrOfItemsToValidate <= 1));
 
     const closeDialog = (_dummy: boolean) => {
-        meta.control.clearDependencies();
-        meta.control.handleDialogState(false);
+        if (meta) {
+            meta.control.clearDependencies();
+            meta.control.handleDialogState(false);
+        }
     }
 
     const handleSubmit = (dummy: boolean) => {
         console.log("TAB ITEM => HANDLE SUBMIT");
-        meta.form.validateForm();
+        if (meta) {
+            meta.form.validateForm();
+        }
     }
 
     const [valid, setValid] = useState<boolean>(false);
 
     const handleValidateSubject = (dummy: boolean) => {
-        const isValid: boolean = meta.subject.validateSubject();
-
+        let isValid: boolean = false;
+        
+        if (meta) {
+            meta.subject.validateSubject();
+            isValid = meta.subject.getValidationResult();
+        }
+        
         setValid(isValid);
     }
 

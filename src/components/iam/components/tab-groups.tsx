@@ -13,14 +13,12 @@ import { ConsoleLogger } from "@/lib/console.logger";
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
 
-  // logger.debug("TabGroups", "IN(_meta)", JSON.stringify(_meta))
-
   const allGroups = useRef<NewGroupType[]>([]);
 
   const [metaOfTabGroups, setMetaOfTabGroups] = useState<MetaBase>();
   const actionButtons = useRef<NewButtonConfig>({})
 
-  const groupsLoadedCallback = (_data: NewRoleType[], _end: FunctionDefault) => {
+  const groupsLoadedCallback = (_data: NewRoleType[]) => {
     logger.debug("TabGroups", "groupsLoadedCallback", JSON.stringify(_data));
    
     allGroups.current = _data;
@@ -34,8 +32,6 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
     newMeta.subject.getAllDependencies = getAllGroups;
    
     setMetaOfTabGroups(newMeta);
-   
-    _end();
   }
   
    const getAllGroups = (): NewGroupType[] => {
@@ -47,15 +43,15 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
    useEffect(() => {
      logger.debug("TabGroups", "useEffect[]", "Loading Groups");
  
-     handleLoadGroups(() => {}, groupsLoadedCallback, () => {});
+     handleLoadGroups(groupsLoadedCallback);
    }, [])
  
   const renderComponent = () => {
-    if (metaOfTabGroups) {
+    // if (metaOfTabGroups) {
       return (
         <TabItems _meta={metaOfTabGroups} _buttonConfig={actionButtons.current}/>
       );
-    }
+    // }
   }
 
   return (

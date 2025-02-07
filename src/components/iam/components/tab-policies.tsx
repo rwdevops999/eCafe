@@ -1,7 +1,6 @@
 import { MetaBase } from "@/data/meta";
-import { FunctionDefault, NewButtonConfig } from "@/data/types";
-import { useToast } from "@/hooks/use-toast";
-import { cloneObject, log } from "@/lib/utils";
+import { NewButtonConfig } from "@/data/types";
+import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { defineActionButtons } from "../users/manage/data/util";
 import { Meta } from "../users/data/meta";
@@ -22,7 +21,7 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
   const [metaOfTabPolicies, setMetaOfTabPolicies] = useState<MetaBase>();
   const actionButtons = useRef<NewButtonConfig>({})
  
-   const policiesLoadedCallback = (_data: NewRoleType[], _end: FunctionDefault) => {
+   const policiesLoadedCallback = (_data: NewRoleType[]) => {
      logger.debug("TabPolicies", "policiesLoadedCallback", JSON.stringify(_data));
  
      allPolicies.current = _data;
@@ -36,8 +35,6 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
      newMeta.subject.getAllDependencies = getAllPolicies;
  
      setMetaOfTabPolicies(newMeta);
- 
-     _end();
    }
  
    const getAllPolicies = (): NewPolicyType[] => {
@@ -49,17 +46,17 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
    useEffect(() => {
      logger.debug("TabPolicies", "useEffect[]", "Loading Policies");
  
-     handleLoadPolicies(() => {}, policiesLoadedCallback, () => {});
+     handleLoadPolicies(policiesLoadedCallback);
    }, [])
  
    const renderComponent = () => {
     logger.debug("TabPolicies", "RENDER")
-    if (metaOfTabPolicies) {
+    // if (metaOfTabPolicies) {
       logger.debug("TabPolicies", "RENDER", "because meta is set");
       return (
         <TabItems _meta={metaOfTabPolicies} _buttonConfig={actionButtons.current}/>
       );
-    }
+    // }
   }
 
   return (

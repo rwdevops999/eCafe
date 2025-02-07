@@ -20,7 +20,8 @@ export type MetaBase = {
         name: string,
         dependency: string,
         getAllDependencies: () => CombinedType[]
-        validateSubject: () => boolean,
+        validateSubject: () => void,
+        getValidationResult: () => boolean,
     },
     form: {
         validateForm: () => void
@@ -42,7 +43,8 @@ export const initMetaBase = {
         name: "",
         dependency: "",
         getAllDependencies: () => {return []},
-        validateSubject: () => {return false},
+        validateSubject: () => {},
+        getValidationResult: () => {return false},
     },
     form: {
         validateForm: () => {}
