@@ -276,9 +276,3 @@ export const updateUser = async (_user: NewExtendedUserType, _callback: Callback
 export const handleUpdateUser = async (_user: NewExtendedUserType, _callback: CallbackFunctionDefault) => {
   await updateUser(_user, _callback);
 }
-
-// export const loadDependencies = async (subject: any, url: string, dependencies: any[], callback: CallbackFunctionDependencyLoaded) => {
-//     await fetch(url + "?ids="+JSON.stringify(dependencies))
-//     .then((response) => response.json())
-//     .then((response) =>callback(subject, response));
-// }
