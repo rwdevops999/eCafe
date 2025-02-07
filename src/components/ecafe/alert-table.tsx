@@ -1,6 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTableType, AlertType } from "@/data/types";
-import { Button } from "../ui/button";
+import { Alert } from "@/components/ui/alert"
+import { AlertTableType } from "@/data/types";
 import PageTitle from "./page-title";
 
 const AlertTable = ({alert}:{alert: AlertTableType}) => {

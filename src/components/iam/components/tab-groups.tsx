@@ -1,7 +1,6 @@
 import { MetaBase } from "@/data/meta";
-import { FunctionDefault, NewButtonConfig } from "@/data/types";
-import { useToast } from "@/hooks/use-toast";
-import { cloneObject, log } from "@/lib/utils";
+import { NewButtonConfig } from "@/data/types";
+import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { defineActionButtons } from "../users/manage/data/util";
 import { Meta } from "../users/data/meta";
@@ -47,16 +46,12 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
    }, [])
  
   const renderComponent = () => {
-    // if (metaOfTabGroups) {
-      return (
-        <TabItems _meta={metaOfTabGroups} _buttonConfig={actionButtons.current}/>
-      );
-    // }
+    return (
+      <TabItems _meta={metaOfTabGroups} _buttonConfig={actionButtons.current}/>
+    );
   }
 
-  return (
-    <>{renderComponent()}</>
-  )
+  return (<>{renderComponent()}</>);
 }
 
 export default TabGroups;

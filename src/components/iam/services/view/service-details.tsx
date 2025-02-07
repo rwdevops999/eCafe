@@ -7,7 +7,6 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { useEffect, useState } from "react";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
-import { ServiceType } from "@/data/iam-scheme";
 import { Data, mapServicesToData } from "@/lib/mapping";
 import { handleLoadServicesWithService } from "@/lib/db";
 

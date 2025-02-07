@@ -4,7 +4,6 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } fr
 import NavHeader from "./nav-header";
 import NavTools from "./nav-tools";
 import NavServices from "./nav-services";
-import { log } from "@/lib/utils";
 import NavResources from "./nav-resources";
 import NavUser from "./nav-user";
 import { SidebarType } from "@/data/navigation-scheme";

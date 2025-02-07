@@ -1,6 +1,5 @@
 import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, useSidebar } from "@/components/ui/sidebar";
 import { SidebarToolsType } from "@/data/navigation-scheme";
-import { log } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Tool from "./tool";

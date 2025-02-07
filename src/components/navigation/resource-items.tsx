@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { SidebarResourceType } from "../data/scheme"
 import { SidebarMenuAction } from "@/components/ui/sidebar";
+import { SidebarResourceType } from "@/data/navigation-scheme";
 import { MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

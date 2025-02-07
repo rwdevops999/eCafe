@@ -1,5 +1,5 @@
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { SidebarResourceType } from "../data/scheme";
+import { SidebarResourceType } from "@/data/navigation-scheme";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

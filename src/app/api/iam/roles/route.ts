@@ -56,7 +56,6 @@ const createRole = async (data: NewRoleType) => {
       description: data.description,
       managed: data.managed,
       policies: {
-        // create: [{id: 1, sid: "", description: "", serviceId: 5}],
         connect: mapPolicies(data.policies)
       }
     }

@@ -1,8 +1,8 @@
-import { LanguageType } from "@/app/api/languages/data/scheme";
-import { defaultLanguage } from "@/app/api/languages/route";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
+import { defaultLanguage } from "@/data/constants";
+import { LanguageType } from "@/data/types";
 import { handleLoadLanguages } from "@/lib/db";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";

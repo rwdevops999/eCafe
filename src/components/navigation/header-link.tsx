@@ -1,6 +1,5 @@
+import { SidebarHeaderType } from "@/data/navigation-scheme";
 import Link from "next/link";
-import { SidebarHeaderType } from "../data/scheme";
-import { log } from "@/lib/utils";
 
 const HeaderLink = ({header}:{header:SidebarHeaderType}) => {
     const renderComponent = () => {

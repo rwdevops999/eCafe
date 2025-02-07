@@ -1,6 +1,4 @@
-import { PolicyType, RoleType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
-import { log } from "@/lib/utils";
 import { NextRequest } from "next/server";
 
 const findRolesByIds = async (idValues: number[]) => {

@@ -1,4 +1,3 @@
-import { log } from "@/lib/utils";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { defaultCountry } from "@/data/constants";
@@ -11,7 +10,7 @@ import LogonSection from "./logon-section";
 import AddressSection, { countries } from "./address-section";
 import { Separator } from "@/components/ui/separator";
 import { Meta } from "../../data/meta";
-import { defineActionButtons, initUserForm, storeUserFormValues } from "../data/util";
+import { defineActionButtons, storeUserFormValues } from "../data/util";
 import ActionButtons from "@/components/iam/components/action-buttons";
 import { ConsoleLogger } from "@/lib/console.logger";
 
@@ -102,7 +101,7 @@ const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   }, [onTabLeave]);
 
   const onSubmit = async (data: any) => {
-    log(true, "onSubmit", "SUBMITTING...");
+    logger.debug("TabUsers", "onSubmit", "SUBMITTING...");
   };
 
   const renderComponent = () => {
@@ -119,7 +118,7 @@ const TabUsers = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
               <AddressSection formMethods={formMethods}/>
             </div>
             <div className="ml-5 col-span-1">
-              <ActionButtons buttonConfig={actionButtons.current} meta={_meta} nrOfItemsToValidate={nrOfItemsToValidate} valid={true}/>
+              <ActionButtons buttonConfig={actionButtons.current} meta={_meta} nrOfItemsToValidate={nrOfItemsToValidate} />
             </div>
           </div>
         </form>

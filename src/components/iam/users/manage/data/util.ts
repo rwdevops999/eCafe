@@ -1,7 +1,6 @@
 import { defaultCountry } from "@/data/constants";
 import { CountryType } from "@/data/iam-scheme";
 import { NewButtonConfig } from "@/data/types";
-import { log } from "@/lib/utils";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
 export const storeUserFormValues = (user: NewUserType|undefined, values: UseFormGetValues<any>, countries: CountryType[]): NewUserType => {

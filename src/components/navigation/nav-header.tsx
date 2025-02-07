@@ -1,6 +1,5 @@
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SidebarHeaderType } from "@/data/navigation-scheme";
-import { log } from "@/lib/utils";
 import HeaderLink from "./header-link";
 
 const NavHeader = ({header}:{header: SidebarHeaderType}) => {

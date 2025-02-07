@@ -2,7 +2,6 @@ import { DataTableColumnHeader } from "@/components/datatable/data-table-column-
 import { ColumnDef } from "@tanstack/react-table";
 import { Data } from "@/lib/mapping";
 import { Button } from "@/components/ui/button";
-import { log } from "@/lib/utils";
 import Link from "next/link";
 import { DataTableRowActions } from "./data-table-row-actions";
 

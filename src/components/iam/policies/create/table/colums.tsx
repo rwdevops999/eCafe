@@ -2,8 +2,7 @@ import { DataTableColumnHeader } from "@/components/datatable/data-table-column-
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Data } from "@/lib/mapping";
-import { log } from "@/lib/utils";
-import { ColumnDef, RowData, Table } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Data>[] = [
     {

@@ -3,7 +3,6 @@ import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import Link from "next/link";
 import ServiceItems from "./service-items";
 import { Collapsible } from "@/components/ui/collapsible";
-import { log } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { SidebarServiceType } from "@/data/navigation-scheme";
 

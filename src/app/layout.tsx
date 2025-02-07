@@ -9,7 +9,6 @@ import { ArrowLeftRight } from "lucide-react";
 
 import i18n from './i18n';
 import { I18nextProvider } from "react-i18next";
-import { Toaster } from "@/components/ui/toaster";
 
 export default function RootLayout({
   children,
@@ -37,7 +36,6 @@ export default function RootLayout({
               </div>
               <div className="w-svw h-svw rounded-lg">
                 {children}
-                <Toaster />
                 </div>
             </Theme>
           </SidebarProvider>

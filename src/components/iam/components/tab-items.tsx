@@ -4,7 +4,6 @@ import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@/components/ui/separator";
 import { MetaBase } from "@/data/meta";
 import { Data, mapDependenciesToData } from "@/lib/mapping";
-import { log } from "@/lib/utils";
 import { Row, TableMeta } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
@@ -19,7 +18,6 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
   const logger = new ConsoleLogger({ level: 'debug' });
 
     const dependencies = useRef<CombinedType[]>([]);
-    // const selectedDependencies = useRef<any[]|undefined>(undefined);
     const [mappedDependencies, setMappedDependencies] = useState<Data[]>([]);
 
     const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
@@ -38,9 +36,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
         if (_meta) {
             const _dependencies: CombinedType[] = _meta.subject.getAllDependencies();
             dependencies.current = _dependencies;
-        // log(debug, "TabItems", "UseEffect[]: dependencies", _dependencies, true);
 
-        // console.log("SET MAPPED DEPENDENCIES");
             setMappedDependencies(mapDependenciesToData(_dependencies));
             getNrOfItemsToValidate();
         }
@@ -103,9 +99,7 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
         );
     }
 
-    return (
-        <>{renderComponent()}</>
-    )
+    return (<>{renderComponent()}</>);
 }
 
 export default TabItems

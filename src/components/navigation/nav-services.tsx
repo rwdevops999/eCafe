@@ -1,7 +1,5 @@
 import { SidebarGroupLabel, SidebarMenu } from "@/components/ui/sidebar";
-import { Collapsible } from "@/components/ui/collapsible";
 import { useEffect, useState } from "react";
-import { log } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { SidebarServicesType } from "@/data/navigation-scheme";
 import ServiceItem from "./service-item";

@@ -1,4 +1,6 @@
+import { z } from "zod";
 import { CountryType, PolicyType, RoleType, ServiceStatementType, ServiceType, UserType } from "./iam-scheme";
+import { breadCrumbsScheme, languageScheme } from "./schemes";
 
 export type AlertType = {
   open: boolean;
@@ -37,3 +39,7 @@ export type NewButtonConfig = {
 }
 
 export type CombinedType = NewRoleType|NewPolicyType|NewGroupType;
+
+
+export type LanguageType = z.infer<typeof languageScheme>
+export type BreadCrumbsType = z.infer<typeof breadCrumbsScheme>

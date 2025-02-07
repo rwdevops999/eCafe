@@ -1,5 +1,5 @@
 import { SidebarMenuButton } from "@/components/ui/sidebar"
-import { SidebarServiceType } from "../data/scheme"
+import { SidebarServiceType } from "@/data/navigation-scheme"
 import Link from "next/link"
 
 const ServiceLink = ({service}:{service:SidebarServiceType}) => {

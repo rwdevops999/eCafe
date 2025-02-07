@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Data } from "@/lib/mapping";
-import { cn, log } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 export const alertcolumns: ColumnDef<Data>[] = [
     {
@@ -20,7 +20,7 @@ export const alertcolumns: ColumnDef<Data>[] = [
             }}
           >
             <div className="flex items-center h-[10px]">
-              {row.original.children?.length > 0 ? (
+              {row.original.children && row.original.children?.length > 0 ? (
                 <Button variant="ghost" className="border-0 hover:bg-muted/10"
                 {...{
                     onClick: row.getToggleExpandedHandler(),

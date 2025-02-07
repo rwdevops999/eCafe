@@ -1,7 +1,5 @@
 import { all } from "@/data/constants";
-import { ServiceStatementType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
-import { log } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 

@@ -1,10 +1,11 @@
 import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormSchemaType } from "../data/form-scheme";
 import { CountryType } from "@/data/iam-scheme";
+import { handleLoadCountries } from "@/lib/db";
+import { useEffect, useState } from "react";
 
 export const countries: CountryType[] = [
   {
@@ -49,6 +50,16 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
     const country: CountryType = countries.find((country) => country.name === countryname)!;
     setValue("dialcode", `${country.dialCode}`)
   };
+
+  const [countries, setCountries] = useState<NewCountryType[]>([]);
+
+  const countriesLoadedCallback = (data: NewCountryType[]) => {
+    setCountries(data);
+  }
+
+  useEffect(() => {
+    handleLoadCountries(countriesLoadedCallback);
+  }, []);
 
   return (
     <Card className="border-stone-500">

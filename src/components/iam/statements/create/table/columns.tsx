@@ -2,7 +2,7 @@ import { DataTableColumnHeader } from "@/components/datatable/data-table-column-
 import IndeterminateCheckbox from "@/components/ecafe/indeterminate-checkbox";
 import { Button } from "@/components/ui/button";
 import { Data } from "@/lib/mapping";
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 export const initialTableState = {
   pagination: {

@@ -8,7 +8,7 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ActionType, defaultAccess, defaultService, ServiceStatementType, ServiceType } from "@/data/iam-scheme";
+import { defaultAccess, defaultService } from "@/data/iam-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
