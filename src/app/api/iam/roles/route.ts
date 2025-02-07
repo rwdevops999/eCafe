@@ -1,6 +1,4 @@
-import { PolicyType, RoleType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
-import { log } from "@/lib/utils";
 import { NextRequest } from "next/server";
 
 const findAllRoles = async () => {
@@ -15,7 +13,9 @@ const findAllRoles = async () => {
             }
           }
         }
-       }
+       },
+       users: true,
+       groups: true
       }
     });
 
@@ -30,20 +30,24 @@ export async function GET(request: NextRequest) {
     return Response.json(roles);
 }
 
-const mapPolicies = (policies: PolicyType[]) => {
-  let result: any[] = policies.map(policy => {
-    return {
-      id: policy?.id,
-      name: policy?.name,
-      description: policy?.description,
-      managed: policy?.managed,
-    };
-  });
+const mapPolicies = (policies: NewPolicyType[]|undefined) => {
+  if (policies) {
+    let result: any[] = policies.map(policy => {
+      return {
+        id: policy?.id,
+        name: policy?.name,
+        description: policy?.description,
+        managed: policy?.managed,
+      };
+    });
 
-  return result;
+    return result;
+  }
+
+  return [];
 }
 
-const createRole = async (data: RoleType) => {
+const createRole = async (data: NewRoleType) => {
   let role: any;
 
    await prisma.role.create({
@@ -64,7 +68,7 @@ const createRole = async (data: RoleType) => {
 }
 
 export async function POST(req: NextRequest) {
-    const _data: RoleType = await req.json();
+    const _data: NewRoleType = await req.json();
 
     const role = await createRole(_data);
 

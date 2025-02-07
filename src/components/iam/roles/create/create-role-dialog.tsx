@@ -5,7 +5,7 @@ import PageTitle from "@/components/ecafe/page-title";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTableType, AlertType, FunctionDefault } from "@/data/types";
+import { AlertTableType, AlertType } from "@/data/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@radix-ui/react-separator";
@@ -16,11 +16,8 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { Row } from "@tanstack/react-table";
 import { validateMappedData } from "@/lib/validate";
-import { log } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
-import { PolicyType, RoleType } from "@/data/iam-scheme";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { createRole, handleLoadPolicies } from "@/lib/db";
 import { alertcolumns } from "@/components/ecafe/table/alert-columns";
@@ -33,26 +30,7 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
-const debug: boolean = false;
-
 const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
-  const { toast, dismiss } = useToast();
-  let toastId: string;
-
-  const renderToast = (_title: string, _description: string): void => {
-    log(debug, "RoleCreateDialog", "render toast");
-    let {id} = toast({title: `${_title}`, description: `${_description}`});
-    toastId = id;
-  }
-    
-  const renderToastLoadPolicies = () => renderToast("Loading...", "policies");
-  const renderToastCreateRole = () => renderToast("Creating...", "role");
-    
-  const closeToast = () => {
-    log(debug, "RoleCreateDialog", "dismiss toast");
-    dismiss(toastId);
-  }
-
   /**
    * state of the dialog
    */
@@ -62,8 +40,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const [valid, setValid] = useState<boolean>(false);
   const [alert, setAlert] = useState<AlertType>();
 
-  const [policies, setPolicies] = useState<PolicyType[]>([]);
-  // const [selectedPolicies, setSelectedPolicies] = useState<Row<Data>[]>([]);
+  const [policies, setPolicies] = useState<NewPolicyType[]>([]);
   const [selectedPolicies, setSelectedPolicies] = useState<Data[]>([]);
   const [policyData, setPolicyData] = useState<Data[]>([]);
     
@@ -71,8 +48,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setOpen(state);
   }
 
-  const policiesLoadedCallback = (policies: PolicyType[], _end: FunctionDefault) => {
-    _end();
+  const policiesLoadedCallback = (policies: NewPolicyType[]) => {
     setPolicies(policies);
     const mappedPolicies: Data[] = mapPoliciesToData(policies);
     setPolicyData(mappedPolicies);
@@ -81,7 +57,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   useEffect(() => {
     if (open) {
       resetAll();
-      handleLoadPolicies(renderToastLoadPolicies, policiesLoadedCallback, closeToast);
+      handleLoadPolicies(policiesLoadedCallback);
     }
   }, [open]);
 
@@ -98,21 +74,16 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
       reset
     } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-    const mapPoliciesToRole = (_policies: Data[]): PolicyType[] => {
+    const mapPoliciesToRole = (_policies: Data[]): NewPolicyType[] => {
       let res = _policies.map((_policy) => 
         {
           return policies.find((p) => p.id === _policy.id)
         });
 
-      return res as PolicyType[];
+      return res as NewPolicyType[];
     }
 
-  const prepareCreateRole = (data: FormSchemaType): RoleType => {
-    // let prep: Data[] = selectedPolicies.flatMap((policy) => {
-    //   return (policy.depth === 0 ? policy : []);
-    //   }
-    // ) as Row<Data>[];
-
+  const prepareCreateRole = (data: FormSchemaType): NewRoleType => {
     return {
       id: 0,
       name: data.name,
@@ -122,9 +93,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     }
   }
 
-  const roleCreatedCallback = (_end: FunctionDefault) => {
-    _end();
-    
+  const roleCreatedCallback = () => {
     if (setReload) {
       setReload((x: any) => x+1);
     }
@@ -133,7 +102,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     const role = prepareCreateRole(data);
 
-    createRole(role, renderToastCreateRole, roleCreatedCallback, closeToast);
+    createRole(role, roleCreatedCallback);
 
     handleDialogState(false);
   }

@@ -168,7 +168,7 @@ export const handleDeleteRole = async (id: number, _callback: CallbackFunctionDe
   }).then((response: Response) => _callback());
 }
 
-export const createRole = async (_role: RoleType, _callback: CallbackFunctionDefault) => {
+export const createRole = async (_role: NewRoleType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/iam/roles',
     {
       method: 'POST',

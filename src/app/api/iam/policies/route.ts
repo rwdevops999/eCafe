@@ -1,4 +1,3 @@
-import { PolicyType, ServiceStatementType } from "@/data/iam-scheme";
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { all } from "@/data/constants";
@@ -12,6 +11,7 @@ const findAllPolicies = async () => {
             actions: true
           }
         },
+        roles: true,
       }});
 
   return policies;
@@ -48,22 +48,26 @@ export async function GET(request: NextRequest) {
     return Response.json(policies);
 }
 
-const mapStatements = (statements: ServiceStatementType[]) => {
-  let result: any[] = statements.map(statement => {
-    return {
-      id: statement?.id,
-      sid: statement?.sid,
-      description: statement?.description,
-      permission: statement?.permission,
-      managed: statement?.managed,
-      serviceId: statement?.serviceId
-    };
-  });
+const mapStatements = (statements: NewStatementType[]|undefined) => {
+  if (statements) {
+    let result: any[] = statements.map(statement => {
+      return {
+        id: statement?.id,
+        sid: statement?.sid,
+        description: statement?.description,
+        permission: statement?.permission,
+        managed: statement?.managed,
+        serviceId: statement?.serviceId
+      };
+    });
 
-  return result;
+    return result;
+  }
+
+  return [];
 }
 
-const createPolicy = async (data: PolicyType) => {
+const createPolicy = async (data: NewPolicyType) => {
   let policy: any;
 
    await prisma.policy.create({
@@ -84,7 +88,7 @@ const createPolicy = async (data: PolicyType) => {
 }
 
 export async function POST(req: NextRequest) {
-    const _data: PolicyType = await req.json();
+    const _data: NewPolicyType = await req.json();
 
     const policy = await createPolicy(_data);
 

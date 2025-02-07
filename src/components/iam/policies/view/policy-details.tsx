@@ -13,8 +13,11 @@ import { AlertType } from "@/data/types";
 import { Data, mapPoliciesToData } from "@/lib/mapping";
 import { handleDeletePolicy, handleLoadPoliciesWithName } from "@/lib/db";
 import AlertMessage from "@/components/ecafe/alert-message";
+import { ConsoleLogger } from "@/lib/console.logger";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
+    const logger = new ConsoleLogger({ level: 'debug' });
+
     const [selectedPolicy, setSelectedPolicy] = useState<string>(all)
     const [policies, setPolicies] = useState<NewPolicyType[]>([]);
     const [policiesData, setPoliciesData] = useState<Data[]>([]);
@@ -25,6 +28,8 @@ import AlertMessage from "@/components/ecafe/alert-message";
     const [reload, setReload] = useState(0);
     
     const policiesLoadedCallback = (data: NewPolicyType[]) => {
+        logger.debug("PolicyDetails", "policiesLoadedCallback", JSON.stringify(data));
+        
         setPolicies(data);
 
         let mappedPolicies: Data[] = mapPoliciesToData(data);
