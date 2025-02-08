@@ -15,9 +15,11 @@ import { AlertType, Data, PolicyType } from "@/types/ecafe";
 import { mapPoliciesToData } from "@/lib/mapping";
 import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
 import { DataTableToolbar } from "./table/data-table-toolbar";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const logger = new ConsoleLogger({ level: 'debug' });
+    const [loader, setLoader] = useState<boolean>(false);
 
     const [selectedPolicy, setSelectedPolicy] = useState<string>(allItems)
     const [policies, setPolicies] = useState<PolicyType[]>([]);
@@ -37,17 +39,20 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 
         setPoliciesData(mappedPolicies);
         policiesLoaded.current = true;
+        setLoader(false);
     }
 
     useEffect(() => {
         if (_policy) {
           setSelectedPolicy(_policy);
 
+          setLoader(true);
           handleLoadPoliciesWithPolicyName(_policy, policiesLoadedCallback);
         }
     }, []);
 
     useEffect(() => {
+        setLoader(true);
         handleLoadPoliciesWithPolicyName(selectedPolicy, policiesLoadedCallback);
     }, [reload, setReload]);
 
@@ -122,14 +127,21 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
         return (
             <div>
                 <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "policies", url: "/iam/policies/policy=*"}]} />
-                <PageTitle className="m-2" title={`Overview policies`} />
-                <div className="flex items-center justify-end">
-                    <PolicyCreateDialog _enabled={policiesLoaded.current} setReload={setReload}/> 
+                <div className="flex space-x-2 items-center">
+                    <PageTitle className="m-2" title={`Overview policies`} />
+                    <EcafeLoader className={loader ? "" : "hidden"}/>
                 </div>
+                {! loader &&
+                    <div className="flex items-center justify-end">
+                        <PolicyCreateDialog _enabled={policiesLoaded.current} setReload={setReload}/> 
+                    </div>
+                }   
     
-                <div className="block space-y-5">
-                    <DataTable data={policiesData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
-                </div>
+                {policiesData &&
+                    <div className="block space-y-5">
+                        <DataTable data={policiesData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
+                    </div>
+                }
             </div>
         )
     }

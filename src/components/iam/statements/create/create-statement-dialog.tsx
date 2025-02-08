@@ -230,7 +230,9 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
                 </div>
               </form>
             }
-            <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
+            {actionsData &&
+              <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
+            }
           </DialogContent>
         </Dialog>
       );

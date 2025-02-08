@@ -26,6 +26,7 @@ import { mapStatementsToData } from "@/lib/mapping";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { handleCreatePolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import { validateMappedData } from "@/lib/validate";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -34,6 +35,8 @@ const FormSchema = z.object({
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
+  const [loader, setLoader] = useState<boolean>(false);
+
   /**
    * state of the dialog
    */
@@ -104,6 +107,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   }
 
   const handleChangeService = (_service: string): void => {
+    setLoader(true);
     setSelectedService(_service);
     
     const serviceId = prepareStatementsLoad(_service, '*');
@@ -117,6 +121,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
     const sd: Data[] = mapStatementsToData(data, services.current);
     setStatementData(sd);
+    setLoader(false);
   }
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
@@ -127,6 +132,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   }
 
   useEffect(() => {
+    setLoader(true);
     handleLoadServices(servicesLoadedCallback);
   }, []);
 
@@ -201,71 +207,78 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
         <DialogContent className="min-w-[75%]" aria-describedby="">
           <DialogHeader className="mb-2">
             <DialogTitle>
-              <PageTitle title="Create policy" className="m-2 -ml-[2px]"/>
+              <div className="flex space-x-2 items-center">
+                <PageTitle title="Create policy" className="m-2 -ml-[2px]"/>
+                <EcafeLoader className={loader ? "" : "hidden"}/>
+              </div>
               <Separator className="bg-red-500"/>
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="form">
-            <div className="flex justify-between">
-              <div>
+          {!loader && 
+            <form onSubmit={handleSubmit(onSubmit)} className="form">
+              <div className="flex justify-between">
+                <div>
+                  <div className="grid gap-2">
+                    <div className="grid grid-cols-6 items-center gap-2 mb-2" >
+                      <Label>Service</Label>
+                      <div className="ml-2">
+                        <ServiceSelect label="" defaultService={selectedService??allItems} handleChangeService={handleChangeService}/>
+                      </div>
+                    </div>
+                  </div>
                 <div className="grid gap-2">
-                  <div className="grid grid-cols-6 items-center gap-2 mb-2" >
-                    <Label>Service</Label>
-                    <div className="ml-2">
-                      <ServiceSelect label="" defaultService={selectedService??allItems} handleChangeService={handleChangeService}/>
+                    <div className="grid grid-cols-6 items-center gap-2 mb-2" >
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        placeholder="name..."
+                        className="col-span-2 h-8"
+                        {...register("name")}
+                      />
+                    </div>
+                    {errors.name && 
+                      <span className="text-red-500">{errors.name.message}</span>
+                    }
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className="grid grid-cols-6 items-center gap-2 mb-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Input
+                        id="description"
+                        placeholder="description..."
+                        className="col-span-3 h-8"
+                        {...register("description")}
+                      />
+                    </div>
+                    {errors.description && 
+                      <span className="text-red-500">{errors.description.message}</span>
+                    }
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className="grid grid-cols-6 items-center gap-2 mt-2 mb-2">
+                      <Label htmlFor="managed">Managed</Label>
+                      <Checkbox id="managed" onCheckedChange={changeManaged}></Checkbox>
                     </div>
                   </div>
                 </div>
-              <div className="grid gap-2">
-                  <div className="grid grid-cols-6 items-center gap-2 mb-2" >
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="name..."
-                      className="col-span-2 h-8"
-                      {...register("name")}
-                    />
-                  </div>
-                  {errors.name && 
-                    <span className="text-red-500">{errors.name.message}</span>
-                  }
-                </div>
-
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-6 items-center gap-2 mb-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                      id="description"
-                      placeholder="description..."
-                      className="col-span-3 h-8"
-                      {...register("description")}
-                    />
-                  </div>
-                  {errors.description && 
-                    <span className="text-red-500">{errors.description.message}</span>
-                  }
-                </div>
-
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-6 items-center gap-2 mt-2 mb-2">
-                    <Label htmlFor="managed">Managed</Label>
-                    <Checkbox id="managed" onCheckedChange={changeManaged}></Checkbox>
-                  </div>
+                <div className="space-y-1">
+                  <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedStatements.length > 0}/>
+                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
+                  <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                 </div>
               </div>
-              <div className="space-y-1">
-                <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedStatements.length > 0}/>
-                <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
-                <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
-              </div>
-            </div>
-          </form>
-          <DataTable 
-            data={statementData} 
-            columns={columns} 
-            rowSelecting={false} 
-            Toolbar={DataTableToolbar}
-            handleChangeSelection={handleChangeSelection} />
+            </form>
+          }
+          {statementData &&
+            <DataTable 
+              data={statementData} 
+              columns={columns} 
+              rowSelecting={false} 
+              Toolbar={DataTableToolbar}
+              handleChangeSelection={handleChangeSelection} />
+          }
         </DialogContent>
       </Dialog>
     );
