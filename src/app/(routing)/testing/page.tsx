@@ -1,34 +1,20 @@
 'use client'
 
-import { Button } from "@/components/ui/button";
-import LoadingSpinner from "./loading-spinner";
-import { useRef, useState } from "react";
-import Loader from "./loader";
-import PageTitle from "@/components/ecafe/page-title";
+import { useUser } from "@/hooks/use-user";
+import LoginLogout from "./login-logout"
 
 const Test = () => {
-  const [loader, setLoader] = useState<boolean>(false);
+  const {user} = useUser();
 
-  const showSpinner = () => {
-    setLoader(true);
+  if (user.roles) {
+    console.log("ROLE: " + user.roles[0].name);
   }
-
-  const hideSpinner = () => {
-    setLoader(false);
-  }
-
+  
   const renderComponent = () => {
     return(
       <>
-        <div className="flex space-x-2">
-          <Button onClick={showSpinner}>Show Loader</Button>
-          <Button onClick={hideSpinner}>Hide Loader</Button>
-
-          <div className="flex space-x-2">
-            <PageTitle className="m-2" title={`Test Page`} />
-            <Loader className={loader ? "" : "hidden"} />
-          </div>
-        </div>
+        USER: {user.name}
+        <LoginLogout />
       </>
     );
   };

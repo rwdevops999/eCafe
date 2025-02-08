@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
+    "@kinde-oss/kinde-auth-nextjs": "^2.5.0",
     "@mantine/core": "^6.0.21",
     "@mantine/dates": "^6.0.21",
     "@mantine/hooks": "^6.0.21",
@@ -35,7 +36,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "crypto-js": "^4.2.0",
-    "dotenv": "^16.4.7",
     "i18next": "^24.1.0",
     "i18next-browser-languagedetector": "^8.0.2",
     "json-stringify-safe": "^5.0.1",

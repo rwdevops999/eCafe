@@ -1,10 +1,12 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
-import { Bell, Briefcase, ChevronsUpDown, LogOut } from "lucide-react";
+import { Bell, Briefcase, ChevronsUpDown, LogIn, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SidebarUserType } from "@/data/navigation-scheme";
 import UserInfo from "./user-info";
+import Link from "next/link";
+import LoginLogout from "@/app/(routing)/testing/login-logout";
 
 const NavUser = ({user}:{user:SidebarUserType}) => {
   const {t} = useTranslation();
@@ -15,8 +17,7 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
       setIsClient(true);
     });
 
-  const handleLogout = () => {
-    console.log('logged out');
+  const handleLogin = () => {
   }
 
   const renderComponent = () => {
@@ -61,10 +62,11 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={handleLogin}>
                   <div className="ml-1 flex space-x-2 items-center cursor-pointer">
-                    <LogOut size={18}/>
-                    <div className="capitalize">{isClient ? t('logout') : 'logout'}</div>
+                    <LoginLogout />
+                    {/* <LogIn size={18}/>
+                    <div className="capitalize">{isClient ? t('login') : 'login'}</div> */}
                   </div>
                 </DropdownMenuItem>
             </DropdownMenuContent>

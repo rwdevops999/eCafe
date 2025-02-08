@@ -5,6 +5,8 @@ type CallbackFunctionDefault = () => void;
 type CallbackFunctionSubjectLoaded = (data: any[]) => void;
 type CallbackFunctionDependencyLoaded = (subject: any, data: any[]) => void;
 
+type CallbackFunctionLoggedIn = () => void;
+
 type BreadCrumbsType = z.infer<typeof breadCrumbsScheme>
 
 type ActionType = {
