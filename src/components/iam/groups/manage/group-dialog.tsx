@@ -23,6 +23,7 @@ import { AlertTableType, AlertType, CombinedType, Data, ExtendedGroupType, Group
 import { fullMapNoSubjectToData } from "@/lib/mapping";
 import { cloneObject, difference } from "@/lib/utils";
 import { handleCreateGroup, handleUpdateGroup } from "@/lib/db";
+import { initMetaBase } from "@/data/meta-base";
 
 type DependencyType = {
   initialised: boolean,

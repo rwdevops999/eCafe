@@ -15,9 +15,11 @@ import { Data, GroupType } from "@/types/ecafe";
 import { initGroupMeta, Meta } from "../meta/meta";
 import { mapGroupsToData } from "@/lib/mapping";
 import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
+  const [loader, setLoader] = useState<boolean>(false);
 
   logger.debug("GroupDetails", "IN(_selectedGroup)", _selectedGroup);
 
@@ -45,6 +47,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
     groupsDataRef.current = mapGroupsToData(_groups);
     setRerender((x:any) => x+1);
+    setLoader(false);
   }
 
   const handleDialogState = (open: boolean) => {
@@ -62,17 +65,20 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     logger.debug("GroupDetails", "USE EFFECT[] => META handleDialogState");
     metaGroupDetails.current.control.handleDialogState = handleDialogState;
 
+    setLoader(true);
     handleLoadGroups(groupsLoadedCallback);
   }, []);
 
   useEffect(() => {
     logger.debug("GroupDetails", "LOAD GROUPS AFTER RELOAD");
 
+    setLoader(true);
     handleLoadGroups(groupsLoadedCallback);
   }, [reloadState, setReloadState]);
 
   const groupDeletedCallback = () => {
     setSelectedGroup(undefined);
+    setLoader(true);
     handleLoadGroups(groupsLoadedCallback);
   }
 
@@ -105,14 +111,22 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
       return (
         <div>
           <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
-          <PageTitle className="m-2" title={`Overview group`} />
+          <div className="flex space-x-2 items-center">
+            <PageTitle className="m-2" title={`Overview group`} />
+            <EcafeLoader className={loader ? "" : "hidden"}/>
+          </div>
 
+          {!loader &&
             <div className="flex items-center justify-end">
               <GroupDialog _open={dialogState}  _meta={cloneObject(metaGroupDetails.current)} _setReload={setReloadState}/>
             </div>
+          }
+
+          {groupsDataRef.current &&
             <div className="block space-y-5">
               <DataTable data={groupsDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
             </div>
+          }
         </div>
       );
     }

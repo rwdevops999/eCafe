@@ -15,9 +15,11 @@ import { Data, UserType } from "@/types/ecafe";
 import { initUserMeta, Meta } from "../meta/meta";
 import { mapUsersToData } from "@/lib/mapping";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
+  const [loader, setLoader] = useState<boolean>(false);
 
   logger.debug("UserDetails", "IN(_selectedUser)", _selectedUser);
 
@@ -53,6 +55,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     // setDataUsers(mapUsersToData(_users));
     usersDataRef.current = mapUsersToData(_users);
     setRerender((x:any) => x+1);
+    setLoader(false)
   }
 
   const handleDialogState = (open: boolean) => {
@@ -70,18 +73,21 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     logger.debug("UserDetails", "USE EFFECT[] => META handleDialogState");
     metaUserDetails.current.control.handleDialogState = handleDialogState;
 
+    setLoader(true);
     handleLoadUsers(usersLoadedCallback);
   }, []);
 
   useEffect(() => {
     logger.debug("UserDetails", "LOAD USERS AFTER RELOAD");
 
+    setLoader(true);
     handleLoadUsers(usersLoadedCallback);
   }, [reloadState, setReloadState]);
 
   // on deletion of user, reload the component
   const userDeletedCallback = () => {
     setSelectedUser(undefined);
+    setLoader(true);
     handleLoadUsers(usersLoadedCallback);
   }
 
@@ -114,14 +120,22 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
       return (
         <div>
           <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/users"}]} />
-          <PageTitle className="m-2" title={`Overview users`} />
+          <div className="flex space-x-2 items-center">
+            <PageTitle className="m-2" title={`Overview users`} />
+            <EcafeLoader className={loader ? "" : "hidden"}/>
+          </div>
 
-          <div className="flex items-center justify-end">
-            <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)} _setReload={setReloadState}/>
-          </div>
-          <div className="block space-y-5">
-            <DataTable data={usersDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
-          </div>
+          {!loader &&
+            <div className="flex items-center justify-end">
+              <UserDialog _open={dialogState}  _meta={cloneObject(metaUserDetails.current)} _setReload={setReloadState}/>
+            </div>
+          }
+
+          {usersDataRef.current &&
+            <div className="block space-y-5">
+              <DataTable data={usersDataRef.current} columns={columns} tablemeta={tablemeta} Toolbar={DataTableToolbar} rowSelecting enableRowSelection={false}/>
+            </div>
+          }
         </div>
       );
     }
