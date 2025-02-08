@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { Separator } from "@radix-ui/react-separator";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,6 +22,8 @@ import { AlertTableType, AlertType, Data, PolicyType, RoleType } from "@/types/e
 import { mapPoliciesToData } from "@/lib/mapping";
 import { handleCreateRole, handleLoadPolicies } from "@/lib/db";
 import { validateMappedData } from "@/lib/validate";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { Separator } from "@/components/ui/separator";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -31,6 +32,8 @@ const FormSchema = z.object({
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setReload?(x: any): void;}) => {
+  const [loader, setLoader] = useState<boolean>(false);
+
   /**
    * state of the dialog
    */
@@ -52,11 +55,13 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setPolicies(policies);
     const mappedPolicies: Data[] = mapPoliciesToData(policies);
     setPolicyData(mappedPolicies);
+    setLoader(false);
   }
 
   useEffect(() => {
     if (open) {
       resetAll();
+      setLoader(true);
       handleLoadPolicies(policiesLoadedCallback);
     }
   }, [open]);
@@ -154,64 +159,72 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
           <DialogContent className="min-w-[75%]" aria-describedby="">
             <DialogHeader className="mb-2">
               <DialogTitle>
-                <PageTitle title="Create role" className="m-2 -ml-[2px]"/>
+                <div className="flex space-x-2 items-center">
+                  <PageTitle title="Create role" className="m-2 -ml-[2px]"/>
+                  <EcafeLoader className={loader ? "" : "hidden"}/>
+                </div>
                 <Separator className="bg-red-500"/>
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="form">
-              <div className="flex justify-between">
-                <div>
-                  <div className="grid gap-2">
-                    <div className="grid grid-cols-6 items-center gap-2 mb-2" >
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="name..."
-                        className="col-span-2 h-8"
-                        {...register("name")}
-                      />
+            {!loader &&
+              <form onSubmit={handleSubmit(onSubmit)} className="form">
+                <div className="flex justify-between">
+                  <div>
+                    <div className="grid gap-2">
+                      <div className="grid grid-cols-6 items-center gap-2 mb-2" >
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          placeholder="name..."
+                          className="col-span-2 h-8"
+                          {...register("name")}
+                        />
+                      </div>
+                      {errors.name && 
+                        <span className="text-red-500">{errors.name.message}</span>
+                      }
                     </div>
-                    {errors.name && 
-                      <span className="text-red-500">{errors.name.message}</span>
-                    }
-                  </div>
 
-                  <div className="grid gap-2">
-                    <div className="grid grid-cols-6 items-center gap-2 mb-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Input
-                        id="description"
-                        placeholder="description..."
-                        className="col-span-5 h-8"
-                        {...register("description")}
-                      />
+                    <div className="grid gap-2">
+                      <div className="grid grid-cols-6 items-center gap-2 mb-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Input
+                          id="description"
+                          placeholder="description..."
+                          className="col-span-5 h-8"
+                          {...register("description")}
+                        />
+                      </div>
+                      {errors.description && 
+                        <span className="text-red-500">{errors.description.message}</span>
+                      }
                     </div>
-                    {errors.description && 
-                      <span className="text-red-500">{errors.description.message}</span>
-                    }
-                  </div>
 
-                  <div className="grid gap-2">
-                    <div className="grid grid-cols-6 items-center gap-2 mt-2 mb-2">
-                      <Label htmlFor="managed">Managed</Label>
-                      <Checkbox id="managed" onCheckedChange={changeManaged}></Checkbox>
+                    <div className="grid gap-2">
+                      <div className="grid grid-cols-6 items-center gap-2 mt-2 mb-2">
+                        <Label htmlFor="managed">Managed</Label>
+                        <Checkbox id="managed" onCheckedChange={changeManaged}></Checkbox>
+                      </div>
                     </div>
+                  </div>
+                  <div className="space-y-1">
+                    <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedPolicies.length > 0}/>
+                    <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
+                    <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <EcafeButton id={"validateButton"} caption="Validate" className="bg-blue-500 hover:bg-blue-600" clickHandler={handleValidate} enabled={selectedPolicies.length > 0}/>
-                  <EcafeButton id={"createButton"} caption="Create&nbsp;&nbsp;" enabled={Object.keys(errors).length === 0 && valid} type={"submit"}/>
-                  <EcafeButton id={"cancelButton"} caption="Cancel&nbsp;&nbsp;" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
-                </div>
-              </div>
-            </form>
-            <DataTable 
-              data={policyData} 
-              columns={columns} 
-              rowSelecting={false} 
-              handleChangeSelection={handleChangeSelection}
-              Toolbar={DataTableToolbar}
-              />
+              </form>
+            }
+
+            {policyData &&
+              <DataTable 
+                data={policyData} 
+                columns={columns} 
+                rowSelecting={false} 
+                handleChangeSelection={handleChangeSelection}
+                Toolbar={DataTableToolbar}
+                />
+            }
           </DialogContent>
         </Dialog>
       );
