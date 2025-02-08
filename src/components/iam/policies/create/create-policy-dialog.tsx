@@ -25,6 +25,7 @@ import { allItems } from "@/data/constants";
 import { mapStatementsToData } from "@/lib/mapping";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { handleCreatePolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import { validateMappedData } from "@/lib/validate";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),

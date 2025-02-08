@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import * as  fs from 'fs';
 import * as path from 'path';
 import { Country, Data } from "@/types/ecafe";
+import { AccessResultType, AccessType } from "./validate";
 
 
 
@@ -86,44 +87,7 @@ const differenceBySomeType = (original: any[], selected: any[]): number[] => {
   return originalIds.filter(id => selectedIds.indexOf(id) < 0); 
 }
 
-const addActionToResult = (_result: AccessResultType[], _action: string, _allowedPath: string[], _deniedPath: string[]): AccessResultType[] => {
 
-  let art: AccessResultType|undefined = _result.find((item) => item.action === _action);
-  if (art) {
-    art.allowed.push({path: _allowedPath});
-    art.denied.push({path: _deniedPath});
-  } else {
-    _result.push({
-      action: _action,
-      allowed: [{path: _allowedPath}],
-      denied: [{path: _deniedPath}] 
-    })
-  }
-
-  return _result;
-}
-
-const operation = (allowed: AccessType[], denied: AccessType[]): AccessResultType[] => {
-  let result: AccessResultType[] = [];
-
-  for (let i = 0; i < allowed.length; i++) {
-      let item1 = allowed[i],
-          found = false;
-      for (let j = 0; j < denied.length && !found; j++) {
-        let item2 = denied[j],
-        found = item1.action === item2.action;
-        if  (found) {
-          result = addActionToResult(result, item1.action, item1.path, item2.path);
-        }
-      }
-  }
-
-  return result;
-}
-
-const intersection = (source: AccessType[], destination: AccessType[]): AccessResultType[] => {
-  return operation(source, destination);
-}
 
 
 

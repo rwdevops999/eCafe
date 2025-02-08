@@ -12,8 +12,13 @@ import { Button } from "@/components/ui/button";
 import { AlertType, Data, RoleType } from "@/types/ecafe";
 import { mapRolesToData } from "@/lib/mapping";
 import { handleDeleteRole, handleLoadRoles } from "@/lib/db";
+import { DataTableToolbar } from "./table/data-table-toolbar";
+import { ConsoleLogger } from "@/lib/console.logger";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
+    const logger = new ConsoleLogger({ level: 'debug' });
+
     const [reload, setReload] = useState(0);
     const [alert, setAlert] = useState<AlertType>();
 
@@ -22,6 +27,8 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const rolesLoaded = useRef<boolean>(false);
 
     const rolesLoadedCallback = (data: RoleType[]) => {
+        logger.debug(" RoleDetails", "rolesLadedCallback", JSON.stringify(data));
+
         setRoles(data);
         setRolesData(mapRolesToData(data));
         rolesLoaded.current = true;
@@ -68,6 +75,11 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
       return alert;
     }
 
+    const handleDeleteManagedRole = (role: Data) => {
+        handleDeleteRole(role.id, roleDeletedCallback);
+        setAlert(undefined);
+    }
+    
     const handleAction = (action: string, role: Data) => {
         if (action === action_delete) {
             if (role.other?.managed) {
@@ -76,9 +88,10 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
                 error: true,
                 title: "Unable to delete role.",
                 message: "Managed roles can not be deleted.",
-                child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+                // child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+                child: <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedRole(role)}>delete anyway</Button>
               };
-  
+      
               setAlert(alert);
             } else {
                 let alert = roleUsed(role);
@@ -96,6 +109,10 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     };
 
     const renderComponent = () => {
+        if (alert && alert.open) {
+            return (<AlertMessage alert={alert}></AlertMessage>)
+        }
+    
         return (
             <div>
                 <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "roles", url: "/iam/roles"}]} />
@@ -105,13 +122,14 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
                     {/* enabled={loaded} setReload={setReload}/> */}
                 </div>
                 <div className="block space-y-5">
-                    <DataTable data={rolesData} columns={columns} tablemeta={meta}/>
+                    <DataTable data={rolesData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
                     {/* renderAdditional={renderData} showSelectInfo={false} Toolbar={DataTableToolbar} onRowDelete={handleRowDelete}/> */}
                 </div>
             </div>
         )
     }
-    return (<div>{renderComponent()}</div>);
+    
+    return (<>{renderComponent()}</>);
 }
 
 export default RoleDetails;

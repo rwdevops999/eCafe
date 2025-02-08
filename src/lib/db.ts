@@ -49,7 +49,9 @@ export const handleLoadCountries = async (_callback: CallbackFunctionSubjectLoad
 const loadServices = async (_callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
     .then((response) => response.json())
-    .then((response) => _callback(response));
+    .then((response) => {
+      _callback(response);
+    });
 }
 
 export const handleLoadServices = async (_callback: CallbackFunctionSubjectLoaded) => {

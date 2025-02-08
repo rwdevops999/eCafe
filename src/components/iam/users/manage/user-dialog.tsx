@@ -22,6 +22,8 @@ import { Meta } from "../meta/meta";
 import { AlertTableType, AlertType, CombinedType, CountryType, Data, ExtendedUserType, GroupType, UserType } from "@/types/ecafe";
 import { fullMapNoSubjectToData } from "@/lib/mapping";
 import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
+import { initMetaBase } from "@/data/meta-base";
+import { validateMappedData } from "@/lib/validate";
 
 type DependencyType = {
   initialised: boolean,

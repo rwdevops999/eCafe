@@ -20,7 +20,7 @@ export const columns: ColumnDef<Data>[] = [
         },
 
         filterFn: (row, id, value) => {
-            return value.includes(row.original.other?.access);
+            return row.original.name.includes(value);
         },
 
         footer: props => props.column.id,
@@ -34,10 +34,6 @@ export const columns: ColumnDef<Data>[] = [
 
         cell: ({row, getValue}) => {
             return (<>{getValue<string>()}</>);
-        },
-
-        filterFn: (row, id, value) => {
-            return value.includes(row.original.other?.access);
         },
 
         footer: props => props.column.id,

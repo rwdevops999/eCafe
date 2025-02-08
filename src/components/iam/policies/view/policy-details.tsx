@@ -14,6 +14,7 @@ import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, PolicyType } from "@/types/ecafe";
 import { mapPoliciesToData } from "@/lib/mapping";
 import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
+import { DataTableToolbar } from "./table/data-table-toolbar";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const logger = new ConsoleLogger({ level: 'debug' });
@@ -80,6 +81,11 @@ import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
         return alert;
     }
 
+    const handleDeleteManagedPolicy = (policy: Data) => {
+        handleDeletePolicy(policy.id, policyDeletedCallback);
+        handleRemoveAlert();
+    }
+
     const handleAction = (action: string, policy: Data) => {
         if (action === action_delete) {
             if (policy.other?.managed) {
@@ -88,7 +94,8 @@ import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
                 error: true,
                 title: "Unable to delete policy.",
                 message: "Managed policies can not be deleted.",
-                child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+                // child: <Button className="bg-orange-500" size="sm" onClick={handleRemoveAlert}>close</Button>
+                child: <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedPolicy(policy)}>delete anyway</Button>
               };
   
               setAlert(alert);
@@ -121,7 +128,7 @@ import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
                 </div>
     
                 <div className="block space-y-5">
-                    <DataTable data={policiesData} columns={columns} tablemeta={meta} />
+                    <DataTable data={policiesData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
                 </div>
             </div>
         )

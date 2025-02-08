@@ -22,6 +22,7 @@ import { Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
 import { handleCreateStatement, handleLoadServicesWithServiceName } from "@/lib/db";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
 
 const FormSchema = z.object({
@@ -31,6 +32,8 @@ const FormSchema = z.object({
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x:any): void;}) => {
+  const [loader, setLoader] = useState<boolean>(false);
+
   /**
    * state of the dialog
    */
@@ -167,61 +170,66 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
           <DialogContent className="min-w-[75%]" aria-describedby="">
             <DialogHeader>
               <DialogTitle>
-                <PageTitle title={`Create service statement for ${selectedService}`} className="m-2 -ml-[2px]"/>
+                <div className="flex space-x-2 items-center">
+                  <PageTitle title={`Create service statement for ${selectedService}`} className="m-2 -ml-[2px]"/>
+                  <EcafeLoader className={loader ? "" : "hidden"}/>
+                </div>
                 <Separator className="bg-red-500"/>
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="form">
-              <div className="flex justify-between">
-                <div>
-                  <div className="grid gap-2">
-                    <div className="grid grid-cols-6 items-center gap-2">
-                      <Label>Service</Label>
-                      <div className="ml-2">
-                        <ServiceSelect label="" defaultService={selectedService} handleChangeService={handleChangeService}/>
+            {!loader && 
+              <form onSubmit={handleSubmit(onSubmit)} className="form">
+                <div className="flex justify-between">
+                  <div>
+                    <div className="grid gap-2">
+                      <div className="grid grid-cols-6 items-center gap-2">
+                        <Label>Service</Label>
+                        <div className="ml-2">
+                          <ServiceSelect label="" defaultService={selectedService} handleChangeService={handleChangeService}/>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-6 items-center gap-2">
+                        <Label htmlFor="sid">SID</Label>
+                        <Input
+                          id="sid"
+                          placeholder="sid..."
+                          className="col-span-2 h-8"
+                          {...register("sid")}
+                        />
+                      </div>
+                      {errors.sid && 
+                        <span className="text-red-500">{errors.sid.message}</span>
+                      }
+
+                      <div className="grid grid-cols-6 items-center gap-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Input
+                          id="description"
+                          placeholder="description..."
+                          className="col-span-3 h-8"
+                          {...register("description")}
+                        />
+                      </div>
+                      {errors.description && 
+                        <span className="text-red-500">{errors.description.message}</span>
+                      }
+
+                      <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
+                        <Label>Access Level</Label>
+                        <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
+                        <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
+                        <Label className="ml-4" htmlFor="managed">Managed</Label>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-6 items-center gap-2">
-                      <Label htmlFor="sid">SID</Label>
-                      <Input
-                        id="sid"
-                        placeholder="sid..."
-                        className="col-span-2 h-8"
-                        {...register("sid")}
-                      />
-                    </div>
-                    {errors.sid && 
-                      <span className="text-red-500">{errors.sid.message}</span>
-                    }
-
-                    <div className="grid grid-cols-6 items-center gap-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Input
-                        id="description"
-                        placeholder="description..."
-                        className="col-span-3 h-8"
-                        {...register("description")}
-                      />
-                    </div>
-                    {errors.description && 
-                      <span className="text-red-500">{errors.description.message}</span>
-                    }
-
-                    <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
-                      <Label>Access Level</Label>
-                      <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
-                      <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
-                      <Label className="ml-4" htmlFor="managed">Managed</Label>
-                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && selectedActions.length > 0} type={"submit"}/>
+                    <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                   </div>
                 </div>
-                <div className="flex space-x-1">
-                  <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && selectedActions.length > 0} type={"submit"}/>
-                  <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
-                </div>
-              </div>
-            </form>
+              </form>
+            }
             <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
           </DialogContent>
         </Dialog>

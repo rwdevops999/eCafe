@@ -16,8 +16,10 @@ import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData } from "@/lib/mapping";
 import { isNumber } from "@/lib/utils";
 import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import EcafeLoader from "@/components/ecafe/ecafe-loader";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
+  const [loader, setLoader] = useState<boolean>(false);
   const [reload, setReload] = useState(0);
 
   const [selectedService, setSelectedService] = useState<number | string>(allItems);
@@ -32,7 +34,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
   const [alert, setAlert] = useState<AlertType>();
 
-  const serviceName = useRef<string>(allItems);
+  const serviceName = useRef<string>('All');
 
   const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
     let serviceId: number = 0;
@@ -62,6 +64,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     setStatements(data);
     setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
+    setLoader(false);
   }
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
@@ -77,16 +80,19 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
   useEffect(() => {
     if (_service && _sid) {
+      setLoader(true);
       handleLoadServices(servicesLoadedCallback);
     }
   }, []);
 
   useEffect(() => {
+    setLoader(true);
     const serviceId: number = prepareStatementsLoad(selectedService, selectedSid);
     handleLoadStatements(serviceId, selectedSid, statementsLoadedCallback);
   }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
+    setLoader(true);
     const serviceId: number = prepareStatementsLoad(_service, '*');
     handleLoadStatements(serviceId, '*', statementsLoadedCallback);
     setSelectedService(_service);
@@ -160,23 +166,26 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         return (<AlertMessage alert={alert}></AlertMessage>)
       }
 
-      if (selectedService && statementData) {
-        return (
-          <div>
-            <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
+      return (
+        <div>
+          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
+          <div className="flex space-x-2 items-center">
             <PageTitle className="m-2" title={`Overview service statements for ${serviceName.current === 'All' ? 'All Services' : serviceName.current}`} />
-            <div className="flex items-center justify-between p-5">
-              <ServiceSelect defaultService={serviceName.current} forceAll={true} handleChangeService={handleChangeService}/>
-              <StatementCreateDialog _service={serviceName.current} _enabled={statementsLoaded.current} setReload={setReload} /> 
-            </div>
-            <div className="block space-y-5">
-              <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} expandAll={isNumber(selectedService)}/>
-            </div>
+            <EcafeLoader className={loader ? "" : "hidden"}/>
           </div>
-        )
-      }
-        
-      return null;
+            {!loader && 
+              <div className="flex items-center justify-between p-5">
+                <ServiceSelect defaultService={serviceName.current} forceAll={true} handleChangeService={handleChangeService}/>
+                <StatementCreateDialog _service={serviceName.current} _enabled={statementsLoaded.current} setReload={setReload} /> 
+              </div>
+            }
+          <div className="block space-y-5">
+            {statementData && 
+              <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} expandAll={isNumber(selectedService)}/>
+            }
+          </div>
+        </div>
+      )
     }
 
     return (<>{renderComponent()}</>);

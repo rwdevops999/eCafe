@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertTableType, AlertType, Data, PolicyType, RoleType } from "@/types/ecafe";
 import { mapPoliciesToData } from "@/lib/mapping";
 import { handleCreateRole, handleLoadPolicies } from "@/lib/db";
+import { validateMappedData } from "@/lib/validate";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),

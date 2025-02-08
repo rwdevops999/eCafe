@@ -23,7 +23,7 @@ const mapConflictChildren = (allowed: any[], denied: any): Data[] => {
     return result;
   }
 
-const mapConflictsToData = (conflicts: any[]): Data[] => {
+export const mapConflictsToData = (conflicts: any[]): Data[] => {
     let result: Data[] = [];
 
     let _id: number = 0;
@@ -227,7 +227,10 @@ export const mapRolesToData = (roles: any[]|undefined): Data[] => {
         id: role.id,
         name: role.name!,
         description: role.description!,
-        children: mapPoliciesToData(role.policies)
+        children: mapPoliciesToData(role.policies),
+        other: {
+          managed: role.managed
+        }
       }
     });
   }

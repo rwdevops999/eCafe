@@ -1,6 +1,8 @@
+import { CombinedType, GroupType, UserType } from "@/types/ecafe"
+
 // subject is user or group
-type MetaBase = {
-    currentSubject?: NewUserType|NewGroupType,
+export type MetaBase = {
+    currentSubject?: UserType|GroupType,
     control: {
         handleDialogState: (b: boolean) => void,
         clearDependencies: () => void,
@@ -20,7 +22,7 @@ type MetaBase = {
     }
 }
 
-const initMetaBase = {
+export const initMetaBase = {
     control: {
         handleDialogState: (b: boolean) => {},
         clearDependencies: () => {},

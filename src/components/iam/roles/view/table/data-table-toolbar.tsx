@@ -1,13 +1,12 @@
- "use client"
+"use client"
 
-import { Table } from "@tanstack/react-table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { DataTableToolbarProps, Table } from "@tanstack/react-table"
 import { X } from "lucide-react"
 
-export interface DataTableToolbarProps<TData> {
-  table: Table<TData>
-}
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { DataTableFacetedFilter } from "@/components/datatable/data-table-faceted-filter"
+import { access } from "@/data/constants"
 
 export function DataTableToolbar<TData>({
   table,
@@ -25,7 +24,7 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-         {isFiltered && (
+        {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
@@ -35,7 +34,7 @@ export function DataTableToolbar<TData>({
             <X />
           </Button>
         )}
-     </div>
+      </div>
     </div>
   )
 }
