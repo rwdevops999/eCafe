@@ -6,6 +6,7 @@ import { dependency_policies } from "@/data/constants";
 import TabItems from "./tab-items";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig, PolicyType, RoleType, UserType } from "@/types/ecafe";
+import { handleLoadPolicies } from "@/lib/db";
 
 const debug: boolean = false;
 

@@ -15,6 +15,7 @@ import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData } from "@/lib/mapping";
 import { isNumber } from "@/lib/utils";
+import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
   const [reload, setReload] = useState(0);

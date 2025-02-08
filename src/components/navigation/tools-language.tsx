@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 import { defaultLanguage } from "@/data/constants";
+import { handleLoadLanguages } from "@/lib/db";
 import { LanguageType } from "@/types/ecafe";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";

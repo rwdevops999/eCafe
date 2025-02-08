@@ -6,6 +6,7 @@ import TabItems from "./tab-items";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig, GroupType, UserType } from "@/types/ecafe";
 import { cloneObject } from "@/lib/utils";
+import { handleLoadGroups } from "@/lib/db";
 
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });

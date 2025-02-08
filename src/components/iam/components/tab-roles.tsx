@@ -8,6 +8,7 @@ import { dependency_roles } from "@/data/constants";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { defineActionButtons } from "../users/manage/data/util";
 import { ButtonConfig, RoleType, UserType } from "@/types/ecafe";
+import { handleLoadRoles } from "@/lib/db";
 
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });

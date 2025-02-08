@@ -9,6 +9,7 @@ import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Data, ServiceType } from "@/types/ecafe";
 import { mapServicesToData } from "@/lib/mapping";
+import { handleLoadServicesWithServiceName } from "@/lib/db";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
   const [servicesData, setServicesData] = useState<Data[]>([]);
@@ -18,11 +19,11 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
   }
     
   useEffect(() => {
-    handleLoadServicesWithService(selectedService!, servicesLoadedCallback);
+    handleLoadServicesWithServiceName(selectedService!, servicesLoadedCallback);
   }, []);
 
   const handleChangeService = (_service: string) =>  {
-    handleLoadServicesWithService(_service!, servicesLoadedCallback);
+    handleLoadServicesWithServiceName(_service!, servicesLoadedCallback);
   }
 
   const renderComponent = () => {

@@ -6,6 +6,7 @@ import { cloneObject } from "@/lib/utils";
 import { dependency_users } from "@/data/constants";
 import TabItems from "./tab-items";
 import { ButtonConfig, GroupType, UserType } from "@/types/ecafe";
+import { handleLoadUsers } from "@/lib/db";
 
 const TabUsers = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });

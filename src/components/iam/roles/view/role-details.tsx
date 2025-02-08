@@ -11,6 +11,7 @@ import { action_delete } from "@/data/constants";
 import { Button } from "@/components/ui/button";
 import { AlertType, Data, RoleType } from "@/types/ecafe";
 import { mapRolesToData } from "@/lib/mapping";
+import { handleDeleteRole, handleLoadRoles } from "@/lib/db";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const [reload, setReload] = useState(0);

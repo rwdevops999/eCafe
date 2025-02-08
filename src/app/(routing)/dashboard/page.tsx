@@ -3,18 +3,13 @@
 import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import { initDB } from "@/lib/db";
-import { log } from "@/lib/utils";
 
 const Dashboard = () => {
   const initializeDB = () => {
-    log(true, "Dashboard", "Initializing DB");
-    
     initDB('*');
   };
 
   const provisionCountries = () => {
-    log(true, "Dashboard", "Initializing DB");
-    
     initDB('country');
   };
 

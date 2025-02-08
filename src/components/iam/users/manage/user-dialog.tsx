@@ -21,6 +21,7 @@ import TabUser from "./components/tab-user";
 import { Meta } from "../meta/meta";
 import { AlertTableType, AlertType, CombinedType, CountryType, Data, ExtendedUserType, GroupType, UserType } from "@/types/ecafe";
 import { fullMapNoSubjectToData } from "@/lib/mapping";
+import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
 
 type DependencyType = {
   initialised: boolean,

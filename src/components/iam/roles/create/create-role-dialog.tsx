@@ -21,6 +21,7 @@ import AlertTable from "@/components/ecafe/alert-table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertTableType, AlertType, Data, PolicyType, RoleType } from "@/types/ecafe";
 import { mapPoliciesToData } from "@/lib/mapping";
+import { handleCreateRole, handleLoadPolicies } from "@/lib/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -97,7 +98,7 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     const role = prepareCreateRole(data);
 
-    createRole(role, roleCreatedCallback);
+    handleCreateRole(role, roleCreatedCallback);
 
     handleDialogState(false);
   }

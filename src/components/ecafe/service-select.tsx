@@ -10,6 +10,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { allItems } from "@/data/constants";
 import { ServiceType } from "@/types/ecafe";
+import { handleLoadServices } from "@/lib/db";
 
 /**
  * Loads the services from API and let us select a service through a combo

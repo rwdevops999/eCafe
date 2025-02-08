@@ -21,6 +21,7 @@ import { Row } from "@tanstack/react-table"
 import { Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
+import { handleCreateStatement, handleLoadServicesWithServiceName } from "@/lib/db";
 
 
 const FormSchema = z.object({
@@ -70,7 +71,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const resetAll = () => {
     access.current = defaultAccess;
     reset();
-    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServicesWithServiceName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
@@ -79,7 +80,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }, [open]);
 
   useEffect(() => {
-    handleLoadServicesWithService(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServicesWithServiceName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, []);
 
@@ -132,7 +133,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     const statement = prepareCreateStatement(data);
 
     if  (statement) {
-      createStatement(statement, statementCreatedCallback);
+      handleCreateStatement(statement, statementCreatedCallback);
       handleDialogState(false);
     }
   }
@@ -153,7 +154,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
 
   const handleChangeService = (_service: string) => {
     setSelectedService(_service);
-    handleLoadServicesWithService(_service, servicesLoadedCallback);
+    handleLoadServicesWithServiceName(_service, servicesLoadedCallback);
   }
 
   const renderDialog = () => {

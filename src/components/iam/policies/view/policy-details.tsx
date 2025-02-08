@@ -13,6 +13,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, PolicyType } from "@/types/ecafe";
 import { mapPoliciesToData } from "@/lib/mapping";
+import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const logger = new ConsoleLogger({ level: 'debug' });
@@ -41,12 +42,12 @@ import { mapPoliciesToData } from "@/lib/mapping";
         if (_policy) {
           setSelectedPolicy(_policy);
 
-          handleLoadPoliciesWithName(_policy, policiesLoadedCallback);
+          handleLoadPoliciesWithPolicyName(_policy, policiesLoadedCallback);
         }
     }, []);
 
     useEffect(() => {
-        handleLoadPoliciesWithName(selectedPolicy, policiesLoadedCallback);
+        handleLoadPoliciesWithPolicyName(selectedPolicy, policiesLoadedCallback);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {

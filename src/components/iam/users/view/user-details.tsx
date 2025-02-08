@@ -14,6 +14,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import { Data, UserType } from "@/types/ecafe";
 import { initUserMeta, Meta } from "../meta/meta";
 import { mapUsersToData } from "@/lib/mapping";
+import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const logger = new ConsoleLogger({ level: 'debug' });

@@ -24,6 +24,7 @@ import { AlertTableType, AlertType, Data, PolicyType, ServiceType, StatementType
 import { allItems } from "@/data/constants";
 import { mapStatementsToData } from "@/lib/mapping";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { handleCreatePolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -161,7 +162,7 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     const policy = prepareCreatePolicy(data);
 
-    createPolicy(policy, policyCreatedCallback);
+    handleCreatePolicy(policy, policyCreatedCallback);
 
     handleDialogState(false);
   }
