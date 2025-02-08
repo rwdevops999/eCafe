@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
-import { access, accessAllow, accessDeny, defaultAccess } from "@/data/constants";
+import { accessAllow, accessDeny, defaultAccess } from "@/data/constants";
+
+const access: string = defaultAccess;
 
 const AllowDenySwitch = ({handleChangeAccess}:{handleChangeAccess?(access: string):void}) => {
   let [checked, setChecked] = useState(access === defaultAccess);

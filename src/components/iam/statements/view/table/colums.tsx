@@ -40,7 +40,7 @@ export const columns: ColumnDef<Data>[] = [
         },
 
         filterFn: (row, id, value) => {
-            return value.includes(row.original.other?.access);
+            return row.original.name.includes(value);
         },
 
         footer: props => props.column.id,

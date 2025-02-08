@@ -121,6 +121,12 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
       return alert;
   }
 
+  /** for admin only later on */
+  const handleDeleteManagedStatement = (statement: Data) => {
+    handleDeleteStatement(statement.id, statementDeletedCallback);
+    setAlert(undefined);
+  }
+
   const handleAction = (action: string, statement: Data) => {
     if (action === action_delete) {
       if (statement.other?.managed) {
@@ -129,7 +135,8 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
           error: true,
           title: "Unable to delete statement.",
           message: "Managed statements can not be deleted.",
-          child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+          // child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+          child: <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedStatement(statement)}>delete anyway</Button>
         };
 
         setAlert(alert);
