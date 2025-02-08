@@ -113,6 +113,8 @@ model User {
   phone String
   email String
   password String
+  passwordless Boolean
+  OTP String
   address Address?
   roles Role[]
   policies Policy[]
