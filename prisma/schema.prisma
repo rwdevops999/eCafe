@@ -115,6 +115,7 @@ model User {
   password String
   passwordless Boolean
   OTP String
+  createDate DateTime? @default(now())
   address Address?
   roles Role[]
   policies Policy[]
