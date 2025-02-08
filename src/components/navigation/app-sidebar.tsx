@@ -22,7 +22,7 @@ data.Header = {
 
 data.User = {
     name: 'ecafé',
-    email: 'rwdevops999@&gmail.com',
+    email: 'rwdevops999@gmail.com',
     avatar: '/avatars/rw.png'
 };
 
