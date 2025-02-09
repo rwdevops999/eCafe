@@ -183,7 +183,7 @@ export async function GET(request: NextRequest) {
         }
       })
 
-      return Response.json(user);
+      return Response.json([user]);
     }
 
     const users = await findAllUsers();

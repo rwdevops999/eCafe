@@ -69,7 +69,8 @@ export default {
   		},
 		backgroundImage: {
 			'login-pattern': "linear-gradient(0deg, rgba(255,255,255,0.5), rgba(244,247,251,1.0))",
-			'login-button' : "linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%)"
+			'login-button' : "linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%)",
+			'login-cancel' : "linear-gradient(45deg, rgb(158, 158, 158) 0%, rgb(218, 218, 218) 60%)"
 		},
 		 boxShadow: {
 			'login-shadow': "rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px"

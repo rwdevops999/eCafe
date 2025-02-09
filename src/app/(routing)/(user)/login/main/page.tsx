@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { handleLoadUserByEmail, updateUserOTPByEmail } from "@/lib/db";
 import { EmailType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
@@ -84,7 +84,7 @@ const LoginMain = () => {
     
         setDialogState(false);
         push("/dashboard");
-      }
+    }
     
     const userByEmailLoadedCallback = (data: UserType[]) => {
         console.log("Loaded user = ", data);
@@ -105,7 +105,6 @@ const LoginMain = () => {
                 push("/login/OTP");
             } else {
                 push("/login/password");
-                // route to password
             }
         } else {
             dialogTitleRef.current = "User not found";
@@ -124,25 +123,26 @@ const LoginMain = () => {
             <div className="flex items-center justify-center">
                 <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
                     <CardHeader>
-                        <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Sign In</CardTitle>
+                        <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400 mb-5">Sign In</CardTitle>
+                        <CardTitle className="flex justify-center text-center font-black text-sm text-black/50">Enter your email</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex justify-center">
                             <form className="form" onSubmit={handleSubmit(onSubmit)}>
                                 <div className="block space-y-2">
                                     <div className="w-[100%] grid grid-cols-12 items-center space-x-2">
-                                        <Label className="col-span-2 text-black" htmlFor="email">Email:</Label>
+                                        {/* <Label className="col-span-2 text-black" htmlFor="email">Email:</Label> */}
                                         <Input
                                             type="text" 
                                             id="email"
                                             placeholder="email..."
-                                            className="h-8 col-span-9 text-black"
+                                            className="h-8 col-span-12 text-black"
                                             {...register("email")}
                                         />
                                     </div>
                                     {errors.email && errors.email.type === "too_small" && <span className="text-red-500" role="alert">Email is required</span>}
                                     {errors.email && errors.email.type === "invalid_string" && <span className="text-red-500" role="alert">Email is invalid</span>}
-                                    <Button className="w-[100%] font-bold bg-login-button text-white m-20px rounded-2xl border-0 transition-all" type="submit">Continue</Button>
+                                    <Button className="w-[100%] font-bold bg-login-button text-stone-700 m-20px rounded-2xl border-0 transition-all" type="submit">Continue</Button>
                                 </div>
                             </form>
                         </div>
