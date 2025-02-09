@@ -53,6 +53,7 @@ const sendEmailCallback = (data: any) => {
 
 const userByEmailLoadedCallback = (data: UserType[]) => {
     console.log("Loaded user = ", data);
+
     if (data) {
         const user: UserType = data[0];
         if (user.passwordless) {
@@ -71,6 +72,8 @@ const userByEmailLoadedCallback = (data: UserType[]) => {
             push("/login/password");
             // route to password
         }
+    } else {
+        // NOTIFICATION NO USER FOUND
     }
 }
 

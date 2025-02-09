@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { SidebarUserType } from "@/data/navigation-scheme";
 import UserInfo from "./user-info";
 import Link from "next/link";
-import LoginLogout from "@/app/(routing)/testing/login-logout";
+import LoginLogout from "../ecafe/login-logout";
 
 const NavUser = ({user}:{user:SidebarUserType}) => {
   const {t} = useTranslation();

@@ -174,10 +174,16 @@ const findAllUsers = async () => {
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    const email = searchParams.get('email');  // passed as ...?service=Stock => service = "Stock"
+    const _email = searchParams.get('email');  // passed as ...?service=Stock => service = "Stock"
 
-    if (email) {
+    if (_email) {
+      const user = await prisma.user.findFirst({
+        where: {
+          email: _email
+        }
+      })
 
+      return Response.json(user);
     }
 
     const users = await findAllUsers();

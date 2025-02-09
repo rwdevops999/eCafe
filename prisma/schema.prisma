@@ -113,8 +113,9 @@ model User {
   phone String
   email String
   password String
-  passwordless Boolean
   OTP String
+  passwordless Boolean
+  attemps Int @default(0)
   createDate DateTime? @default(now())
   address Address?
   roles Role[]
