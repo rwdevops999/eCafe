@@ -31,7 +31,7 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
     user = storedUserRef.current;
   }
 
-  logger.debug("TabUsers", "IN(user)", JSON.stringify(user));
+  logger.debug("TabUsers", ">>> IN(user)", user?.passwordless);
 
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),

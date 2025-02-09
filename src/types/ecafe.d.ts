@@ -199,3 +199,9 @@ type ExtendedUserType = {
 }
 
 type LanguageType = z.infer<typeof languageScheme>
+
+type EmailType = {
+  destination: string,
+  userId: number,
+  OTPcode: string
+}

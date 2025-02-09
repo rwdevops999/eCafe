@@ -23,7 +23,7 @@ data.Header = {
 data.User = {
     name: 'ecafé',
     email: '',
-    avatar: '/avatars/rw.png'
+    avatar: ''
 };
 
 data.Services = [];

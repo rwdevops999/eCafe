@@ -148,3 +148,16 @@ export const difference = (original: Data[], selected: Data[]): number[] => {
 
 export const isNumber = (n: string | Number): boolean => !isNaN(parseFloat(String(n))) && isFinite(Number(n));
 
+export const generateOTP = (): string => {
+    // All possible characters of my OTP
+    let str = "0123456789";
+    let n = str.length;
+
+    // String to hold my OTP
+    let OTP = "";
+
+    for (var i = 1; i <= 6; i++)
+        OTP += str[(Math.floor(Math.random() * 10) % n)];
+
+    return (OTP);
+}

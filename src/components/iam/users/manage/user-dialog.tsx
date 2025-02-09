@@ -302,6 +302,8 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   }
 
   const prepareUser = (data: any, selectedUser?: UserType): ExtendedUserType => {
+    console.log("PREPARE USER", JSON.stringify(data));
+
     const _country: CountryType = countries.current.find((country) => country.name === data.country)!;
     logger.debug("UserDialog", "PrepareUser(country)", JSON.stringify(_country));
 
@@ -313,6 +315,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       email: data.email,
       password: data.password,
       passwordless: data.passwordless,
+      OTP: "",
       address: {
         id: (selectedUser ? selectedUser.address?.id! : 0),
         street: data.street,

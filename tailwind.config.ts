@@ -59,13 +59,30 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+			login: 'rgba(0,0,0,0.54)'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		backgroundImage: {
+			'login-pattern': "linear-gradient(0deg, rgba(255,255,255,0.5), rgba(244,247,251,1.0))",
+			'login-button' : "linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%)"
+		},
+		 boxShadow: {
+			'login-shadow': "rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px"
+		 },
+		 keyframes: {
+			"caret-blink": {
+			  "0%,70%,100%": { opacity: "1" },
+			  "20%,50%": { opacity: "0" },
+			},
+		  },
+		  animation: {
+			"caret-blink": "caret-blink 1.25s ease-out infinite",
+		  },
   	}
   },
   plugins: [require("tailwindcss-animate")],

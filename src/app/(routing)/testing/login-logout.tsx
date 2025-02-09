@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const LoginLogout = () => {
     const {user} = useUser();
+    const router = useRouter();
 
     console.log("USER = " + user.email);
 
@@ -18,7 +21,9 @@ const LoginLogout = () => {
     }
 
     const doLogin = () => {
+        console.log("Logging In");
         setLoggedIn(true);
+        router.push("/login/main");
     }
 
     const doLogout = () => {
@@ -39,22 +44,20 @@ const LoginLogout = () => {
         <div>
             {loggedIn && 
                 <>
-                <LogoutLink>
                     <div className="flex items-center">
                         <LogOut size={18} className="mr-2"/>
                         Log Out
                     </div>
-                </LogoutLink>
             </>
         }
             {!loggedIn && 
                 <>
-                    <LoginLink>
-                        <div className="flex items-center">
-                            <LogIn size={18} className="mr-2"/>
+                    <div className="-ml-4 flex items-center">
+                        <Button variant="ghost" onClick={doLogin} className="h-4">
+                            <LogIn size={18} className="mr-2" />
                             Log In
-                        </div>
-                    </LoginLink>
+                        </Button>
+                    </div>
                 </>
             }
         </div>

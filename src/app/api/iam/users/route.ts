@@ -14,6 +14,7 @@ const provisionUserForCreate = (data: ExtendedUserType) => {
     email: data.email,
     password: data.passwordless ? "" : encrypt(data.password!),
     passwordless: data.passwordless,
+    OTP: data.OTP,
     address: {
       create: {
         street: (data.address?.street ? data.address.street : ""),
@@ -53,6 +54,7 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
     email: data.email,
     password: data.passwordless ? "" : encrypt(data.password!),
     passwordless: data.passwordless,
+    OTP: data.OTP,
     address: {
       update: {
         street: (data.address?.street ? data.address.street : ""),
@@ -162,7 +164,9 @@ const findAllUsers = async () => {
   );
 
   users.forEach(user => {
-    user.password = decrypt(user.password);
+    if (!user.passwordless) {
+      user.password = decrypt(user.password);
+    }
   });
 
   return users;
@@ -170,11 +174,16 @@ const findAllUsers = async () => {
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
+    const email = searchParams.get('email');  // passed as ...?service=Stock => service = "Stock"
+
+    if (email) {
+
+    }
 
     const users = await findAllUsers();
 
     return Response.json(users);
-  }
+}
 
 const deleteUserById = async (userId: number) => {
   let user: any;

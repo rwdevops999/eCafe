@@ -13,6 +13,20 @@ export const initDB = async (table: string) => {
   })        
 }
 
+export const updateUserOTPByEmail = async (info: any, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch('http://localhost:3000/api/db',
+    {
+      method: 'PUT',
+      body: JSON.stringify(info),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(response => _callback(response));
+}
+
+
  /**
  * LANGUAGES
  */
@@ -242,6 +256,18 @@ const loadUsers = async (_callback: CallbackFunctionSubjectLoaded) => {
 
 export const handleLoadUsers = async (_callback: CallbackFunctionSubjectLoaded) => {
   await loadUsers(_callback);
+}
+
+const loadUserByEmail = async (email: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/users?email="+email)
+    .then((response) => response.json())
+    .then((response) => {
+      _callback(response);
+    });
+}
+
+export const handleLoadUserByEmail = async (email: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadUserByEmail(email, _callback);
 }
 
 const deleteUser = async (_id: number, _callback: CallbackFunctionDefault) => {

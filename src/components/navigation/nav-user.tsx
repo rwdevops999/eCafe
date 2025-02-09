@@ -65,8 +65,6 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                 <DropdownMenuItem onClick={handleLogin}>
                   <div className="ml-1 flex space-x-2 items-center cursor-pointer">
                     <LoginLogout />
-                    {/* <LogIn size={18}/>
-                    <div className="capitalize">{isClient ? t('login') : 'login'}</div> */}
                   </div>
                 </DropdownMenuItem>
             </DropdownMenuContent>
