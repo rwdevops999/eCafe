@@ -1,10 +1,10 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
-import { all } from "@/data/constants";
 import { Country } from "@/types/ecafe";
 import { loadCountriesFromFile } from "@/lib/utils";
 import { serviceMappings, ServiceMappingType } from "./setup/setup";
+import { allItems } from "@/data/constants";
 
 const provisionServiceActions = (_service: ServiceMappingType) => {
   let actions: Prisma.ActionCreateInput[] = [];
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
   
-    if (table === all) {
+    if (table === allItems) {
       await clearDB();
       provisionServices(serviceMappings);
     }
@@ -104,14 +104,14 @@ export async function POST(request: NextRequest) {
 const getAllCountries = async () => {
   const countries: any[] = await prisma.country.findMany({});
 
-    return Response.json(countries);
+  return Response.json(countries.sort((a, b) => a.name.localeCompare(b.name)));
 }
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
 
-    if (table && table !== all) {
+    if (table && table !== allItems) {
       if (table === 'country') {
         return getAllCountries();
       }

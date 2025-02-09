@@ -12,7 +12,8 @@ const provisionUserForCreate = (data: ExtendedUserType) => {
     firstname: data.firstname,
     phone: (data.phone ? data.phone : ""),
     email: data.email,
-    password: encrypt(data.password!),
+    password: data.passwordless ? "" : encrypt(data.password!),
+    passwordless: data.passwordless,
     address: {
       create: {
         street: (data.address?.street ? data.address.street : ""),
@@ -50,7 +51,8 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
     firstname: data.firstname,
     phone: (data.phone ? data.phone : ""),
     email: data.email,
-    password: encrypt(data.password!),
+    password: data.passwordless ? "" : encrypt(data.password!),
+    passwordless: data.passwordless,
     address: {
       update: {
         street: (data.address?.street ? data.address.street : ""),

@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
-  const {register, unregister, formState: { errors }, reset, getValues} = formMethods;
+  const {register, unregister, formState: { errors }, setValue} = formMethods;
   const [viewPassword, setViewPassword] = useState<boolean>(false);
 
   const handleSwitchPassword = () => {
@@ -25,13 +25,13 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
 
     if (checked) {
       console.log("UNREGISTER");
-      reset({ ...getValues(), password: undefined });
-      unregister(["password"]);
+      setValue("password", "--------");
+      // unregister(["password"]);
       setSelectedTrigger("passwordless");
     } else {
       console.log("REGISTER");
-      reset({ ...getValues(), password: "" });
-      register("password");
+      setValue("password", "");
+      // register("password");
       setSelectedTrigger("password");
     }
   }
@@ -66,15 +66,14 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
           <div className="col-span-4">
             <div className="grid grid-cols-8 items-center space-x-2">
               <Label className="col-span-2" htmlFor="password">Password:</Label>
-                <Input 
-                  type={viewPassword ? "text" : "password"}
-                  id="password"
-                  placeholder="password..."
-                  disabled={selectedTrigger !== "password"}
-                  className="h-8 col-span-4"
-                  // {...register("password")}
-                  // {...register("password", {disabled: (selectedTrigger !== "password")})}
-                />
+              <Input 
+                type={viewPassword ? "text" : "password"}
+                id="password"
+                placeholder="password..."
+                disabled={selectedTrigger !== "password"}
+                className="h-8 col-span-4"
+                {...register("password")}
+              />
               &nbsp;
               {selectedTrigger === "password" && (
                 viewPassword ? 

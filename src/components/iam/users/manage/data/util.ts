@@ -15,6 +15,7 @@ export const storeUserFormValues = (user: UserType|undefined, values: UseFormGet
     storedUser.firstname = values("firstname");
     storedUser.email = values("email");
     storedUser.password = values("password");
+    storedUser.passwordless = values("passwordless");
     storedUser.phone = values("phone");
 
     if (! storedUser.address) {
@@ -63,24 +64,3 @@ export const storeUserFormValues = (user: UserType|undefined, values: UseFormGet
 
     return storedUser;
 }
-
-export const initUserForm = (user: UserType|undefined, values: UseFormSetValue<any>) => {
-    values("name", user?.name??"");
-    values("firstname", user?.firstname??"");
-    values("email", user?.email??"");
-    values("password", user?.password??"");
-    values("phone", user?.phone??"");
-
-    values("street", user?.address?.street??"");
-    values("number", user?.address?.number??"");
-    values("box", user?.address?.box??"");
-    values("city", user?.address?.city??"");
-    values("postalcode", user?.address?.postalcode??"");
-    values("county", user?.address?.county??"");
-
-    values("dialcode", user?.address?.country.dialCode??defaultCountry.dialCode);
-    values("country", user?.address?.country.name??defaultCountry.name);
-}
-
-
-
