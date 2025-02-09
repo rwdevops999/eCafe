@@ -3,6 +3,7 @@
 import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
 import { AlertDialogAction, AlertDialogCancel, AlertDialogDescription, AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { useEffect, useState } from "react";
+import { Separator } from "../ui/separator";
 
 const NotificationDialog = (
     {
@@ -11,7 +12,7 @@ const NotificationDialog = (
         _message,
         _handleButtonLeft, 
         _handleButtonRight,
-        _buttonnames = {leftButton: "Cancel", rightButton: "Continue"}
+        _buttonnames = {leftButton: "No", rightButton: "Yes"}
     }
     :
     {
@@ -36,7 +37,8 @@ const NotificationDialog = (
     <AlertDialog open={_open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{_title}</AlertDialogTitle>
+          <AlertDialogTitle className="text-red-500 font-bold text-2xl">{_title}</AlertDialogTitle>
+          <Separator className="bg-red-300" />
           <AlertDialogDescription>
             {_message}
           </AlertDialogDescription>
