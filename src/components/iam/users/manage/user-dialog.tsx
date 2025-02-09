@@ -312,6 +312,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       phone: data.phone,
       email: data.email,
       password: data.password,
+      passwordless: data.passwordless,
       address: {
         id: (selectedUser ? selectedUser.address?.id! : 0),
         street: data.street,

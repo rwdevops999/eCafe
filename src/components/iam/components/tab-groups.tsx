@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { defineActionButtons } from "../users/manage/data/util";
-import { Meta } from "../users/data/meta";
 import { dependency_groups } from "@/data/constants";
 import TabItems from "./tab-items";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig, GroupType, UserType } from "@/types/ecafe";
 import { cloneObject } from "@/lib/utils";
 import { handleLoadGroups } from "@/lib/db";
+import { MetaBase } from "@/data/meta-base";
+import { defineActionButtons } from "../lib/util";
+import { Meta } from "../users/meta/meta";
 
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -23,7 +24,7 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
    
     actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
    
-    const newMeta: Meta = cloneObject(_meta);
+    const newMeta: MetaBase = cloneObject(_meta);
     newMeta.subject.name = "Groups";
     newMeta.subject.dependency = dependency_groups;
    

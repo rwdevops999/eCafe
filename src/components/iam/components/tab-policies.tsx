@@ -1,12 +1,12 @@
 import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { defineActionButtons } from "../users/manage/data/util";
-import { Meta } from "../users/data/meta";
 import { dependency_policies } from "@/data/constants";
 import TabItems from "./tab-items";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { ButtonConfig, PolicyType, RoleType, UserType } from "@/types/ecafe";
+import { ButtonConfig, GroupType, PolicyType, RoleType, UserType } from "@/types/ecafe";
 import { handleLoadPolicies } from "@/lib/db";
+import { MetaBase } from "@/data/meta-base";
+import { defineActionButtons } from "../lib/util";
 
 const debug: boolean = false;
 
@@ -23,9 +23,9 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
  
      allPolicies.current = _data;
  
-     actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
+     actionButtons.current = defineActionButtons(_meta.currentSubject as UserType|GroupType);
  
-     const newMeta: Meta = cloneObject(_meta);
+     const newMeta: MetaBase = cloneObject(_meta);
      newMeta.subject.name = "Policies";
      newMeta.subject.dependency = dependency_policies;
  

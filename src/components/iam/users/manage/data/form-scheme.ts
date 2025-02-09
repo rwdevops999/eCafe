@@ -5,6 +5,7 @@ export const FormSchema = z.object({
     firstname: z.string().min(1).max(50),
     email: z.string().min(1).regex(/^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i),
     password: z.string().min(8).max(12),
+    passwordless: z.boolean().default(false).optional(),
     dialcode: z.string(),
     phone: z.string(),
     street: z.string(),

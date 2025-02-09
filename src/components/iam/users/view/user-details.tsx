@@ -41,18 +41,10 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const usersLoadedCallback = (_users: UserType[]) => {
     logger.debug("UserDetails", "usersLoadedCallback", JSON.stringify(_users));
 
-    // Store all the users in ref
     usersRef.current = _users
 
-    // if _selectedUser !== undefined handle it here
     setSelectedUser(undefined);
 
-    // map the users to Data for rendering the DataTable
-    //    id:           user.id,
-    //    name:         user.name,
-    //    description:  user.firstname,
-    //    children:     []
-    // setDataUsers(mapUsersToData(_users));
     usersDataRef.current = mapUsersToData(_users);
     setRerender((x:any) => x+1);
     setLoader(false)
@@ -84,14 +76,11 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     handleLoadUsers(usersLoadedCallback);
   }, [reloadState, setReloadState]);
 
-  // on deletion of user, reload the component
   const userDeletedCallback = () => {
     setSelectedUser(undefined);
     setLoader(true);
     handleLoadUsers(usersLoadedCallback);
   }
-
-  // const [reload, setReload] = useState<number>(0);
 
   const handleAction = (_action: string, _user: Data) => {
     logger.debug("UserDetails", "handleAction", _action);
@@ -107,7 +96,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     }
   }
 
-  // // create TableMeta for handling actions
   const tablemeta: TableMeta<Data[]> = {
     handleAction: handleAction,
   };

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormSchemaType } from "../data/form-scheme";
 import { useEffect, useState } from "react";
 import { CountryType } from "@/types/ecafe";
+import { handleLoadCountries } from "@/lib/db";
 
 const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
   const {register, setValue} = formMethods;

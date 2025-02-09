@@ -24,8 +24,8 @@ const UserSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>})
                 {...register("name")}
               />
             </div>
-            {errors.name && errors.name.type === "too_small" && <span className="text-red-500" role="alert">Name must contain at least 1 character</span>}
-            {errors.name && errors.name.type === "too_big" && <span className="text-red-500" role="alert">Name may not contain more than 50 characters</span>}
+            {/* {errors.name && errors.name.type === "too_small" && <span className="text-red-500" role="alert">Name must contain at least 1 character</span>}
+            {errors.name && errors.name.type === "too_big" && <span className="text-red-500" role="alert">Name may not contain more than 50 characters</span>} */}
           </div>
 
           <div className="col-span-4">
@@ -38,6 +38,18 @@ const UserSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>})
                 {...register("firstname")}
               />
             </div>
+            {/* {errors.firstname && errors.firstname.type === "too_small" && <span className="text-red-500" role="alert">First Name must contain at least 1 character</span>}
+            {errors.firstname && errors.firstname.type === "too_big" && <span className="text-red-500" role="alert">First Name may not contain more than 50 characters</span>} */}
+          </div>
+        </div>
+
+        <div className="w-[100%] grid grid-cols-12 space-x-2">
+          <div className="col-span-4">
+            {errors.name && errors.name.type === "too_small" && <span className="text-red-500" role="alert">Name must contain at least 1 character</span>}
+            {errors.name && errors.name.type === "too_big" && <span className="text-red-500" role="alert">Name may not contain more than 50 characters</span>}
+          </div>
+
+          <div className="col-span-4">
             {errors.firstname && errors.firstname.type === "too_small" && <span className="text-red-500" role="alert">First Name must contain at least 1 character</span>}
             {errors.firstname && errors.firstname.type === "too_big" && <span className="text-red-500" role="alert">First Name may not contain more than 50 characters</span>}
           </div>

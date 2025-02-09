@@ -14,6 +14,7 @@ import { ButtonConfig, CountryType, UserType } from "@/types/ecafe";
 import { defineActionButtons } from "@/components/iam/lib/util";
 import { storeUserFormValues } from "../data/util";
 import AddressSection from "./address-section";
+import { handleLoadCountries } from "@/lib/db";
 
 const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
   const logger = new ConsoleLogger({ level: 'debug' });
@@ -41,6 +42,7 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
      phone: "",
      email: "",
      password: "",
+     passwordless: false,
      number: "",
      box: "",
      street: "",
@@ -54,6 +56,7 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
       firstname: user?.firstname ?? "",
       email: user?.email ?? "",
       password: user?.password ?? "",
+      passwordless: user?.passwordless ?? false,
       phone: user?.phone ?? "",
       dialcode: user?.address?.country.dialCode ? `${user.address.country.dialCode}`: `${defaultCountry.dialCode}`,
       city: user?.address?.city?? "",

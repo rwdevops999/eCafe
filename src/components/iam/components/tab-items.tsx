@@ -10,6 +10,7 @@ import ActionButtons from "./action-buttons";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig, CombinedType, Data } from "@/types/ecafe";
 import { mapDependenciesToData } from "@/lib/mapping";
+import { MetaBase } from "@/data/meta-base";
 
 const debug = true;
 

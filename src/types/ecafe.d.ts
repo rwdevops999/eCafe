@@ -105,6 +105,9 @@ type UserType = {
   phone: string,
   email: string,
   password: string,
+  passwordless?: boolean
+  OTP?: string
+  createDate?: Date,
   address?: AddressType,
   roles?: RoleType[],
   policies?: PolicyType[],
@@ -178,6 +181,8 @@ type ExtendedUserType = {
   phone: string,
   email: string,
   password: string,
+  passwordless?: boolean
+  OTP?: string
   address?: AddressType,
   roles?: {
       selected?: any[],
