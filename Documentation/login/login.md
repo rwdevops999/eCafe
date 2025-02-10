@@ -51,3 +51,17 @@
 38. [ ] >>>>> # attemps not exceeded -> Notification
 39. [ ] >>>>> Cancel -> /dashboard
 40. [ ] >>>>> Retry -> /Login/Password
+
+# Happy Route (OTP)
+
+41. [ ] select login
+42. [ ] enter email
+43. [ ] get OTP code from email and enter OTP code
+44. [ ] user is logged in and set as active user
+
+# Happy Route (Password)
+
+45. [ ] select login
+46. [ ] enter email
+47. [ ] enter password
+44. [ ] user is logged in and set as active user

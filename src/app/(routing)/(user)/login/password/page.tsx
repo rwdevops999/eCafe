@@ -10,9 +10,9 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleLoadUserById, handleUpdateUser } from "@/lib/db";
+import { createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { ExtendedUserType, NotificationButtonsType, UserType } from "@/types/ecafe";
+import { ExtendedUserType, NotificationButtonsType, TaskType, UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
 import { MaxLoginAttemps } from "@/data/constants";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
@@ -75,6 +75,10 @@ const LoginPassword = () => {
     setDialogState(true);
   }
   
+  const taskCreatedCallback = () => {
+    logger.debug("LoginMain", "Task Created");
+  }
+
   const userLoadedCallback = (data: any) => {
     if (data.status === 200) {
       const user: UserType = data.payload;
@@ -87,8 +91,6 @@ const LoginPassword = () => {
       } else {
         user.attemps++;
         if (user.attemps > MaxLoginAttemps) {
-          handleAttempsExceeded();          
-
           const _user: ExtendedUserType = {
             name: user.name,
             firstname: user.firstname,
@@ -99,6 +101,18 @@ const LoginPassword = () => {
             blocked: user.blocked
           }
           handleUpdateUser(_user, ()=>{});
+
+          const task: TaskType = {
+              name: "Unblock",
+              description: "Unblock User",
+              subject: "User",
+              subjectId: user.id
+          }
+          
+          logger.debug("LoginPassword", "userLoadedCallback", "Create Task", JSON.stringify(task));
+          createTask(task, taskCreatedCallback);
+          
+          handleAttempsExceeded();          
         } else {
           const _user: ExtendedUserType = {
             name: user.name,
