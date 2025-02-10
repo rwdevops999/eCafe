@@ -2,7 +2,7 @@ import { z } from "zod";
 import { dataScheme } from "@/data/schemes";
 
 type CallbackFunctionDefault = () => void;
-type CallbackFunctionSubjectLoaded = (data: any[]) => void;
+type CallbackFunctionSubjectLoaded = (data: any[], additional?: any) => void;
 type CallbackFunctionDependencyLoaded = (subject: any, data: any[]) => void;
 
 type CallbackFunctionLoggedIn = () => void;
@@ -106,7 +106,8 @@ type UserType = {
   email: string,
   password: string,
   passwordless?: boolean
-  OTP?: string
+  attemps: number,
+  blocked: boolean,
   createDate?: Date,
   address?: AddressType,
   roles?: RoleType[],
@@ -182,7 +183,8 @@ type ExtendedUserType = {
   email: string,
   password: string,
   passwordless?: boolean
-  OTP?: string
+  attemps?: number,
+  blocked?: boolean,
   address?: AddressType,
   roles?: {
       selected?: any[],
@@ -200,11 +202,17 @@ type ExtendedUserType = {
 
 type LanguageType = z.infer<typeof languageScheme>
 
+/* User for sending an email */
 type EmailType = {
   destination: string,
-  userId?: number,
   OTPcode: string,
   attemps: number,
+}
+
+/* Returned from email sender */
+type EmailSendType = {
+  otp: string,
+  email: string,
 }
 
 type NotificationButtonsType = {
@@ -213,12 +221,6 @@ type NotificationButtonsType = {
   rightButton?: string
 }
 
-type EmailSendType = {
-  status: number,
-  otp: string,
-  email: string,
-  userId: number
-}
 
 type OtpType = {
   id?: number,
@@ -236,3 +238,7 @@ type TaskType = {
   subjectId?: number
 }
 
+type ApiResponseType = {
+  status: number,
+  payload: any
+}

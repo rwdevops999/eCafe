@@ -54,3 +54,4 @@ export const languages: LanguageType[] = [
   }
 ]
 
+export const MaxLoginAttemps: number = 3;

@@ -1,6 +1,6 @@
 import { ConsoleLogger } from "@/lib/console.logger";
 import prisma from "@/lib/prisma";
-import { decrypt, encrypt } from "@/lib/utils";
+import { createApiReponse, decrypt, encrypt } from "@/lib/utils";
 import { ExtendedUserType } from "@/types/ecafe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,8 @@ const provisionUserForCreate = (data: ExtendedUserType) => {
     email: data.email,
     password: data.passwordless ? "" : encrypt(data.password!),
     passwordless: data.passwordless,
-    OTP: data.OTP,
+    attemps: 0,
+    blocked: false,
     address: {
       create: {
         street: (data.address?.street ? data.address.street : ""),
@@ -54,7 +55,8 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
     email: data.email,
     password: data.passwordless ? "" : encrypt(data.password!),
     passwordless: data.passwordless,
-    OTP: data.OTP,
+    attemps: data.attemps,
+    blocked: data.blocked,
     address: {
       update: {
         street: (data.address?.street ? data.address.street : ""),
@@ -174,7 +176,8 @@ const findAllUsers = async () => {
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    const _email = searchParams.get('email');  // passed as ...?service=Stock => service = "Stock"
+    const _email: string|null = searchParams.get('email');  // passed as ...?service=Stock => service = "Stock"
+    const _id: string|null = searchParams.get('id');  // passed as ...?service=Stock => service = "Stock"
 
     if (_email) {
       const user = await prisma.user.findFirst({
@@ -183,7 +186,23 @@ export async function GET(request: NextRequest) {
         }
       })
 
-      return Response.json(user ? [user] : null);
+      if (user) {
+        return Response.json(createApiReponse(200, user));
+      }
+    }
+
+    if (_id) {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: parseInt(_id)
+        }
+      })
+
+      if (user) {
+        return Response.json(createApiReponse(200, user));
+      }
+
+      return Response.json(createApiReponse(404, "user not found"));
     }
 
     const users = await findAllUsers();

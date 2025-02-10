@@ -1,20 +1,22 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/form-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { createOTP, createTask, handleLoadUserByEmail, updateUserOTPByEmail } from "@/lib/db";
-import { EmailSendType, EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
+import { useEffect, useRef, useState } from "react";
+import { createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
+import { EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
 import { generateOTP } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
+import { ConsoleLogger } from "@/lib/console.logger";
  
+const logger = new ConsoleLogger({ level: 'debug' });
+
 const LoginMain = () => {
     const {push} = useRouter();
 
@@ -56,7 +58,13 @@ const LoginMain = () => {
         focusToEmailInfo();
     }, [refocus]);
 
+    const taskCreatedCallback = () => {
+        logger.debug("LoginMain", "Task Created");
+    }
+
     const otpCreatedCallback = (data: any) => {
+        logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", JSON.stringify(data));
+
         const task: TaskType = {
             name: "Remove",
             description: "Remove from OTP",
@@ -64,14 +72,16 @@ const LoginMain = () => {
             subjectId: data.id
         }
 
-        createTask(task, ()=>{});
+        logger.debug("LoginMain", "otpCreatedCallback", "Create Task", JSON.stringify(task));
+        createTask(task, taskCreatedCallback);
 
+        logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
         setDialogState(false);
         push("/login/OTP?otpId="+data.id);
     }
 
     const sendEmailCallback = (data: any) => {
-        console.log("EMAIL DATA", JSON.stringify(data));
+        logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(data));
         if (data.status === 200) {
             const info: OtpType = {
                 userId: data.userId,
@@ -80,11 +90,15 @@ const LoginMain = () => {
                 attemps: 0,
             }
 
+            logger.debug("LoginMain", "sendEmailCallback", "Creating OTP", JSON.stringify(info));
             createOTP(info, otpCreatedCallback);
+        } else {
+            logger.debug("LoginMain", "sendEmailCallback", "Send error", JSON.stringify(data.payload));
         }
     }
 
     const handleRetryLogin = () => {
+        logger.debug("LoginMain", "handleRetryLogin", "Close Dialog and Redirect to LoginMain");
         setDialogState(false);
         setValue("email", "");
         setRefocus((old: boolean) => !old);
@@ -92,6 +106,7 @@ const LoginMain = () => {
     }
 
     const generateOtpAndSendByEmail = (data: OtpType) => {
+        logger.debug("LoginMain", "generate OTP and ...");
         const OTP: string = generateOTP();
 
         const email: EmailType = {
@@ -100,31 +115,49 @@ const LoginMain = () => {
             attemps: 0
         }
 
-        console.log("SEND EMAIL");
+        logger.debug("LoginMain", "... send email", JSON.stringify(email));
         handleSendEmail(email, sendEmailCallback);
     }
 
-    const handleOTP = (name: string, data: OtpType) => {
-        generateOtpAndSendByEmail(data);
+    const closeDialogAndRedirect = (url: string) => {
+        logger.debug("LoginMain", "Close Dialog and redirect to URL", url);
 
-        // setDialogState(false);
-        // push("/login/OTP?email="+data.email);
+        setDialogState(false);
+        push(url);
+    }
+
+    const handleOTP = (name: string, data: OtpType) => {
+        logger.debug("LoginMain", "handleOTP");
+        generateOtpAndSendByEmail(data);
     }
 
     const handleCancelLogin = (name: string) => {
-        console.log("HandleButton", name);
+        logger.debug("LoginMain", "handleCancelLogin");
     
-        setDialogState(false);
-        push("/dashboard");
+        closeDialogAndRedirect("/dashboard");
     }
     
-    const userByEmailLoadedCallback = (data: UserType[]) => {
-        console.log("Loaded data = ", JSON.stringify(data));
-        const user: UserType = data[0];
-        console.log("Loaded user = ", JSON.stringify(user));
+    const handleUserBlocked = () => {
+        logger.debug("LoginMain", "handleUserBlocked", "User is blocked => Show notification");
+        dialogTitleRef.current = "User blocked";
+        dialogMessageRef.current = "Your account is blocked. Please contact the admin?"
+        dialogButtonsRef.current = {leftButton: "Cancel"};
+    }
 
-        if (user.id) {
+    const userByEmailLoadedCallback = (_data: any, _email: string) => {
+        logger.debug("LoginMain", "userByEmailLoadedCallback", JSON.stringify(_data), _email);
+
+        if (_data.status === 200) {
+            const user: UserType = _data.payload;
+
+            if (user.blocked) {
+                handleUserBlocked();
+            }
+
+            logger.debug("LoginMain", "userByEmailLoadedCallback", JSON.stringify(user));
+
             if (user.passwordless) {
+                logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
                 const otpData: OtpType = {
                     email: user.email,
                     attemps: 0,
@@ -132,32 +165,33 @@ const LoginMain = () => {
                     otp: ""
                 }
 
+                logger.debug("LoginMain", "userByEmailLoadedCallback", "GenerateOtp and Send email", JSON.stringify(otpData));
                 generateOtpAndSendByEmail(otpData);
-
-                push("/login/OTP?userId="+user.id);
             } else {
+                logger.debug("LoginMain", "userByEmailLoadedCallback", "WITH PASSWORD => Redirect to LoginPassword", user.id);
                 push("/login/password?userId="+user.id);
             }
-        } else {
-            dialogTitleRef.current = "User not found";
-            dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
-            dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
-
-            const data: OtpType = {
-                attemps: 0,
-                email: user.email,
-                otp: ""                 
-            }
-
-            dialogDataRef.current = data;
-
-            setDialogState(true);
         }
+          
+        logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");
+        dialogTitleRef.current = "User not found";
+        dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
+        dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
+    
+        const otpData: OtpType = {
+            attemps: 0,
+            email: _email,
+            otp: ""                 
+        }
+    
+        dialogDataRef.current = otpData;
+    
+        setDialogState(true);
     }
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: FormSchemaType) => {
+        logger.debug("LoginMain", "SUBMITTING");
         handleLoadUserByEmail(data.email, userByEmailLoadedCallback)
-        console.log("onSubmit Login Form");
     }
 
     return (

@@ -3,6 +3,7 @@ import { EmailSendType, EmailType } from '@/types/ecafe';
 import { NextRequest, NextResponse } from 'next/server';
 import { ErrorResponse, Resend } from 'resend';
 import * as nodemailer from 'nodemailer';
+import { createApiReponse } from '@/lib/utils';
 
 // import nodemailer from 'nodemailer';
 
@@ -34,15 +35,13 @@ export async function POST(req: NextRequest) {
         console.log("email sent");
 
         const sendInfo: EmailSendType = {
-            status: 200,
             otp: _data.OTPcode,
             email: _data.destination,
-            userId: _data.userId??0,
         }
 
-    return NextResponse.json(sendInfo)
+    return NextResponse.json(createApiReponse(200, sendInfo));
       } catch (err) {
         console.log("email error", err);
-        return NextResponse.json({ status: 500 })
+        return NextResponse.json(createApiReponse(500, err))
       }
     }

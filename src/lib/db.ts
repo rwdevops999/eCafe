@@ -248,26 +248,24 @@ const loadUserByEmail = async (email: string, _callback: CallbackFunctionSubject
   await fetch("http://localhost:3000/api/iam/users?email="+email)
     .then((response) => response.json())
     .then((response) => {
-      console.log("REPONSE", JSON.stringify(response));
-      let user: UserType[] = response;
-      if (! user) {
-        user = [];
-        user.push({
-          name: "",
-          firstname: "",
-          phone: "",
-          password: "",
-          email: email,
-        })
-        console.log("REPONSE: CREATED USER", JSON.stringify(user));
-      }
-
-      _callback(user);
+      _callback(response, email);
     });
 }
 
 export const handleLoadUserByEmail = async (email: string, _callback: CallbackFunctionSubjectLoaded) => {
   await loadUserByEmail(email, _callback);
+}
+
+const loadUserById = async (_id: number, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/iam/users?id="+_id)
+    .then((response) => response.json())
+    .then((response) => {
+      _callback(response);
+    });
+}
+
+export const handleLoadUserById = async (_id: number, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadUserById(_id, _callback);
 }
 
 const deleteUser = async (_id: number, _callback: CallbackFunctionDefault) => {
@@ -311,11 +309,11 @@ export const handleUpdateUser = async (_user: ExtendedUserType, _callback: Callb
 }
 
 // OTP
-export const createOTP = async (info: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
+export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
   await fetch('http://localhost:3000/api/otp',
     {
       method: 'POST',
-      body: JSON.stringify(info),
+      body: JSON.stringify(_otp),
       headers: {
         'content-type': 'application/json'
       }
@@ -324,7 +322,7 @@ export const createOTP = async (info: OtpType, _callback: CallbackFunctionSubjec
     .then(response => _callback(response));
 }
 
-const loadOTP = async (_otpId: number, _callback: CallbackFunctionSubjectLoaded) => {
+const loadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded) => {
   await fetch("http://localhost:3000/api/otp?otpId=" + _otpId)
     .then((response) => response.json())
     .then((response) => {
@@ -332,8 +330,23 @@ const loadOTP = async (_otpId: number, _callback: CallbackFunctionSubjectLoaded)
     });
 }
 
-export const handleLoadOTP = async (_otpId: number, _callback: CallbackFunctionSubjectLoaded) => {
-await loadOTP(_otpId, _callback);
+export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadOTP(_otpId, _callback);
+}
+
+const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/otp',
+    {
+      method: 'PUT',
+      body: JSON.stringify(_otp),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => _callback());
+}
+
+export const handleUpdateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
+  await updateOtp(_otp, _callback);
 }
 
 // TASKS

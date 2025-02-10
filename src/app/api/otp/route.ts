@@ -51,11 +51,27 @@ export async function GET(request: NextRequest) {
   if (otpId) {
     const otp = await findOtpById(parseInt(otpId));
 
-    return Response.json(createApiReponse(200, otp));
+    if (otp) {
+      return Response.json(createApiReponse(200, otp));
+    }
   }
 
   return new Response(JSON.stringify(createApiReponse(404, "otp not found")), {
     headers: { "content-type": "application/json" },
-    status: 404,
  });
+}
+
+export async function PUT(req: NextRequest) {
+  const data: OtpType = await req.json();
+
+  const  updatedOtp = await prisma.oTP.update({
+    where: {
+      id: data.id
+    },
+    data: {
+      attemps: data.attemps
+    }
+  });
+
+  return Response.json(createApiReponse(200, updatedOtp));
 }

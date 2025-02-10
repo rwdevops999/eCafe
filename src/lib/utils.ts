@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 import * as  fs from 'fs';
 import * as path from 'path';
-import { Country, Data } from "@/types/ecafe";
+import { ApiResponseType, Country, Data } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
 
 
@@ -164,6 +164,6 @@ export const generateOTP = (): string => {
 
 export const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
-export const createApiReponse = (_status: number, _payload: any) => {
+export const createApiReponse = (_status: number, _payload: any): ApiResponseType => {
   return {status: _status, payload: _payload};
 }

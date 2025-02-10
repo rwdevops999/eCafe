@@ -125,6 +125,7 @@ model User {
   passwordless Boolean
   attemps Int @default(0)
   createDate DateTime? @default(now())
+  blocked Boolean @default(false)
   address Address?
   roles Role[]
   policies Policy[]

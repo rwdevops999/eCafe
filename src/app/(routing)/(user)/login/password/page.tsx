@@ -7,10 +7,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
+import { handleLoadUserById, handleUpdateUser } from "@/lib/db";
+import { ConsoleLogger } from "@/lib/console.logger";
+import { ExtendedUserType, NotificationButtonsType, UserType } from "@/types/ecafe";
+import { useUser } from "@/hooks/use-user";
+import { MaxLoginAttemps } from "@/data/constants";
+import NotificationDialog from "@/components/ecafe/notification-dialog";
+
+const logger = new ConsoleLogger({ level: 'debug' });
 
 const LoginPassword = () => {
+  const searchParams = useSearchParams();
+  const {setUser} = useUser();
+  const {push} = useRouter();
+
+  const userId = searchParams.get("userId");
+
+  if (userId) {
+    console.log("OTP for email", userId);
+  }
+
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const setDialogState = (state: boolean): void => {
+      setOpenDialog(state);
+  }
+
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -22,14 +46,100 @@ const LoginPassword = () => {
     }
   });
 
-  const {handleSubmit, setValue, register, formState: {errors}} = formMethods;
+  const {handleSubmit, getValues, register, formState: {errors}} = formMethods;
   const [viewPassword, setViewPassword] = useState<boolean>(false);
   const handleSwitchPassword = () => {
     setViewPassword(!viewPassword);
   }
 
+  const dialogTitleRef = useRef<string>("");
+  const dialogMessageRef = useRef<string>("");
+  const dialogButtonsRef = useRef<NotificationButtonsType>({leftButton: "No", rightButton: "Yes"});
+  const dialogDataRef = useRef<any>(undefined);
+  
+  const handleAttempsExceeded = () => {
+    logger.debug("LoginPassword", "Password login attemps exceed", "Show notification");
+    dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
+    dialogMessageRef.current = "Too many retries. User blocked. Contact your administrator.";
+    dialogButtonsRef.current = {leftButton: "Cancel"};
+
+    setDialogState(true);
+  }
+
+  const handleInvalidPassword = (attemps: number) => {
+    logger.debug("LoginPassword", "Password invalid", "Show notification");
+    dialogTitleRef.current = `Invalid password (attemp ${attemps}/${MaxLoginAttemps})`;
+    dialogMessageRef.current = "Password incorrect. Retry Login again?";
+    dialogButtonsRef.current = {leftButton: "Cancel", rightButton: "Retry"};
+  
+    setDialogState(true);
+  }
+  
+  const userLoadedCallback = (data: any) => {
+    if (data.status === 200) {
+      const user: UserType = data.payload;
+
+      logger.debug("LoadPassword", "User found", JSON.stringify(user));
+
+      if (user.password === getValues("password")) {
+        setUser(user);
+        push("/dashboard")
+      } else {
+        user.attemps++;
+        if (user.attemps > MaxLoginAttemps) {
+          handleAttempsExceeded();          
+
+          const _user: ExtendedUserType = {
+            name: user.name,
+            firstname: user.firstname,
+            email: user.email,
+            password: user.password,
+            phone: user.phone,
+            attemps: user.attemps,
+            blocked: user.blocked
+          }
+          handleUpdateUser(_user, ()=>{});
+        } else {
+          const _user: ExtendedUserType = {
+            name: user.name,
+            firstname: user.firstname,
+            email: user.email,
+            password: user.password,
+            phone: user.phone,
+            attemps: user.attemps,
+          }
+
+          handleUpdateUser(_user, ()=>{});
+          handleInvalidPassword(otp.attemps);
+        }
+      }
+
+    } else {
+      logger.debug("LoadPassword", "User not found", "Status code 404");
+    }
+  }
+
+  const cancelDialogAndRedirect = (url: string) => {
+    logger.debug("LoginPassword", "Close dialog and redirect", url);
+    setDialogState(false);
+    push(url);
+  }
+  
+  const handleCancelLogin = () => {
+    logger.debug("LoginPassword", "handleCancelLogin");
+    cancelDialogAndRedirect("/dashboard");
+  }
+
+  const handleRetryLogin = () => {
+    logger.debug("LoginPassword", "handleRetryLogin");
+    cancelDialogAndRedirect("/login/password");
+  }
+
   const onSubmit = (data: any) => {
       console.log("onSubmit Login Form");
+      if (userId) {
+        handleLoadUserById(parseInt(userId), userLoadedCallback);
+      }
   }
 
   return (
@@ -67,14 +177,14 @@ const LoginPassword = () => {
                 </CardContent>
             </Card>
         </div>
-        {/* <NotificationDialog  
+        <NotificationDialog  
             _open={openDialog}
             _title={dialogTitleRef.current}
             _message={dialogMessageRef.current}
             _buttonnames={dialogButtonsRef.current}
             _handleButtonLeft={handleCancelLogin}
             _handleButtonRight={handleRetryLogin}
-        /> */}
+        />
     </div>
 )
 }
