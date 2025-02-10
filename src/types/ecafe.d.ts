@@ -205,3 +205,9 @@ type EmailType = {
   userId: number,
   OTPcode: string
 }
+
+type NotificationButtonsType = {
+  leftButton?: string,
+  centerButton?: string,
+  rightButton?: string
+}

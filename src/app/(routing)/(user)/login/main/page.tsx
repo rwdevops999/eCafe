@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { generateOTP } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
-
+ 
 const LoginMain = () => {
     const {push} = useRouter();
 
@@ -77,6 +77,10 @@ const LoginMain = () => {
         setValue("email", "");
         setRefocus((old: boolean) => !old);
         push("/login/main");
+        // router.push({
+        //     pathname: '/post/[pid]',
+        //     query: { pid: post.id },
+        //   })
     }
 
     const handleCancelLogin = (name: string) => {
@@ -102,9 +106,9 @@ const LoginMain = () => {
 
                 handleSendEmail(email, sendEmailCallback);
 
-                push("/login/OTP");
+                push("/login/OTP?userId="+user.id);
             } else {
-                push("/login/password");
+                push("/login/password?userId="+user.id);
             }
         } else {
             dialogTitleRef.current = "User not found";

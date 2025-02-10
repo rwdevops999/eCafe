@@ -2,6 +2,7 @@
 
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { Button } from "@/components/ui/button";
+import { NotificationButtonsType } from "@/types/ecafe";
 import { useState } from "react";
 
 const Test = () => {
@@ -17,20 +18,24 @@ const Test = () => {
 
   const dialogTitle: string = "Are you sure?";
   const dialogMessage: string = "You will be blocked";
-  const buttons: {leftButton: string, rightButton: string} = {leftButton: "OK", rightButton: "Cancel"};
+  const buttons: NotificationButtonsType = {leftButton: "Left", centerButton: "Center", rightButton: "Right"};
 
   const handleButton = (name: string) => {
     console.log("HandleButton", name);
 
     if (name === buttons.leftButton) {
-      console.log("Handle OK");
+      console.log("Handle Left");
+    }
+
+    if (name === buttons.centerButton) {
+      console.log("Handle Center");
     }
 
     if (name === buttons.rightButton) {
-      console.log("Handle Cancel");
+      console.log("Handle Right");
     }
 
-    setDialogState(false);
+    // setDialogState(false);
   }
 
   const renderComponent = () => {
@@ -40,10 +45,12 @@ const Test = () => {
         <NotificationDialog 
           _open={open} 
           _handleButtonLeft={handleButton} 
+          _handleButtonCenter={handleButton}
           _handleButtonRight={handleButton}
           _title={dialogTitle}
           _message={dialogMessage}
           _buttonnames={buttons}
+          // className="flex justify-center"
         />
       </>
     );

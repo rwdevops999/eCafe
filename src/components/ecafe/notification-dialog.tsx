@@ -4,6 +4,8 @@ import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogHeader }
 import { AlertDialogAction, AlertDialogCancel, AlertDialogDescription, AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { useEffect, useState } from "react";
 import { Separator } from "../ui/separator";
+import { NotificationButtonsType } from "@/types/ecafe";
+import { cn } from "@/lib/utils";
 
 const NotificationDialog = (
     {
@@ -11,8 +13,10 @@ const NotificationDialog = (
         _title,
         _message,
         _handleButtonLeft, 
+        _handleButtonCenter,
         _handleButtonRight,
-        _buttonnames = {leftButton: "No", rightButton: "Yes"}
+        _buttonnames = {leftButton: "No", rightButton: "Yes"},
+        className
     }
     :
     {
@@ -20,20 +24,26 @@ const NotificationDialog = (
         _title: string,
         _message: string,
         _handleButtonLeft?(name: string): void; 
+        _handleButtonCenter?(name: string): void;
         _handleButtonRight?(name: string): void;
-        _buttonnames?: {leftButton: string, rightButton: string}
+        _buttonnames?: NotificationButtonsType,
+        className?: string
         }) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     const handleButtonLeft = () => {
-        _handleButtonLeft ? _handleButtonLeft(_buttonnames.leftButton) : null;
+        _handleButtonLeft ? _handleButtonLeft(_buttonnames.leftButton??"LEFT (undefined)") : null;
     }
 
     const handleButtonRight = () => {
-        _handleButtonRight ? _handleButtonRight(_buttonnames.rightButton) : null;
+        _handleButtonRight ? _handleButtonRight(_buttonnames.rightButton??"RIGHT (undefined)") : null;
     }
 
-  return (
+    const handleButtonCenter = () => {
+      _handleButtonCenter ? _handleButtonCenter(_buttonnames.centerButton??"CENTER (undefined)") : null;
+  }
+
+return (
     <AlertDialog open={_open}>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -43,11 +53,15 @@ const NotificationDialog = (
             {_message}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleButtonLeft}>{_buttonnames.leftButton}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleButtonRight}>{_buttonnames.rightButton}</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+        <div className={cn("space-x-2", className)}>
+          <AlertDialogFooter>
+            {/* <div className={cn("flex justify-center space-x-2", className)}> */}
+              {_buttonnames.leftButton && <AlertDialogCancel onClick={handleButtonLeft}>{_buttonnames.leftButton}</AlertDialogCancel>}
+              {_buttonnames.centerButton && <AlertDialogCancel onClick={handleButtonCenter}>{_buttonnames.centerButton}</AlertDialogCancel>}
+              {_buttonnames.rightButton && <AlertDialogCancel onClick={handleButtonRight}>{_buttonnames.rightButton}</AlertDialogCancel>}
+          </AlertDialogFooter>
+        </div>
+        </AlertDialogContent>
     </AlertDialog>
   )
 }

@@ -3,10 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const LoginOTP = () => {
   const [value, setValue] = useState("")
+  const searchParams = useSearchParams();
+
+  const userId = searchParams.get("userId");
   
   return (
       <div className="w-[100%] h-[100%]">

@@ -59,7 +59,7 @@ const LoginPassword = () => {
                                 }
                               </div>
                               {errors.password && errors.password.type === "too_small" && <span className="text-red-500" role="alert">Enter at least 8 characters</span>}
-                              {errors.password && errors.password.type === "too_big" && <span className="text-red-500" role="alert">Enter at most 12 characters</span>}
+                              {errors.password && errors.password.type === "too_big" && <span className="text-red-500" role="alert">Enter not more than 12 characters</span>}
                               <Button className="w-[100%] font-bold bg-login-button text-stone-700 m-20px rounded-2xl border-0 transition-all" type="submit">Continue</Button>
                             </div>
                         </form>
