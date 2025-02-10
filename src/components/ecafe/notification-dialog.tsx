@@ -24,9 +24,9 @@ const NotificationDialog = (
         _open: boolean; 
         _title: string,
         _message: string,
-        _handleButtonLeft?(name: string, data?: any): void; 
-        _handleButtonCenter?(name: string, data?: any): void;
-        _handleButtonRight?(name: string, data?: any): void;
+        _handleButtonLeft?(name?: string, data?: any): void; 
+        _handleButtonCenter?(name?: string, data?: any): void;
+        _handleButtonRight?(name?: string, data?: any): void;
         _buttonnames?: NotificationButtonsType,
         className?: string,
         _data?: any

@@ -324,6 +324,18 @@ export const createOTP = async (info: OtpType, _callback: CallbackFunctionSubjec
     .then(response => _callback(response));
 }
 
+const loadOTP = async (_otpId: number, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/otp?otpId=" + _otpId)
+    .then((response) => response.json())
+    .then((response) => {
+      _callback(response);
+    });
+}
+
+export const handleLoadOTP = async (_otpId: number, _callback: CallbackFunctionSubjectLoaded) => {
+await loadOTP(_otpId, _callback);
+}
+
 // TASKS
 export const createTask = async (task: TaskType, _callback: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/task',
@@ -337,3 +349,4 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionDefa
     .then(response => response.json())
     .then(response => _callback());
 }
+

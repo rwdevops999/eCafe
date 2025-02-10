@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { createApiReponse } from "@/lib/utils";
 import { EmailType, OtpType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -30,4 +31,31 @@ export async function POST(request: NextRequest) {
       headers: { "content-type": "application/json" },
       status: 200,
     });
+}
+
+const findOtpById = async (_id: number) => {
+  const otp = await prisma.oTP.findFirst({
+      where: { 
+        id: _id
+      },
+  });
+
+  return otp;
+}
+
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const otpId = searchParams.get('otpId');
+
+  if (otpId) {
+    const otp = await findOtpById(parseInt(otpId));
+
+    return Response.json(createApiReponse(200, otp));
+  }
+
+  return new Response(JSON.stringify(createApiReponse(404, "otp not found")), {
+    headers: { "content-type": "application/json" },
+    status: 404,
+ });
 }

@@ -65,6 +65,9 @@ const LoginMain = () => {
         }
 
         createTask(task, ()=>{});
+
+        setDialogState(false);
+        push("/login/OTP?otpId="+data.id);
     }
 
     const sendEmailCallback = (data: any) => {
@@ -97,29 +100,15 @@ const LoginMain = () => {
             attemps: 0
         }
 
-        // THIS IS BECAUSE 'resend.com' on allows to send to your own email address
-        // if (data.email === process.env.TEST_EMAIL) {
         console.log("SEND EMAIL");
         handleSendEmail(email, sendEmailCallback);
-        // } else {
-        //     const emailSendData: EmailSendType = {
-        //         body: {},
-        //         email: data.email,
-        //         otp: OTP,
-        //         userId: 0
-        //     }
-
-        //     console.log("USE OTP CODE", OTP);
-
-        //     sendEmailCallback(emailSendData);
-        // }
     }
 
     const handleOTP = (name: string, data: OtpType) => {
         generateOtpAndSendByEmail(data);
 
-        setDialogState(false);
-        push("/login/OTP?email="+data.email);
+        // setDialogState(false);
+        // push("/login/OTP?email="+data.email);
     }
 
     const handleCancelLogin = (name: string) => {
