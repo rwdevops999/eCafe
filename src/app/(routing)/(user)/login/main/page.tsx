@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { handleLoadUserByEmail, updateUserOTPByEmail } from "@/lib/db";
-import { EmailType, UserType } from "@/types/ecafe";
+import { createOTP, createTask, handleLoadUserByEmail, updateUserOTPByEmail } from "@/lib/db";
+import { EmailSendType, EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
 import { generateOTP } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
@@ -25,7 +25,8 @@ const LoginMain = () => {
 
     const dialogTitleRef = useRef<string>("");
     const dialogMessageRef = useRef<string>("");
-    const dialogButtonsRef = useRef<{leftButton: string, rightButton: string}>({leftButton: "No", rightButton: "Yes"});
+    const dialogButtonsRef = useRef<NotificationButtonsType>({leftButton: "No", rightButton: "Yes"});
+    const dialogDataRef = useRef<any>(undefined);
 
     const formMethods = useForm<FormSchemaType>({
         resolver: zodResolver(FormSchema),
@@ -55,20 +56,28 @@ const LoginMain = () => {
         focusToEmailInfo();
     }, [refocus]);
 
-    const userUpdatedCallback = (data: any) => {
-        console.log("USER UPDATED", data);
+    const otpCreatedCallback = (data: any) => {
+        const task: TaskType = {
+            name: "Remove",
+            description: "Remove from OTP",
+            subject: "OTP",
+            subjectId: data.id
+        }
+
+        createTask(task, ()=>{});
     }
 
     const sendEmailCallback = (data: any) => {
         console.log("EMAIL DATA", JSON.stringify(data));
-        if (!data.error) {
-            const info: EmailType = {
+        if (data.status === 200) {
+            const info: OtpType = {
                 userId: data.userId,
-                OTPcode: data.otp,
-                destination: data.email                
+                otp: data.otp,
+                email: data.email,
+                attemps: 0,
             }
 
-            updateUserOTPByEmail(info, userUpdatedCallback);
+            createOTP(info, otpCreatedCallback);
         }
     }
 
@@ -77,10 +86,40 @@ const LoginMain = () => {
         setValue("email", "");
         setRefocus((old: boolean) => !old);
         push("/login/main");
-        // router.push({
-        //     pathname: '/post/[pid]',
-        //     query: { pid: post.id },
-        //   })
+    }
+
+    const generateOtpAndSendByEmail = (data: OtpType) => {
+        const OTP: string = generateOTP();
+
+        const email: EmailType = {
+            destination: data.email,
+            OTPcode: OTP,
+            attemps: 0
+        }
+
+        // THIS IS BECAUSE 'resend.com' on allows to send to your own email address
+        // if (data.email === process.env.TEST_EMAIL) {
+        console.log("SEND EMAIL");
+        handleSendEmail(email, sendEmailCallback);
+        // } else {
+        //     const emailSendData: EmailSendType = {
+        //         body: {},
+        //         email: data.email,
+        //         otp: OTP,
+        //         userId: 0
+        //     }
+
+        //     console.log("USE OTP CODE", OTP);
+
+        //     sendEmailCallback(emailSendData);
+        // }
+    }
+
+    const handleOTP = (name: string, data: OtpType) => {
+        generateOtpAndSendByEmail(data);
+
+        setDialogState(false);
+        push("/login/OTP?email="+data.email);
     }
 
     const handleCancelLogin = (name: string) => {
@@ -91,20 +130,20 @@ const LoginMain = () => {
     }
     
     const userByEmailLoadedCallback = (data: UserType[]) => {
-        console.log("Loaded user = ", data);
+        console.log("Loaded data = ", JSON.stringify(data));
+        const user: UserType = data[0];
+        console.log("Loaded user = ", JSON.stringify(user));
 
-        if (data) {
-            const user: UserType = data[0];
+        if (user.id) {
             if (user.passwordless) {
-                const OTP: string = generateOTP();
-
-                const email: EmailType = {
-                    destination: user.email,
-                    userId: user.id!,
-                    OTPcode: OTP,
+                const otpData: OtpType = {
+                    email: user.email,
+                    attemps: 0,
+                    userId: user.id,
+                    otp: ""
                 }
 
-                handleSendEmail(email, sendEmailCallback);
+                generateOtpAndSendByEmail(otpData);
 
                 push("/login/OTP?userId="+user.id);
             } else {
@@ -112,7 +151,17 @@ const LoginMain = () => {
             }
         } else {
             dialogTitleRef.current = "User not found";
-            dialogMessageRef.current = "No user found with this email. Do you want to retry?"
+            dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
+            dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
+
+            const data: OtpType = {
+                attemps: 0,
+                email: user.email,
+                otp: ""                 
+            }
+
+            dialogDataRef.current = data;
+
             setDialogState(true);
         }
     }
@@ -159,7 +208,9 @@ const LoginMain = () => {
                 _message={dialogMessageRef.current}
                 _buttonnames={dialogButtonsRef.current}
                 _handleButtonLeft={handleCancelLogin}
-                _handleButtonRight={handleRetryLogin}
+                _handleButtonCenter={handleRetryLogin}
+                _handleButtonRight={handleOTP}
+                _data={dialogDataRef.current}
             />
         </div>
     )

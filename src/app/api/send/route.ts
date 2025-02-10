@@ -1,47 +1,48 @@
 import { EmailTemplate } from '@/app/(routing)/(user)/login/main/data/email-template';
-import { EmailType } from '@/types/ecafe';
-import { NextRequest } from 'next/server';
+import { EmailSendType, EmailType } from '@/types/ecafe';
+import { NextRequest, NextResponse } from 'next/server';
 import { ErrorResponse, Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
+
+// import nodemailer from 'nodemailer';
 
 const resend = new Resend("re_SeGteF2V_Kb5S4zixiMJFUrFFeAa2dvXd");
-
-type EmailSendType = {
-    body: any,
-    otp: string,
-    email: string,
-    userId: number
-}
 
 export async function POST(req: NextRequest) {
     const _data: EmailType = await req.json();
 
     console.log("SENDING EMAIL");
 
-    try {
-        const { data, error } = await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: _data.destination,
-        subject: 'eCAFé OTP Code',
-        react: EmailTemplate({ otpcode: _data.OTPcode }),
-        });
-
-
-        if (error) {
-            console.log("SENDING EMAIL => ERROR", error);
-            return Response.json({ error }, { status: 500 });
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.GMAIL_FROM,
+          pass: process.env.GMAIL_APP_PASSWORD
         }
-
-        console.log("SENDING EMAIL => SUCCESS");
+      })
+      console.log("sending email to", _data.destination);
+      try {
+        await transporter.sendMail({
+          from: process.env.GMAIL_FROM, // sender address
+          to: _data.destination, // list of receivers
+          subject: 'eCAFé OTP Code', // Subject line
+          text: `Welcome, the login code for eCafé is ${_data.OTPcode}`, // plain text body
+          html: `<b>Welcome, the login code for eCafé is ${_data.OTPcode}</b>` // html body
+        })
+        console.log("email sent");
 
         const sendInfo: EmailSendType = {
-            body: data,
+            status: 200,
             otp: _data.OTPcode,
             email: _data.destination,
-            userId: _data.userId,
+            userId: _data.userId??0,
         }
 
-        return Response.json(sendInfo);
-    } catch (error) {
-        return Response.json({ error }, { status: 500 });
+    return NextResponse.json(sendInfo)
+      } catch (err) {
+        console.log("email error", err);
+        return NextResponse.json({ status: 500 })
+      }
     }
-}

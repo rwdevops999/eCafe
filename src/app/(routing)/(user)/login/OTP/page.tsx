@@ -10,8 +10,12 @@ const LoginOTP = () => {
   const [value, setValue] = useState("")
   const searchParams = useSearchParams();
 
-  const userId = searchParams.get("userId");
-  
+  const email = searchParams.get("email");
+
+  if (email) {
+    console.log("OTP for email", email);
+  }
+
   return (
       <div className="w-[100%] h-[100%]">
           <div className="flex items-center justify-center">

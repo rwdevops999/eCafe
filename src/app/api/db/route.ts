@@ -122,25 +122,3 @@ export async function GET(request: NextRequest) {
       status: 204,
    });
 }
-
-export async function PUT(request: NextRequest) {
-  const _data: any = await request.json();
-
-  if (_data) {
-    console.log("DB => UPDATE USER OTP CODE", _data.email, _data.OTPcode);
-  }
-
-  await prisma.user.update({
-    where: {
-      id: _data.userId,
-    },
-    data: {
-      OTP: _data.OTPcode
-    }
-  })  
-
-  return new Response(JSON.stringify("user updated"), {
-    headers: { "content-type": "application/json" },
-    status: 200,
- });
-}

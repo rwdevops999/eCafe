@@ -16,31 +16,33 @@ const NotificationDialog = (
         _handleButtonCenter,
         _handleButtonRight,
         _buttonnames = {leftButton: "No", rightButton: "Yes"},
-        className
+        className,
+        _data
     }
     :
     {
         _open: boolean; 
         _title: string,
         _message: string,
-        _handleButtonLeft?(name: string): void; 
-        _handleButtonCenter?(name: string): void;
-        _handleButtonRight?(name: string): void;
+        _handleButtonLeft?(name: string, data?: any): void; 
+        _handleButtonCenter?(name: string, data?: any): void;
+        _handleButtonRight?(name: string, data?: any): void;
         _buttonnames?: NotificationButtonsType,
-        className?: string
+        className?: string,
+        _data?: any
         }) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     const handleButtonLeft = () => {
-        _handleButtonLeft ? _handleButtonLeft(_buttonnames.leftButton??"LEFT (undefined)") : null;
+        _handleButtonLeft ? _handleButtonLeft(_buttonnames.leftButton??"LEFT (undefined)", _data) : null;
     }
 
     const handleButtonRight = () => {
-        _handleButtonRight ? _handleButtonRight(_buttonnames.rightButton??"RIGHT (undefined)") : null;
+        _handleButtonRight ? _handleButtonRight(_buttonnames.rightButton??"RIGHT (undefined)", _data) : null;
     }
 
     const handleButtonCenter = () => {
-      _handleButtonCenter ? _handleButtonCenter(_buttonnames.centerButton??"CENTER (undefined)") : null;
+      _handleButtonCenter ? _handleButtonCenter(_buttonnames.centerButton??"CENTER (undefined)", _data) : null;
   }
 
 return (
@@ -82,20 +84,24 @@ export default NotificationDialog;
 
   const dialogTitle: string = "Are you sure?";
   const dialogMessage: string = "You will be blocked";
-  const buttons: {leftButton: string, rightButton: string} = {leftButton: "OK", rightButton: "Cancel"};
+  const buttons: NotificationButtonsType = {leftButton: "Left", centerButton: "Center", rightButton: "Right"};
 
   const handleButton = (name: string) => {
     console.log("HandleButton", name);
 
     if (name === buttons.leftButton) {
-      console.log("Handle OK");
+      console.log("Handle Left");
+    }
+
+    if (name === buttons.centerButton) {
+      console.log("Handle Center");
     }
 
     if (name === buttons.rightButton) {
-      console.log("Handle Cancel");
+      console.log("Handle Right");
     }
 
-    setDialogState(false);
+    // setDialogState(false);
   }
 
   const renderComponent = () => {
@@ -105,10 +111,12 @@ export default NotificationDialog;
         <NotificationDialog 
           _open={open} 
           _handleButtonLeft={handleButton} 
+          _handleButtonCenter={handleButton}
           _handleButtonRight={handleButton}
           _title={dialogTitle}
           _message={dialogMessage}
           _buttonnames={buttons}
+          // className="flex justify-center"
         />
       </>
     );

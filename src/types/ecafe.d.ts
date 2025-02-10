@@ -202,8 +202,9 @@ type LanguageType = z.infer<typeof languageScheme>
 
 type EmailType = {
   destination: string,
-  userId: number,
-  OTPcode: string
+  userId?: number,
+  OTPcode: string,
+  attemps: number,
 }
 
 type NotificationButtonsType = {
@@ -211,3 +212,27 @@ type NotificationButtonsType = {
   centerButton?: string,
   rightButton?: string
 }
+
+type EmailSendType = {
+  status: number,
+  otp: string,
+  email: string,
+  userId: number
+}
+
+type OtpType = {
+  id?: number,
+  email: string,
+  otp: string,
+  attemps: number,
+  userId?: number,
+}
+
+type TaskType = {
+  id?: number,
+  name: string,
+  description: string
+  subject: string,
+  subjectId?: number
+}
+

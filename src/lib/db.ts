@@ -1,4 +1,4 @@
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, LanguageType, PolicyType, RoleType, StatementType } from "@/types/ecafe";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
 
 /**
  * DB
@@ -12,20 +12,6 @@ export const initDB = async (table: string) => {
     }
   })        
 }
-
-export const updateUserOTPByEmail = async (info: any, _callback: CallbackFunctionSubjectLoaded) => {
-  await fetch('http://localhost:3000/api/db',
-    {
-      method: 'PUT',
-      body: JSON.stringify(info),
-      headers: {
-        'content-type': 'application/json'
-      }
-    })
-    .then(response => response.json())
-    .then(response => _callback(response));
-}
-
 
  /**
  * LANGUAGES
@@ -262,7 +248,21 @@ const loadUserByEmail = async (email: string, _callback: CallbackFunctionSubject
   await fetch("http://localhost:3000/api/iam/users?email="+email)
     .then((response) => response.json())
     .then((response) => {
-      _callback(response);
+      console.log("REPONSE", JSON.stringify(response));
+      let user: UserType[] = response;
+      if (! user) {
+        user = [];
+        user.push({
+          name: "",
+          firstname: "",
+          phone: "",
+          password: "",
+          email: email,
+        })
+        console.log("REPONSE: CREATED USER", JSON.stringify(user));
+      }
+
+      _callback(user);
     });
 }
 
@@ -308,4 +308,32 @@ const updateUser = async (_user: ExtendedUserType, _callback: CallbackFunctionDe
 
 export const handleUpdateUser = async (_user: ExtendedUserType, _callback: CallbackFunctionDefault) => {
   await updateUser(_user, _callback);
+}
+
+// OTP
+export const createOTP = async (info: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch('http://localhost:3000/api/otp',
+    {
+      method: 'POST',
+      body: JSON.stringify(info),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(response => _callback(response));
+}
+
+// TASKS
+export const createTask = async (task: TaskType, _callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/task',
+    {
+      method: 'POST',
+      body: JSON.stringify(task),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(response => _callback());
 }
