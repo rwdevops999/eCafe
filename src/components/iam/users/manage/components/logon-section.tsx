@@ -6,13 +6,15 @@ import { UseFormReturn } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormSchemaType } from "../data/form-scheme";
 import { Eye, EyeOff } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
   const {register, formState: { errors }, setValue, getValues} = formMethods;
   const [viewPassword, setViewPassword] = useState<boolean>(false);
+
+  const passwordRef = useRef<string>("");
 
   const handleSwitchPassword = () => {
     setViewPassword(!viewPassword);
@@ -29,12 +31,18 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
 
     if (checked) {
       console.log("UNREGISTER");
+
+      passwordRef.current = getValues("password");
+
       setValue("password", "--------");
       // unregister(["password"]);
       setSelectedTrigger("passwordless");
     } else {
       console.log("REGISTER");
-      setValue("password", "");
+      if (passwordRef.current !== "") {
+        setValue("password", passwordRef.current);
+      }
+      
       // register("password");
       setSelectedTrigger("password");
     }
@@ -51,7 +59,7 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
 
   const renderComponent = () => {
 
-    console.log(">>> RENDER: ", selectedTrigger);
+    console.log(">>> LOGON: RRRREEEERRRREEEENNNDDDER", getValues("email"), getValues("password"));
 
     return (
       <Card className="border-stone-500">
@@ -108,10 +116,10 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
                   onCheckedChange={(value) => handlePasswordless(value)}
                 />
               <Label
-                htmlFor="Passwordless Logon"
+                htmlFor="passwordless"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                passwordless
+                Passwordless
               </Label>
               </div>
             </div>

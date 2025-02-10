@@ -106,7 +106,8 @@ const LoginPassword = () => {
               name: "Unblock",
               description: "Unblock User",
               subject: "User",
-              subjectId: user.id
+              subjectId: user.id,
+              status: "open"
           }
           
           logger.debug("LoginPassword", "userLoadedCallback", "Create Task", JSON.stringify(task));
@@ -158,7 +159,7 @@ const LoginPassword = () => {
 
   return (
     <div className="w-[100%] h-[100%]">
-        <div className="flex items-center justify-center">
+        <div className="h-screen flex items-center justify-center">
             <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
                 <CardHeader>
                     <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400 mb-5">Sign In</CardTitle>

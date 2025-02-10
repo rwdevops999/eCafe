@@ -145,8 +145,8 @@ const LoginOTP = () => {
 
   return (
       <div className="w-[100%] h-[100%]">
-          <div className="flex items-center justify-center">
-              <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
+        <div className="h-screen flex items-center justify-center">
+            <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
                   <CardHeader>
                       <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Sign In</CardTitle>
                   </CardHeader>

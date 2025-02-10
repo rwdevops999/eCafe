@@ -258,6 +258,8 @@ export async function DELETE(request: NextRequest) {
 export async function PUT(req: NextRequest) {
   const data: ExtendedUserType = await req.json();
 
+  console.log("[API] UPDATE USER", JSON.stringify(data));
+  
   const  updatedUser = await prisma.user.update({
     where: {
       id: data.id

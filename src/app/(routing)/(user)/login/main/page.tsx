@@ -69,7 +69,8 @@ const LoginMain = () => {
             name: "Remove",
             description: "Remove from OTP",
             subject: "OTP",
-            subjectId: data.id
+            subjectId: data.id,
+            status: "open"
         }
 
         logger.debug("LoginMain", "otpCreatedCallback", "Create Task", JSON.stringify(task));
@@ -196,8 +197,8 @@ const LoginMain = () => {
 
     return (
         <div className="w-[100%] h-[100%]">
-            <div className="flex items-center justify-center">
-                <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
+            <div className="h-screen flex items-center justify-center">
+                <Card className="max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
                     <CardHeader>
                         <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400 mb-5">Sign In</CardTitle>
                         <CardTitle className="flex justify-center text-center font-black text-sm text-black/50">Enter your email</CardTitle>

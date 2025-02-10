@@ -315,7 +315,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       email: data.email,
       password: data.password,
       passwordless: data.passwordless,
-      OTP: "",
+      blocked: data.blocked,
       address: {
         id: (selectedUser ? selectedUser.address?.id! : 0),
         street: data.street,
@@ -445,11 +445,12 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   const validate = async () => {
     logger.debug("UserDialog", "VALIDATE");
     if (formMethods.current) {
-      const {trigger} = formMethods.current;
+      const {trigger, formState: {errors}} = formMethods.current;
 
       await trigger().then((valid: boolean) => {
         logger.debug("UserDialog", "form validatation(valid)", valid);
         if (!valid) {
+          console.log("ERRORS = " + JSON.stringify(errors));
           handleInvalidForm();
         } else {
           handleValidForm();

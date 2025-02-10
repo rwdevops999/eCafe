@@ -145,6 +145,7 @@ model Task {
   id Int @id @default(autoincrement())
   name String
   description String
+  status String @default("open")
   subject String
   subjectId Int?
   createDate DateTime? @default(now())

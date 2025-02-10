@@ -29,6 +29,8 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
   if (storedUserRef.current) {
     logger.debug("TabUsers", "IN(storedUserRef)", "Using Stored Values");
     user = storedUserRef.current;
+  } else {
+    logger.debug("INNNNNNNN PWD = ", user.password);
   }
 
   logger.debug("TabUsers", ">>> IN(user)", user?.passwordless);
@@ -43,6 +45,7 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
      email: "",
      password: "",
      passwordless: false,
+     blocked: false,
      number: "",
      box: "",
      street: "",
@@ -52,20 +55,21 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
      country: ""
     },
     values: {
-      name: user?.name??"",
-      firstname: user?.firstname ?? "",
-      email: user?.email ?? "",
-      password: user?.password ?? "",
-      passwordless: user?.passwordless ?? false,
-      phone: user?.phone ?? "",
-      dialcode: user?.address?.country.dialCode ? `${user.address.country.dialCode}`: `${defaultCountry.dialCode}`,
-      city: user?.address?.city?? "",
-      number: user?.address?.number?? "",
-      box: user?.address?.box ?? "",
-      street: user?.address?.street ?? "",
-      postalcode: user?.address?.postalcode ?? "",
-      county: user?.address?.county?? "",
-      country: user?.address?.country.name?? defaultCountry.name
+      name: user.name??"",
+      firstname: user.firstname ?? "",
+      email: user.email ?? "",
+      password: user.password ?? "",
+      passwordless: user.passwordless ?? false,
+      blocked: user.blocked,
+      phone: user.phone ?? "",
+      dialcode: user.address?.country.dialCode ? `${user.address.country.dialCode}`: `${defaultCountry.dialCode}`,
+      city: user.address?.city?? "",
+      number: user.address?.number?? "",
+      box: user.address?.box ?? "",
+      street: user.address?.street ?? "",
+      postalcode: user.address?.postalcode ?? "",
+      county: user.address?.county?? "",
+      country: user.address?.country.name?? defaultCountry.name
     },
     resetOptions: {
       keepDirtyValues: true,

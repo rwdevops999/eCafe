@@ -236,6 +236,7 @@ type TaskType = {
   description: string
   subject: string,
   subjectId?: number
+  status: string
 }
 
 type ApiResponseType = {

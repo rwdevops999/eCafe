@@ -8,7 +8,9 @@ export const storeUserFormValues = (user: UserType|undefined, values: UseFormGet
         firstname: "",
         email: "",
         password: "",
-        phone: ""
+        phone: "",
+        blocked: false,
+        attemps: 0
     }
 
     storedUser.name = values("name");
@@ -17,6 +19,7 @@ export const storeUserFormValues = (user: UserType|undefined, values: UseFormGet
     storedUser.password = values("password");
     storedUser.passwordless = values("passwordless");
     storedUser.phone = values("phone");
+    storedUser.blocked = values("blocked");
 
     if (! storedUser.address) {
         storedUser.address = {

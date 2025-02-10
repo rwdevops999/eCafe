@@ -8,6 +8,7 @@ export const FormSchema = z.object({
     passwordless: z.boolean().default(false),
     dialcode: z.string(),
     phone: z.string(),
+    blocked: z.boolean(),
     street: z.string(),
     number: z.string(),
     box: z.string(),

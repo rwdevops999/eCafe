@@ -11,6 +11,7 @@ const createTask = async (data: TaskType) => {
         description: data.description,
         subject: data.subject,
         subjectId: data.subjectId??0,
+        status: data.status
       }
     }).then((response) => {
       task = response;
