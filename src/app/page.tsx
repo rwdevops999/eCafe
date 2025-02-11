@@ -16,9 +16,9 @@ export default function Home() {
 
   return (
       <div className="w-[100%] h-[100%]">
-            <div className="h-screen flex items-center justify-center">
-              <img src="/images/ecafe.png" width={750} height={665} />
-            </div>
+          <div className="h-screen flex items-center justify-center">
+            <img className="border border-foreground/50 rounded-lg p-2" src="/images/ecafe.png" width={750} height={665} />
+          </div>
       </div>
   );
 }
