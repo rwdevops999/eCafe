@@ -11,6 +11,8 @@ import ToolsTheme from "./tools-theme";
 import ToolsTime from "./tools-time";
 import ToolsLanguage from "./tools-language";
 import { useUser } from "@/hooks/use-user";
+import { useDebug } from "@/hooks/use-debug";
+import { useEffect } from "react";
 
 const data: SidebarType = {
 };
@@ -306,13 +308,18 @@ data.Tools.push(
 
 const AppSidebar = () => {
     const {user} = useUser();
+    const {setDebug} = useDebug();
 
     data.User = {
         name: 'ecafé',
         email: user ? user.email : '',
         avatar: user ? `https://ui-avatars.com/api/?name=${user.firstname} ${user.name}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
     };
-    
+
+    useEffect(() => {
+        setDebug(false);
+    }, []);
+
     const renderComponent = () => {
         console.log("RENDER SIDEBAR");
         return (

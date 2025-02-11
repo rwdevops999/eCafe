@@ -11,9 +11,11 @@ import DbcUserProfile from "./components/dbc-user-profile";
 import { User, UserMinus, UserPlus } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { testUser } from "./data/test-user";
+import { useDebug } from "@/hooks/use-debug";
 
 const Dashboard = () => {
   const {setUser} = useUser();
+  const {debug} = useDebug();
 
   const databaseCleared = () => {
     console.log("Database cleared");
@@ -44,7 +46,7 @@ const Dashboard = () => {
       <PageBreadCrumbs crumbs={[{name: "dashboard"}]} />
       {/* <div className="bg-red-500 w-[100%] h-[97%]"> */}
       <div className="w-[100%] h-[97%]">
-        <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
+        {debug && <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
           <div className="flex items-center space-x-1 ml-1">
             <UserPlus width={16} height={16} onClick={setTestUser}/>
             <UserMinus width={16} height={16} onClick={clearTestUser}/>
@@ -53,7 +55,7 @@ const Dashboard = () => {
             <EcafeButton caption="Initialize Database" clickHandler={initializeDB} />
             <EcafeButton caption="Setup Countries" clickHandler={provisionCountries} />
           </div>
-        </div>
+        </div>}
         <div className="grid grid-cols-12">
           <div className="col-span-3">
             <DbcCalendar className="mx-1 flex justify-center rounded-md border-foreground/20"/>
