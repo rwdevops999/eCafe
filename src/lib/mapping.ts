@@ -1,5 +1,6 @@
 import { Data, GroupType, ServiceType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
+import { padZero } from "./utils";
 
 /* ============ NEW VERSION ================= */
 const prettify = (path: any[]): string => {
@@ -299,6 +300,7 @@ export const mapTasksToData = (tasks: TaskType[]|undefined): TaskData[] => {
     result = slicedTasks.map((task: any) => {
       const data: TaskData = {
         id: task.id,
+        taskId: padZero(task.id, 5, "TSK"),
         name: task.name,
         description: task.description,
         type: task.subject,

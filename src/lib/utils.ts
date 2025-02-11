@@ -171,3 +171,5 @@ export const createApiReponse = (_status: number, _payload: any): ApiResponseTyp
 export const stringToBoolean = (str: string): boolean => {
   return (str.toLowerCase() === 'true');
 }
+
+export const padZero = (num: number, length: number, prefix: string = ""): string => `${prefix}`+`${(num + "").padStart(length, "0")}`;

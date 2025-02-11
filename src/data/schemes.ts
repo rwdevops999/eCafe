@@ -28,6 +28,7 @@ export const dataScheme = z.object({
 
 export const taskDataScheme = z.object({
     id: z.number(),
+    taskId: z.string(),
     name: z.string(),
     description: z.string(),
     type: z.string(),

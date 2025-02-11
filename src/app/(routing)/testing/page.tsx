@@ -5,8 +5,20 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import DbcCalendar from "../dashboard/components/dbc-calendar";
 import DbcUserProfile from "../dashboard/components/dbc-user-profile";
 import DbcTasks from "../dashboard/components/dbc-tasks";
+import { padZero } from "@/lib/utils";
 
 const Test = () => {
+
+  const test = (num: number) => {
+    console.log(padZero(num, 5));
+  }
+
+  test(1);
+  test(56);
+  test(789);
+  test(1234);
+  test(98765);
+
   const renderComponent = () => {
     return(
       <>

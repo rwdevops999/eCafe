@@ -3,8 +3,51 @@ import { Button } from "@/components/ui/button";
 import { TaskData } from "@/types/ecafe";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { ReactNode } from "react";
+
+const renderNormal = (str: string): ReactNode => {
+    return (
+        <div className="-p-2 flex items-center h-[8px]">
+            {str}
+        </div>
+    );
+};
+
+const renderLink = (str: string): ReactNode => {
+    return (
+        <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
+            <Link href="">{str}</Link>
+        </div>
+    );
+};
 
 export const columns: ColumnDef<TaskData>[] = [
+    {
+        accessorKey: 'taskId',
+
+        header: ({ column }) => (
+            <>Task ID</>
+        ),
+
+        cell: ({ row, getValue }) => {
+            const isOpen: boolean = row.original.status === "open";
+
+            console.log("STATUS", row.original.id, isOpen);
+
+
+            return(
+                (isOpen ? renderLink(getValue<string>()) : renderNormal(getValue<string>()))
+                // {isOpen ?
+                //     <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
+                //         <Link href="">{getValue<string>()}</Link>
+                //     </div> :
+                //     <></>
+                // }
+            )
+        },
+
+        footer: props => props.column.id,
+    },
     {
         accessorKey: 'name',
 
