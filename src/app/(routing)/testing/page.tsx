@@ -6,23 +6,26 @@ import DbcCalendar from "../dashboard/components/dbc-calendar";
 import DbcUserProfile from "../dashboard/components/dbc-user-profile";
 import DbcTasks from "../dashboard/components/dbc-tasks";
 import { padZero } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const Test = () => {
-
-  const test = (num: number) => {
-    console.log(padZero(num, 5));
-  }
-
-  test(1);
-  test(56);
-  test(789);
-  test(1234);
-  test(98765);
+  const {push} = useRouter();
 
   const renderComponent = () => {
+    const gotoTaskPage = () => {
+      push("/task");
+    }
+
+    const gotoTaskIdPage = () => {
+      push("/task/1");
+    }
+
     return(
       <>
-        <div className="w-[100%] h-[97%]">
+      <Button onClick={gotoTaskPage}>Task Page</Button>
+      <Button onClick={gotoTaskIdPage}>TaskId Page</Button>
+        {/* <div className="w-[100%] h-[97%]">
           <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
             <div className="flex items-center space-x-1 ml-1">
               <Label>Database:</Label>
@@ -38,7 +41,7 @@ const Test = () => {
             </div>
             <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
           </div>
-        </div>
+        </div> */}
       </>
     );
   };

@@ -13,10 +13,10 @@ const renderNormal = (str: string): ReactNode => {
     );
 };
 
-const renderLink = (str: string): ReactNode => {
+const renderLink = (id: number, str: string): ReactNode => {
     return (
         <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
-            <Link href="">{str}</Link>
+            <Link href={`/task/${id}`}>{str}</Link>
         </div>
     );
 };
@@ -36,7 +36,7 @@ export const columns: ColumnDef<TaskData>[] = [
 
 
             return(
-                (isOpen ? renderLink(getValue<string>()) : renderNormal(getValue<string>()))
+                (isOpen ? renderLink(row.original.id, getValue<string>()) : renderNormal(getValue<string>()))
                 // {isOpen ?
                 //     <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
                 //         <Link href="">{getValue<string>()}</Link>

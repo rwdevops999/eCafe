@@ -15,6 +15,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div>{isClient ? t('title') : "Welcome by eCAFé"}</div>
+      <div className="w-[100%] h-[100%]">
+            <div className="h-screen flex items-center justify-center">
+              <img src="/images/ecafe.png" width={750} height={665} />
+            </div>
+      </div>
   );
 }
