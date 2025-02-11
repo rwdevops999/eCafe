@@ -102,6 +102,13 @@ export const serviceMappings: ServiceMappingType[] = [
     ]
   },
   {
+    service: "Tasks",
+    actions: [
+      "ListTasks", 
+      "GetTasks"
+    ]
+  },
+  {
     service: "Access",
     actions: [
       "ListUserGroups", 

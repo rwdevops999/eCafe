@@ -4,12 +4,20 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { initDB } from "@/lib/db";
+import { handleClearDB, initDB } from "@/lib/db";
 import DbcTasks from "./components/dbc-tasks";
 import DbcCalendar from "./components/dbc-calendar";
 import DbcUserProfile from "./components/dbc-user-profile";
 
 const Dashboard = () => {
+  const databaseCleared = () => {
+    console.log("Database cleared");
+  }
+
+  const clearDB = () => {
+    handleClearDB(databaseCleared);
+  };
+
   const initializeDB = () => {
     initDB('*');
   };
@@ -24,6 +32,7 @@ const Dashboard = () => {
       <div className="bg-red-500 w-svw h-svh">
         <div className="flex items-center h-[40px] w-svw bg-blue-400 space-x-2">
           <Label>Database:</Label>
+          <EcafeButton caption="Clear Database" clickHandler={clearDB} />
           <EcafeButton caption="Initialize Database" clickHandler={initializeDB} />
           <EcafeButton caption="Setup Countries" clickHandler={provisionCountries} />
         </div>

@@ -12,8 +12,6 @@ const LoginLogout = () => {
     const {user} = useUser();
     const router = useRouter();
 
-    console.log("USER = " + user.email);
-
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
     const loggedInCallback = () => {
@@ -31,10 +29,10 @@ const LoginLogout = () => {
     }
 
     useEffect(() => {
-        let loggedIn: boolean = true;
+        let loggedIn: boolean = false;
 
-        if (user.name === "") {
-            loggedIn = false;
+        if (user && user.email !== "") {
+            loggedIn = true;
         } 
 
         setLoggedIn(loggedIn);

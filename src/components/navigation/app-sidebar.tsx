@@ -1,5 +1,5 @@
 import packageJson from "../../../package.json"
-import { Album, Binoculars, Blocks, BookOpenText, Braces, Calendar1, Clock3, Coffee, ContactRound, Database, Globe, History, LampDesk, Languages, Lock, MessageSquare, ServerCog, Settings2, Store, TestTube, Truck, User, Users } from "lucide-react";
+import { Album, Binoculars, Blocks, BookOpenText, Braces, Calendar1, Clock3, Coffee, ContactRound, Database, Globe, History, LampDesk, Languages, ListTodo, Lock, MessageSquare, ServerCog, Settings2, Store, TestTube, Truck, User, Users } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
 import NavHeader from "./nav-header";
 import NavTools from "./nav-tools";
@@ -10,6 +10,7 @@ import { SidebarType } from "@/data/navigation-scheme";
 import ToolsTheme from "./tools-theme";
 import ToolsTime from "./tools-time";
 import ToolsLanguage from "./tools-language";
+import { useUser } from "@/hooks/use-user";
 
 const data: SidebarType = {
 };
@@ -192,6 +193,15 @@ data.Services.push(
 data.Services.push(    
     {
         id: 7,
+        tkey: 'tasks',
+        url: '#',
+        icon: ListTodo,
+    }
+);
+
+data.Services.push(    
+    {
+        id: 8,
         tkey: 'test',
         url: '/testing',
         icon: TestTube,
@@ -295,7 +305,16 @@ data.Tools.push(
 )
 
 const AppSidebar = () => {
+    const {user} = useUser();
+
+    data.User = {
+        name: 'ecafé',
+        email: user ? user.email : '',
+        avatar: user ? `https://ui-avatars.com/api/?name=${user.email}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
+    };
+    
     const renderComponent = () => {
+        console.log("RENDER SIDEBAR");
         return (
             <Sidebar collapsible="icon">
                 <SidebarHeader>

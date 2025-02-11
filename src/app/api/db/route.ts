@@ -122,3 +122,25 @@ export async function GET(request: NextRequest) {
       status: 204,
    });
 }
+
+const flush = async () => {
+  const models = Object.keys(prisma).filter((key) => key[0] !== "_");
+
+  const promises = models.map((name) => {
+    console.log("[DB] Flushing", name);
+
+    // @ts-expect-error
+    return prisma[name].deleteMany();
+  });
+
+  await Promise.all(promises);
+}
+
+export async function DELETE(request: NextRequest) {
+  await flush();
+
+  return new Response(JSON.stringify("flushed database"), {
+    headers: { "content-type": "application/json" },
+    status: 200,
+ });
+}

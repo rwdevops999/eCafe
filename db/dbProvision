@@ -13,6 +13,8 @@ insert into Service (uuid,name,createDate,createUser,updateDate,updateUser)
 insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
 	values ("srv-61be10d4-0e25-4cf6-8518-60ae446771d9", "Meetings", new Date(), "admin", new Data(), "admin");
 insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
+	values ("srv-4e1feda1-d713-438e-839d-382ef2409b16", "Tasks", new Date(), "admin", new Data(), "admin");
+insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
 	values ("srv-2ddfb06e-9030-49cd-aaf2-03306f7cf278", "Access", new Date(), "admin", new Data(), "admin");
 insert into Service (uuid,name,createDate,createUser,updateDate,updateUser) 
 	values ("srv-452a2e20-6cc9-4b67-8430-2b1b3a131d9f", "Settings", new Date(), "admin", new Data(), "admin");

@@ -56,7 +56,7 @@ function uuidv4(prefix:string): string {
   })
 }
 
-function serviceUUID(): string {
+export const serviceUUID = (): string => {
   return uuidv4("srv");
 }
 
