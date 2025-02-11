@@ -310,7 +310,7 @@ const AppSidebar = () => {
     data.User = {
         name: 'ecafé',
         email: user ? user.email : '',
-        avatar: user ? `https://ui-avatars.com/api/?name=${user.email}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
+        avatar: user ? `https://ui-avatars.com/api/?name=${user.firstname} ${user.name}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
     };
     
     const renderComponent = () => {
