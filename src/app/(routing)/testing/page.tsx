@@ -8,38 +8,8 @@ import {useUser} from "@/hooks/use-user";
 import { UserType } from "@/types/ecafe";
 import { Button } from "@/components/ui/button";
 
-const _user: UserType = {
-  name: "Welter",
-  firstname: "Rudi",
-  email: "rudi.welter@gmail.com",
-  password: "",
-  phone: "471611256",
-  attemps: 0,
-  blocked: true,
-  createDate: new Date(),
-  address: {
-    id: 0,
-    street: "Suikerpotstraat",
-    number: "6",
-    box: "3",
-    city: "Diest",
-    postalcode: "3290",
-    county: "",
-    country: {
-      id: 0,
-      code: "BE",
-      name: "Belgium",
-      dialCode: "+32",
-    }
-  }
-}
-
 const Test = () => {
   const{ setUser } = useUser();
-
-  const setTestUser = () => {
-    setUser(_user);
-  }
 
   const renderComponent = () => {
     return(
@@ -60,7 +30,6 @@ const Test = () => {
             </div>
           </div>
         </div>
-        <Button onClick={setTestUser}>Set User</Button>
       </>
     );
   };
