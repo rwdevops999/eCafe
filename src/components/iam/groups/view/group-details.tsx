@@ -16,9 +16,13 @@ import { initGroupMeta, Meta } from "../meta/meta";
 import { mapGroupsToData } from "@/lib/mapping";
 import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const [loader, setLoader] = useState<boolean>(false);
 
   logger.debug("GroupDetails", "IN(_selectedGroup)", _selectedGroup);

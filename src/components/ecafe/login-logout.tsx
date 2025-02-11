@@ -7,13 +7,18 @@ import { UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ConsoleLogger } from "@/lib/console.logger";
+import { useDebug } from "@/hooks/use-debug";
 
 const LoginLogout = () => {
     const {user, setUser} = useUser();
     const router = useRouter();
+    const {debug} = useDebug();
 
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+    
     const doLogin = () => {
-        console.log("Logging In");
+        logger.debug("LoginLogout", "Logging In");
         router.push("/login/main");
     }
 

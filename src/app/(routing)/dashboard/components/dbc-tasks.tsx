@@ -8,10 +8,13 @@ import { Data, TaskData, TaskType } from "@/types/ecafe";
 import { useEffect, useState } from "react";
 import { columns } from "./table/colums";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
-
-const logger = new ConsoleLogger({level: "debug"});
+import { useDebug } from "@/hooks/use-debug";
 
 const DbcTasks = ({className = ""}:{className?:string}) => {
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const [loader, setLoader] = useState<boolean>(false);
 
   const [tasksData, setTasksData] = useState<TaskData[]>([]);

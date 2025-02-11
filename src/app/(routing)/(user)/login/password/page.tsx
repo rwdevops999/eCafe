@@ -16,18 +16,21 @@ import { ExtendedUserType, NotificationButtonsType, TaskType, UserType } from "@
 import { useUser } from "@/hooks/use-user";
 import { MaxLoginAttemps } from "@/data/constants";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
+import { useDebug } from "@/hooks/use-debug";
 
-const logger = new ConsoleLogger({ level: 'debug' });
 
 const LoginPassword = () => {
   const searchParams = useSearchParams();
   const {setUser} = useUser();
   const {push} = useRouter();
+  const {debug} = useDebug();
+
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const userId = searchParams.get("userId");
 
   if (userId) {
-    console.log("OTP for email", userId);
+    logger.debug("LoginPasswor", "userId", userId);
   }
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -125,10 +128,9 @@ const LoginPassword = () => {
           }
 
           handleUpdateUser(_user, ()=>{});
-          handleInvalidPassword(otp.attemps);
+          handleInvalidPassword(user.attemps);
         }
       }
-
     } else {
       logger.debug("LoadPassword", "User not found", "Status code 404");
     }
@@ -151,10 +153,10 @@ const LoginPassword = () => {
   }
 
   const onSubmit = (data: any) => {
-      console.log("onSubmit Login Form");
-      if (userId) {
-        handleLoadUserById(parseInt(userId), userLoadedCallback);
-      }
+    logger.debug("LoginOTP", "onSubmit Login Form");
+    if (userId) {
+      handleLoadUserById(parseInt(userId), userLoadedCallback);
+    }
   }
 
   return (

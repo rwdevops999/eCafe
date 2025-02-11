@@ -6,13 +6,18 @@ import { FormSchemaType } from "../data/form-scheme";
 import { useEffect, useState } from "react";
 import { CountryType } from "@/types/ecafe";
 import { handleLoadCountries } from "@/lib/db";
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
   const {register, setValue, getValues} = formMethods;
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const changeCountry = (event: any) => {
     const countryname = event.target.value;
-    console.log("changeCountry = " + countryname);
+    logger.debug("AddressSection", "changeCountry = " + countryname);
     setValue("country", countryname);
     const country: CountryType = countries.find((country) => country.name === countryname)!;
     setValue("dialcode", `${country.dialCode}`)
@@ -21,7 +26,7 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
   const [countries, setCountries] = useState<CountryType[]>([]);
 
   const countriesLoadedCallback = (data: CountryType[]) => {
-    console.log("ADRESS LOADED COUNTRIES");
+    logger.debug("AddressSection", "ADRESS LOADED COUNTRIES");
     setCountries(data);
   }
 
@@ -30,7 +35,7 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
   }, []);
 
   const renderComponent =() => {
-    console.log("RENDER", JSON.stringify(countries));
+    logger.debug("AddressSection", "RENDER", JSON.stringify(countries));
 
     return (
       <Card className="border-stone-500">

@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useState } from "react";
 import { dependency_groups } from "@/data/constants";
 import TabItems from "./tab-items";
@@ -8,9 +10,12 @@ import { handleLoadGroups } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
 import { Meta } from "../users/meta/meta";
+import { useDebug } from "@/hooks/use-debug";
 
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const allGroups = useRef<GroupType[]>([]);
 

@@ -24,6 +24,8 @@ import { fullMapNoSubjectToData } from "@/lib/mapping";
 import { cloneObject, difference } from "@/lib/utils";
 import { handleCreateGroup, handleUpdateGroup } from "@/lib/db";
 import { initMetaBase } from "@/data/meta-base";
+import { useDebug } from "@/hooks/use-debug";
+import { validateMappedData } from "@/lib/validate";
 
 type DependencyType = {
   initialised: boolean,
@@ -47,7 +49,9 @@ type ItemType = {
 }
 
 const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _setReload(x: any): void;}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   logger.debug("GroupDialog", "IN(_open)", _open);
   logger.debug("GroupDialog", "IN(_meta)", JSON.stringify(_meta));

@@ -16,9 +16,13 @@ import { mapPoliciesToData } from "@/lib/mapping";
 import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
-    const logger = new ConsoleLogger({ level: 'debug' });
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
     const [loader, setLoader] = useState<boolean>(false);
 
     const [selectedPolicy, setSelectedPolicy] = useState<string>(allItems)

@@ -8,26 +8,32 @@ import { FormSchemaType } from "../data/form-scheme";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const UserSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const {getValues, setValue, register, formState: { errors }} = formMethods;
 
   const [reload, setReload] = useState<number>(0);
 
   const handleChangeBlocked = (checked: boolean|string) => {
-    console.log("BLOCKED = " + checked);
+    logger.debug("UserSection", "BLOCKED = " + checked);
     if (typeof checked === "string") {
       checked = checked.toLowerCase() === "true";
     }
 
-    console.log("SET BLOCKED = " + checked);
+    logger.debug("UserSection", "SET BLOCKED = " + checked);
 
     setValue("blocked", checked);
     setReload((x: number) => x+1);
   }
 
   const renderComponent = () => {
-    console.log("RRRREEEERRRREEEENNNDDDER", getValues("password"));
+    logger.debug("UserSection", "RENDER", getValues("password"));
     
     return (
       <Card className="border-stone-500">

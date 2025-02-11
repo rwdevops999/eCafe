@@ -1,3 +1,5 @@
+'use client'
+
 import { cloneObject } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { dependency_policies } from "@/data/constants";
@@ -7,11 +9,14 @@ import { ButtonConfig, GroupType, PolicyType, RoleType, UserType } from "@/types
 import { handleLoadPolicies } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
+import { useDebug } from "@/hooks/use-debug";
 
 const debug: boolean = false;
 
 const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const allPolicies = useRef<PolicyType[]>([]);
 

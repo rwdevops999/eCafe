@@ -16,10 +16,14 @@ import { initUserMeta, Meta } from "../meta/meta";
 import { mapUsersToData } from "@/lib/mapping";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
-  const [loader, setLoader] = useState<boolean>(false);
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
+    const [loader, setLoader] = useState<boolean>(false);
 
   logger.debug("UserDetails", "IN(_selectedUser)", _selectedUser);
 

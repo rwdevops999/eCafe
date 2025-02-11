@@ -24,6 +24,7 @@ import { fullMapNoSubjectToData } from "@/lib/mapping";
 import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/db";
 import { initMetaBase } from "@/data/meta-base";
 import { validateMappedData } from "@/lib/validate";
+import { useDebug } from "@/hooks/use-debug";
 
 type DependencyType = {
   initialised: boolean,
@@ -47,7 +48,9 @@ type ItemType = {
 }
 
 const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _setReload(x: any): void;}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   logger.debug("UserDialog", "IN(_open)", _open);
   logger.debug("UserDialog", "IN(_meta)", JSON.stringify(_meta));
@@ -302,7 +305,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   }
 
   const prepareUser = (data: any, selectedUser?: UserType): ExtendedUserType => {
-    console.log("PREPARE USER", JSON.stringify(data));
+    logger.debug("UserDialog", "PREPARE USER", JSON.stringify(data));
 
     const _country: CountryType = countries.current.find((country) => country.name === data.country)!;
     logger.debug("UserDialog", "PrepareUser(country)", JSON.stringify(_country));
@@ -450,7 +453,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
       await trigger().then((valid: boolean) => {
         logger.debug("UserDialog", "form validatation(valid)", valid);
         if (!valid) {
-          console.log("ERRORS = " + JSON.stringify(errors));
+          logger.debug("UserDialog", "ERRORS = " + JSON.stringify(errors));
           handleInvalidForm();
         } else {
           handleValidForm();

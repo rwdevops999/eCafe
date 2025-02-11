@@ -1,3 +1,5 @@
+'useClient'
+
 import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { defaultCountry } from "@/data/constants";
@@ -15,9 +17,12 @@ import { defineActionButtons } from "@/components/iam/lib/util";
 import { storeUserFormValues } from "../data/util";
 import AddressSection from "./address-section";
 import { handleLoadCountries } from "@/lib/db";
+import { useDebug } from "@/hooks/use-debug";
 
 const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
   logger.debug("TabUsers", "IN(onTabLeave)", onTabLeave);

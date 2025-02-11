@@ -1,3 +1,5 @@
+'use client'
+
 import packageJson from "../../../package.json"
 import { Album, Binoculars, Blocks, BookOpenText, Braces, Calendar1, Clock3, Coffee, ContactRound, Database, Globe, History, LampDesk, Languages, ListTodo, Lock, MessageSquare, ServerCog, Settings2, Store, TestTube, Truck, User, Users } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
@@ -13,6 +15,7 @@ import ToolsLanguage from "./tools-language";
 import { useUser } from "@/hooks/use-user";
 import { useDebug } from "@/hooks/use-debug";
 import { useEffect } from "react";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const data: SidebarType = {
 };
@@ -308,7 +311,9 @@ data.Tools.push(
 
 const AppSidebar = () => {
     const {user} = useUser();
-    const {setDebug} = useDebug();
+    const {debug, setDebug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
     data.User = {
         name: 'ecafé',
@@ -321,7 +326,7 @@ const AppSidebar = () => {
     }, []);
 
     const renderComponent = () => {
-        console.log("RENDER SIDEBAR");
+        logger.debug("SideBar", "RENDER");
         return (
             <Sidebar collapsible="icon">
                 <SidebarHeader>

@@ -16,9 +16,13 @@ import { DataTableToolbar } from "./table/data-table-toolbar";
 import { ConsoleLogger } from "@/lib/console.logger";
 import AlertMessage from "@/components/ecafe/alert-message";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
-    const logger = new ConsoleLogger({ level: 'debug' });
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
     const [loader, setLoader] = useState<boolean>(false);
 
     const [reload, setReload] = useState(0);

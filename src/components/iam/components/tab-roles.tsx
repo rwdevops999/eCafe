@@ -9,10 +9,13 @@ import { ButtonConfig, GroupType, RoleType, UserType } from "@/types/ecafe";
 import { handleLoadRoles } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
+import { useDebug } from "@/hooks/use-debug";
 
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
-
+  const {debug} = useDebug();
+    
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+  
   const allRoles = useRef<RoleType[]>([]);
 
   const [metaOfTabRoles, setMetaOfTabRoles] = useState<MetaBase>();

@@ -12,13 +12,16 @@ import { User, UserMinus, UserPlus } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { testUser } from "./data/test-user";
 import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const Dashboard = () => {
   const {setUser} = useUser();
   const {debug} = useDebug();
 
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const databaseCleared = () => {
-    console.log("Database cleared");
+    logger.debug("Dashboard", "Database cleared");
   }
 
   const clearDB = () => {

@@ -1,10 +1,7 @@
-import { ConsoleLogger } from "@/lib/console.logger";
 import prisma from "@/lib/prisma";
 import { createApiReponse, decrypt, encrypt } from "@/lib/utils";
 import { ExtendedUserType } from "@/types/ecafe";
 import { NextRequest, NextResponse } from "next/server";
-
-const logger = new ConsoleLogger({ level: 'debug' });
 
 const provisionUserForCreate = (data: ExtendedUserType) => {
   return ({
@@ -90,11 +87,7 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
 export async function POST(req: NextRequest) {
   const data: ExtendedUserType = await req.json();
 
-  logger.debug("API", "USER TO CREATE", JSON.stringify(data));
-
   const user: any = provisionUserForCreate(data);
-
-  logger.debug("API", "PREPARED USER", JSON.stringify(user));
 
   const createdUser = await prisma.user.create({data: user});
 

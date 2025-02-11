@@ -11,11 +11,14 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig, CombinedType, Data } from "@/types/ecafe";
 import { mapDependenciesToData } from "@/lib/mapping";
 import { MetaBase } from "@/data/meta-base";
+import { useDebug } from "@/hooks/use-debug";
 
 const debug = true;
 
 const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConfig:ButtonConfig}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
     const dependencies = useRef<CombinedType[]>([]);
     const [mappedDependencies, setMappedDependencies] = useState<Data[]>([]);

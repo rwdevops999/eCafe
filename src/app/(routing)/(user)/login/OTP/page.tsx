@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { MaxLoginAttemps } from "@/data/constants";
+import { useDebug } from "@/hooks/use-debug";
 import { useUser } from "@/hooks/use-user";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "@/lib/db";
@@ -12,12 +13,14 @@ import { NotificationButtonsType, OtpType, UserType } from "@/types/ecafe";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-const logger = new ConsoleLogger({ level: 'debug' });
 
 const LoginOTP = () => {
   const {push} = useRouter();
   const {setUser} = useUser();
+  const {debug} = useDebug();
 
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+ 
   const [value, setValue] = useState("")
   const searchParams = useSearchParams();
 
@@ -34,7 +37,7 @@ const LoginOTP = () => {
   const otpId = searchParams.get("otpId");
 
   if (otpId) {
-    console.log("OTP for email", otpId);
+    logger.debug("LoginOTP", "OTP for email", otpId);
   }
 
   const handleInvalidOtpCode = (attemps: number) => {
@@ -74,6 +77,8 @@ const LoginOTP = () => {
       email: _email,
       password: "",
       phone: "",
+      attemps: 0,
+      blocked: false
     }
     logger.debug("LoginOTP", "OTP login as guest", "set user", JSON.stringify(user));
 

@@ -9,8 +9,14 @@ import { Eye, EyeOff } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const {register, formState: { errors }, setValue, getValues} = formMethods;
   const [viewPassword, setViewPassword] = useState<boolean>(false);
 
@@ -27,10 +33,10 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
       checked = checked.toLowerCase() === "true";
     }
 
-    console.log("CHECKBOX = " + checked);
+    logger.debug("LogonSection", "CHECKBOX = " + checked);
 
     if (checked) {
-      console.log("UNREGISTER");
+      logger.debug("LogonSection", "UNREGISTER");
 
       passwordRef.current = getValues("password");
 
@@ -38,7 +44,7 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
       // unregister(["password"]);
       setSelectedTrigger("passwordless");
     } else {
-      console.log("REGISTER");
+      logger.debug("LogonSection", "REGISTER");
       if (passwordRef.current !== "") {
         setValue("password", passwordRef.current);
       }
@@ -53,13 +59,13 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
   useEffect(() => {
     register("password");
 
-    console.log("LOGON SECTION UE[]", getValues("passwordless"));
+    logger.debug("LogonSection", "LOGON SECTION UE[]", getValues("passwordless"));
     handlePasswordless(getValues("passwordless"));
   }, [])
 
   const renderComponent = () => {
 
-    console.log(">>> LOGON: RRRREEEERRRREEEENNNDDDER", getValues("email"), getValues("password"));
+    logger.debug("LogonSection", "RENDER", getValues("email"), getValues("password"));
 
     return (
       <Card className="border-stone-500">

@@ -1,3 +1,5 @@
+'use client'
+
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useEffect, useRef, useState } from "react";
 import { cloneObject } from "@/lib/utils";
@@ -7,9 +9,12 @@ import { ButtonConfig, GroupType, UserType } from "@/types/ecafe";
 import { handleLoadUsers } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
+import { useDebug } from "@/hooks/use-debug";
 
 const TabUsers = ({_meta}:{_meta: MetaBase}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const allUsers = useRef<UserType[]>([]);
 

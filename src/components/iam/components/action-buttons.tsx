@@ -1,10 +1,16 @@
+'use client'
+
 import EcafeButton from "@/components/ecafe/ecafe-button";
+import { MetaBase } from "@/data/meta-base";
+import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ButtonConfig } from "@/types/ecafe";
 import { useState } from "react";
 
 const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:ButtonConfig; meta: MetaBase|undefined; nrOfItemsToValidate: number;}) => {
-    const logger = new ConsoleLogger({ level: 'debug' });
+    const {debug} = useDebug();
+  
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
     logger.debug("ActionButtons", "IN", nrOfItemsToValidate);
     logger.debug("ActionButtons", "IN", "HIDDEN", (nrOfItemsToValidate <= 1));

@@ -1,3 +1,5 @@
+'use client'
+
 import { useForm, UseFormReturn } from "react-hook-form";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useEffect, useRef, useState } from "react";
@@ -11,9 +13,12 @@ import { Meta } from "../../meta/meta";
 import { ButtonConfig, GroupType } from "@/types/ecafe";
 import { defineActionButtons } from "@/components/iam/lib/util";
 import { storeGroupFormValues } from "./data/util";
+import { useDebug } from "@/hooks/use-debug";
 
 const TabGroup = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
-  const logger = new ConsoleLogger({ level: 'debug' });
+  const {debug} = useDebug();
+  
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
   logger.debug("TabGroups", "IN(onTabLeave)", onTabLeave);
