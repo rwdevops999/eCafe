@@ -32,3 +32,8 @@ const createTask = async (data: TaskType) => {
 
 }
 
+export async function GET(request: NextRequest) {
+    const tasks = await prisma.task.findMany();
+
+    return Response.json(tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime()));
+}

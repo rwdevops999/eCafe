@@ -44,7 +44,8 @@ interface DataTableProps<TData, TValue> {
   expandAll?: boolean;
   enableRowSelection?: boolean;
   selectedItems?: number[]
-  id?: string
+  id?: string,
+  pagination?: boolean
 }
 
 export function DataTable<TData extends IDataSubRows<TData>, TValue>({
@@ -58,7 +59,8 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   expandAll = false,
   enableRowSelection = true,
   selectedItems = [],
-  id = ""
+  id = "",
+  pagination = true
 }: DataTableProps<TData, TValue>) {
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -211,7 +213,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
               </TableBody>
           </Table>
         </div>
-        <DataTablePagination table={table} />
+        {pagination && <DataTablePagination table={table} />}
       </div>
       );
     }

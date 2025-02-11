@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dataScheme } from "@/data/schemes";
+import { dataScheme, taskDataScheme } from "@/data/schemes";
 
 type CallbackFunctionDefault = () => void;
 type CallbackFunctionSubjectLoaded = (data: any[], additional?: any) => void;
@@ -118,6 +118,7 @@ type UserType = {
 type CombinedType = NewRoleType|NewPolicyType|NewGroupType;
 
 type Data = z.infer<typeof dataScheme>
+type TaskData = z.infer<typeof taskDataScheme>
 
 type PolicyType = {
   id: number,
@@ -236,7 +237,7 @@ type TaskType = {
   description: string
   subject: string,
   subjectId?: number
-  status: string
+  status: "open" | "completed"
 }
 
 type ApiResponseType = {

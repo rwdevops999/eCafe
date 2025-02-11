@@ -58,7 +58,8 @@ const Dashboard = () => {
           <div className="col-span-3">
             <DbcCalendar className="mx-1 flex justify-center rounded-md border-foreground/20"/>
             <DbcUserProfile className="mx-1 mt-1 rounded-md border border-foreground/20"/>
-            </div>
+          </div>
+          <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
         </div>
       </div>
     </>

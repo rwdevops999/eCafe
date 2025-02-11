@@ -9,46 +9,31 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const LoginLogout = () => {
-    const {user} = useUser();
+    const {user, setUser} = useUser();
     const router = useRouter();
-
-    const [loggedIn, setLoggedIn] = useState<boolean>(false);
-
-    const loggedInCallback = () => {
-        console.log("Logged In");
-    }
 
     const doLogin = () => {
         console.log("Logging In");
-        setLoggedIn(true);
         router.push("/login/main");
     }
 
     const doLogout = () => {
-        setLoggedIn(false);
+        setUser(undefined);
     }
-
-    useEffect(() => {
-        let loggedIn: boolean = false;
-
-        if (user && user.email !== "") {
-            loggedIn = true;
-        } 
-
-        setLoggedIn(loggedIn);
-    }, []);
 
     return (
         <div>
-            {loggedIn && 
+            {user && 
                 <>
                     <div className="flex items-center">
-                        <LogOut size={18} className="mr-2"/>
-                        Log Out
+                        <Button variant="ghost" onClick={doLogout} className="h-4">
+                            <LogOut size={18} className="mr-2"/>
+                            Log Out
+                        </Button>
                     </div>
             </>
         }
-            {!loggedIn && 
+            {!user && 
                 <>
                     <div className="-ml-4 flex items-center">
                         <Button variant="ghost" onClick={doLogin} className="h-4">

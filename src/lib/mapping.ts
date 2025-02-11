@@ -1,4 +1,4 @@
-import { Data, GroupType, ServiceType, UserType } from "@/types/ecafe";
+import { Data, GroupType, ServiceType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 
 /* ============ NEW VERSION ================= */
@@ -289,3 +289,24 @@ export const mapUsersToData = (users: UserType[]): Data[] => {
   return data;
 }
 
+
+export const mapTasksToData = (tasks: TaskType[]|undefined): TaskData[] => {
+  let result: TaskData[] = [];
+
+  if (tasks) {
+    result = tasks.map((task: any) => {
+      const data: TaskData = {
+        id: task.id,
+        name: task.name,
+        description: task.description,
+        type: task.subject,
+        status: task.status,
+        children: []
+      }
+
+      return data;
+    });
+  }
+
+  return result;
+}

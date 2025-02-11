@@ -25,3 +25,12 @@ export const dataScheme = z.object({
     children: z.array(z.any()).optional(),
     other: additionalScheme.optional()
 });
+
+export const taskDataScheme = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string(),
+    type: z.string(),
+    status: z.string(),
+    children: z.array(z.any()).optional(),
+});

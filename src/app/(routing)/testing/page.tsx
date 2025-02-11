@@ -7,6 +7,7 @@ import DbcUserProfile from "../dashboard/components/dbc-user-profile";
 import {useUser} from "@/hooks/use-user";
 import { UserType } from "@/types/ecafe";
 import { Button } from "@/components/ui/button";
+import DbcTasks from "../dashboard/components/dbc-tasks";
 
 const Test = () => {
   const{ setUser } = useUser();
@@ -28,6 +29,9 @@ const Test = () => {
               <DbcCalendar className="mx-1 flex justify-center rounded-md border-foreground/20"/>
               <DbcUserProfile className="mx-1 mt-1 rounded-md border border-foreground/20"/>
             </div>
+            {/* <div className="col-span-9"> */}
+              <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
+            {/* </div> */}
           </div>
         </div>
       </>

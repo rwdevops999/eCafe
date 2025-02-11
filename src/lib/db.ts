@@ -370,3 +370,16 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionDefa
     .then(response => _callback());
 }
 
+const loadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
+  let data: TaskType[]= [];
+  
+  await fetch("http://localhost:3000/api/task")
+    .then((response) => response.json())
+    .then((response) => _callback(response));
+  
+  return data;
+}
+
+export const handleLoadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadTasks(_callback);
+}
