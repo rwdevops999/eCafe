@@ -14,11 +14,13 @@ import { generateOTP } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { useDebug } from "@/hooks/use-debug";
  
-const logger = new ConsoleLogger({ level: 'debug' });
-
 const LoginMain = () => {
     const {push} = useRouter();
+    const {debug} = useDebug();
+
+    const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none') });
 
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const setDialogState = (state: boolean): void => {
