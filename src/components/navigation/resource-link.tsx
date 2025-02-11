@@ -1,5 +1,6 @@
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { SidebarResourceType } from "@/data/navigation-scheme";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,10 +16,10 @@ const ResourceLink = ({resource}:{resource:SidebarResourceType}) => {
     const renderComponent = () => {
         return (
             <SidebarMenuButton asChild className="-ml-1">
-                <a href={resource.url}>
+                <Link href={resource.url}>
                     <resource.icon />
                     <span className="capitalize">{isClient ? t(resource.tkey) : resource.tkey}</span>
-                </a>
+                </Link>
             </SidebarMenuButton>
         );
     }

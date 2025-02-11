@@ -51,13 +51,13 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                   <DropdownMenuItem className="mb-1">
                     <div className="ml-1 flex items-center cursor-pointer space-x-2">
                       <Briefcase size={18}/>
-                      <a href="/user/profile" className="capitalize">{isClient ? t('profile') : 'profile'}</a>
+                      <Link href="/user/profile" className="capitalize">{isClient ? t('profile') : 'profile'}</Link>
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="mb-1">
                     <div className="ml-1 flex space-x-2 items-center cursor-pointer">
                       <Bell size={18}/>
-                      <a href="/user/notifications" className="capitalize">{isClient ? t('notifications') : 'notifications'}</a>
+                      <Link href="/user/notifications" className="capitalize">{isClient ? t('notifications') : 'notifications'}</Link>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

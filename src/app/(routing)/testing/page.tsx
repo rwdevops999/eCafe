@@ -8,24 +8,44 @@ import DbcTasks from "../dashboard/components/dbc-tasks";
 import { padZero } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { UserType } from "@/types/ecafe";
+import { useUser } from "@/hooks/use-user";
 
 const Test = () => {
+  const {setUser} = useUser();
+
+  const testUser: UserType = {
+    name: "test",
+    firstname: "test",
+    email: "test@example.com",
+    phone: "",
+    attemps: 0,
+    blocked: false,
+    password: ""
+  }
+
+  const setAnUser = () => {
+    setUser(testUser);
+  }
+
   const {push} = useRouter();
 
+  const gotoTaskPage = () => {
+    push("/task");
+  }
+
   const renderComponent = () => {
-    const gotoTaskPage = () => {
-      push("/task");
-    }
-
-    const gotoTaskIdPage = () => {
-      push("/task/1");
-    }
-
     return(
       <>
-      {/* <Button onClick={gotoTaskPage}>Task Page</Button>
-      <Button onClick={gotoTaskIdPage}>TaskId Page</Button> */}
-        <div className="w-[100%] h-[97%]">
+      <Button onClick={setAnUser}>Set User</Button>&nbsp;
+      <Button onClick={gotoTaskPage}>Button Redirect</Button>&nbsp; 
+      {/* OK */}
+      <a href="/task">Href Redirect</a>&nbsp;
+      {/* NOK */}
+      <Link href="/task">Link Redirect</Link>
+      {/* OK */}
+        {/* <div className="w-[100%] h-[97%]">
           <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
             <div className="flex items-center space-x-1 ml-1">
               <Label>Database:</Label>
@@ -41,7 +61,7 @@ const Test = () => {
             </div>
             <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
           </div>
-        </div>
+        </div> */}
       </>
     );
   };

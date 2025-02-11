@@ -1,17 +1,21 @@
 'use client'
 
+import { useDebug } from "@/hooks/use-debug";
 import { useUser } from "@/hooks/use-user";
 import { UserType } from "@/types/ecafe";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { setDebug } = useDebug()
+
   const {t} = useTranslation();
 
   const [isClient, setIsClient] = useState<boolean>(false);
 
   useEffect(() => {
     setIsClient(true);
+    setDebug(true);
   }, []);
 
   return (

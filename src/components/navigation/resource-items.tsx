@@ -2,6 +2,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SidebarMenuAction } from "@/components/ui/sidebar";
 import { SidebarResourceType } from "@/data/navigation-scheme";
 import { MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -31,9 +32,9 @@ const ResourceItems = ({resource}:{resource: SidebarResourceType}) => {
                         <DropdownMenuItem key={child.tkey}>
                         <div className="flex m-1 space-x-1 text-sm hover:bg-muted">
                             <child.icon size={18}/>
-                            <a href={child.url}>
+                            <Link href={child.url}>
                                 <span className="capitalize">{isClient ? t(child.tkey) : child.tkey}</span>
-                            </a>
+                            </Link>
                         </div>
                     </DropdownMenuItem>
                 ))}

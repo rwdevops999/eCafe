@@ -311,7 +311,7 @@ data.Tools.push(
 
 const AppSidebar = () => {
     const {user} = useUser();
-    const {debug, setDebug} = useDebug();
+    const {debug } = useDebug();
   
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
@@ -320,10 +320,6 @@ const AppSidebar = () => {
         email: user ? user.email : '',
         avatar: user ? `https://ui-avatars.com/api/?name=${user.firstname} ${user.name}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
     };
-
-    useEffect(() => {
-        setDebug(false);
-    }, []);
 
     const renderComponent = () => {
         logger.debug("SideBar", "RENDER");
