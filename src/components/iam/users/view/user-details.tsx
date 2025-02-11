@@ -111,7 +111,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
 
       return (
         <div>
-          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "users", url: "/iam/users"}]} />
+          <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "users", url: "/iam/users"}]} />
           <div className="flex space-x-2 items-center">
             <PageTitle className="m-2" title={`Overview users`} />
             <EcafeLoader className={loader ? "" : "hidden"}/>

@@ -114,7 +114,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
       return (
         <div>
-          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
+          <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "groups", url: "/iam/groups"}]} />
           <div className="flex space-x-2 items-center">
             <PageTitle className="m-2" title={`Overview group`} />
             <EcafeLoader className={loader ? "" : "hidden"}/>

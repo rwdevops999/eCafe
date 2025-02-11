@@ -46,7 +46,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <PageBreadCrumbs crumbs={[{name: "dashboard"}]} />
+        <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "dashboard"}]} />
       {/* <div className="bg-red-500 w-[100%] h-[97%]"> */}
       <div className="w-[100%] h-[97%]">
         {debug && <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">

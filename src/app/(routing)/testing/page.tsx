@@ -23,9 +23,9 @@ const Test = () => {
 
     return(
       <>
-      <Button onClick={gotoTaskPage}>Task Page</Button>
-      <Button onClick={gotoTaskIdPage}>TaskId Page</Button>
-        {/* <div className="w-[100%] h-[97%]">
+      {/* <Button onClick={gotoTaskPage}>Task Page</Button>
+      <Button onClick={gotoTaskIdPage}>TaskId Page</Button> */}
+        <div className="w-[100%] h-[97%]">
           <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
             <div className="flex items-center space-x-1 ml-1">
               <Label>Database:</Label>
@@ -41,7 +41,7 @@ const Test = () => {
             </div>
             <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
           </div>
-        </div> */}
+        </div>
       </>
     );
   };

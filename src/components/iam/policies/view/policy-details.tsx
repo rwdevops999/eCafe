@@ -130,7 +130,7 @@ import { useDebug } from "@/hooks/use-debug";
 
         return (
             <div>
-                <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "policies", url: "/iam/policies/policy=*"}]} />
+                <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "policies", url: "/iam/policies/policy=*"}]} />
                 <div className="flex space-x-2 items-center">
                     <PageTitle className="m-2" title={`Overview policies`} />
                     <EcafeLoader className={loader ? "" : "hidden"}/>

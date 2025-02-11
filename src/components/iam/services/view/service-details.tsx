@@ -34,7 +34,7 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
   const renderComponent = () => {
     return (
       <div>
-        <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "services", url: "/iam/services/service=*"}]} />
+        <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "services", url: "/iam/services/service=*"}]} />
         <div className="flex space-x-2 items-center">
           <PageTitle className="m-2" title={`Services`} />
           <EcafeLoader className={loader ? "" : "hidden"}/>

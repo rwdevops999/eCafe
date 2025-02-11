@@ -168,7 +168,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
       return (
         <div>
-          <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
+          <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
           <div className="flex space-x-2 items-center">
             <PageTitle className="m-2" title={`Overview service statements for ${serviceName.current === 'All' ? 'All Services' : serviceName.current}`} />
             <EcafeLoader className={loader ? "" : "hidden"}/>

@@ -124,7 +124,7 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     
         return (
             <div>
-                <PageBreadCrumbs crumbs={[{name: "iam"}, {name: "roles", url: "/iam/roles"}]} />
+                <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "roles", url: "/iam/roles"}]} />
                 <div className="flex space-x-2 items-center">
                     <PageTitle className="m-2" title={`Overview roles`} />
                     <EcafeLoader className={loader ? "" : "hidden"}/>
