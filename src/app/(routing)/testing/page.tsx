@@ -33,28 +33,12 @@ const Test = () => {
     console.log("USER = ", user);
   }
 
-  const [avatar, setAvatar] = useState<ReactElement>(<img />);
-
-  const getAvatar = () => {
-    let image: ReactElement;
-
-    image = <img src="https://ui-avatars.com/api/?name=rwdevops@gmail.com&size=32&background=00FF00&color=FF0000&rounded=true" />;
-
-    setAvatar(image);
-  }
-
   const renderComponent = () => {
     return(
       <>
-        <Button onClick={getAvatar}>Avatar</Button>
         <Button onClick={setTheUser}>Set User</Button>
         <Button onClick={clearTheUser}>Clear User</Button>
         <Button onClick={logTheUser}>Show User</Button>
-        {avatar}
-        {/* <Avatar>
-          <AvatarImage src={avatar} alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar> */}
       </>
     );
   };
