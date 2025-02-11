@@ -1,7 +1,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
-const DbcCalendar = ({className = "", classNames = {day_today: "bg-foreground"}}:{className?:string, classNames?: any}) => {
+const EdbCalendar = ({className = "", classNames = {}}:{className?:string, classNames?: any}) => {
   return (
     <Calendar
       mode="single"
@@ -12,4 +12,4 @@ const DbcCalendar = ({className = "", classNames = {day_today: "bg-foreground"}}
   )
 }
 
-export default DbcCalendar;
+export default EdbCalendar;
