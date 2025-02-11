@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { stringToBoolean } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -33,7 +34,16 @@ const createTask = async (data: TaskType) => {
 }
 
 export async function GET(request: NextRequest) {
-    const tasks = await prisma.task.findMany();
+  const searchParams = request.nextUrl.searchParams
+  const open = searchParams.get('open');  // passed as ...?service=Stock => service = "Stock"
 
-    return Response.json(tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime()));
+  let tasks: any[] = [];
+
+  if (open && stringToBoolean(open)) {
+    tasks = await prisma.task.findMany({where: {status: "open"}});
+  } else {
+    tasks = await prisma.task.findMany();
+  }
+
+  return Response.json(tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime()));
 }

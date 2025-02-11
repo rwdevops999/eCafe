@@ -167,3 +167,7 @@ export const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
 export const createApiReponse = (_status: number, _payload: any): ApiResponseType => {
   return {status: _status, payload: _payload};
 }
+
+export const stringToBoolean = (str: string): boolean => {
+  return (str.toLowerCase() === 'true');
+}

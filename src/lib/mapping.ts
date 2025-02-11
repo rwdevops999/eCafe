@@ -294,7 +294,9 @@ export const mapTasksToData = (tasks: TaskType[]|undefined): TaskData[] => {
   let result: TaskData[] = [];
 
   if (tasks) {
-    result = tasks.map((task: any) => {
+    let slicedTasks: TaskType[] = tasks.slice(0, 5);
+
+    result = slicedTasks.map((task: any) => {
       const data: TaskData = {
         id: task.id,
         name: task.name,

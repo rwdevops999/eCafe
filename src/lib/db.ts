@@ -370,10 +370,10 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionDefa
     .then(response => _callback());
 }
 
-const loadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
+const loadTasks = async (open: boolean, _callback: CallbackFunctionSubjectLoaded) => {
   let data: TaskType[]= [];
   
-  await fetch("http://localhost:3000/api/task")
+  await fetch("http://localhost:3000/api/task?open="+open)
     .then((response) => response.json())
     .then((response) => _callback(response));
   
@@ -381,5 +381,9 @@ const loadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
 }
 
 export const handleLoadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
-  await loadTasks(_callback);
+  await loadTasks(false, _callback);
+}
+
+export const handleLoadOpenTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadTasks(true, _callback);
 }
