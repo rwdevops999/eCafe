@@ -32,17 +32,9 @@ export const columns: ColumnDef<TaskData>[] = [
         cell: ({ row, getValue }) => {
             const isOpen: boolean = row.original.status === "open";
 
-            console.log("STATUS", row.original.id, isOpen);
-
 
             return(
                 (isOpen ? renderLink(row.original.id, getValue<string>()) : renderNormal(getValue<string>()))
-                // {isOpen ?
-                //     <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
-                //         <Link href="">{getValue<string>()}</Link>
-                //     </div> :
-                //     <></>
-                // }
             )
         },
 
