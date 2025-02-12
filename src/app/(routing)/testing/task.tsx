@@ -21,14 +21,16 @@ type TaskActionType = {
   id: number,
   type: string,
   action: string,
-  payload: any|undefined
+  payload: any|undefined,
+  func: () => void
 }
 
 const taskActions: TaskActionType[] = [{
   id: 1,
   type: "OTP",
   action: "Remove OTP",
-  payload: undefined
+  payload: undefined,
+  func: () => {}
 }]
 
 // FOR NOW UNTIL ALL IS KNOW, HARDCODED
