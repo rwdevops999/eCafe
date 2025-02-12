@@ -24,13 +24,9 @@ export const handleClearDB = async (_callback: CallbackFunctionDefault) => {
  * LANGUAGES
  */
 const loadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
-  let data: LanguageType[]= [];
-  
   await fetch("http://localhost:3000/api/languages")
     .then((response) => response.json())
     .then((response) => _callback(response));
-  
-  return data;
 }
 
 export const handleLoadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
@@ -372,13 +368,9 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionDefa
 }
 
 const loadTasks = async (open: boolean, _callback: CallbackFunctionSubjectLoaded) => {
-  let data: TaskType[]= [];
-  
   await fetch("http://localhost:3000/api/task?open="+open)
     .then((response) => response.json())
     .then((response) => _callback(response));
-  
-  return data;
 }
 
 export const handleLoadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
@@ -387,4 +379,14 @@ export const handleLoadTasks = async (_callback: CallbackFunctionSubjectLoaded) 
 
 export const handleLoadOpenTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
   await loadTasks(true, _callback);
+}
+
+const loadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/task?taskId="+_taskId)
+    .then((response) => response.json())
+    .then((response) => _callback(response));
+}
+
+export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded) => {
+  await loadTask(_taskId, _callback);
 }

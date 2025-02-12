@@ -1,5 +1,6 @@
 import { HoverCard } from "@/components/ui/hover-card";
 import { Label } from "@/components/ui/label";
+import { months } from "@/data/constants";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils"
 import { AddressType, UserType } from "@/types/ecafe";
@@ -37,8 +38,6 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
     
     return result;
   }
-
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   const getJoinedInfo = (date: Date|undefined): string => {
     if (date) {

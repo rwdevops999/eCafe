@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { stringToBoolean } from "@/lib/utils";
+import { createApiReponse, stringToBoolean } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -38,9 +38,26 @@ const createTask = async (data: TaskType) => {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const open = searchParams.get('open');  // passed as ...?service=Stock => service = "Stock"
+  const taskId = searchParams.get('taskId');  // passed as ...?service=Stock => service = "Stock"
 
   let tasks: any[] = [];
 
+  if (taskId) {
+    const task: any = await prisma.task.findFirst({
+      where: {
+        id: parseInt(taskId)
+      }
+    });
+
+    if (task) {
+      console.log("API Task = " + JSON.stringify(task));
+
+      return Response.json(createApiReponse(200, task));
+    }
+
+    return Response.json(createApiReponse(404, "Task not found"));
+  }
+  
   if (open && stringToBoolean(open)) {
     tasks = await prisma.task.findMany({where: {status: "open"}});
   } else {

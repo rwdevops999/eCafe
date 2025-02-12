@@ -234,6 +234,7 @@ type TaskType = {
   subject: string,
   subjectId?: number
   status: "open" | "completed"
+  createDate?: string
 }
 
 type ApiResponseType = {
