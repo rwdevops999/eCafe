@@ -24,6 +24,8 @@ const createTask = async (data: TaskType) => {
   export async function POST(req: NextRequest) {
     const _data: TaskType = await req.json();
 
+    console.log("API CreateTask: ", JSON.stringify(_data));
+    
     const task = await createTask(_data);
 
     return new Response(JSON.stringify(task), {

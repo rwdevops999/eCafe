@@ -17,9 +17,7 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
     user.createDate = d;
   }
 
-  const IsEmpty = (user: UserType|undefined, value: string | undefined): boolean => {
-    return (! (value || value === ''));
-  }
+  const IsEmpty = (user: UserType|undefined, value: string | undefined): boolean => (user === undefined || value === '');
 
   const hasAddressInfo = (user: UserType|undefined): boolean => {
     let result:boolean = false;
@@ -37,7 +35,6 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
       }
     }
     
-    console.log("HAI = ", result);
     return result;
   }
 
@@ -127,6 +124,8 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
 
     return null;
   }
+
+  console.log("RENDER USER PROFILE");
 
   return (
     <>

@@ -8,53 +8,57 @@ import DbcTasks from "../dashboard/components/dbc-tasks";
 import { decrypt, padZero } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { UserType } from "@/types/ecafe";
+import { ExtendedUserType, UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
+import { handleUpdateUser } from "@/lib/db";
 
 const Test = () => {
   const {login} = useUser();
 
   const testUser: UserType = {
-    name: "test",
-    firstname: "test",
-    email: "test@example.com",
-    phone: "",
-    attemps: 0,
-    blocked: false,
-    password: ""
+      id:1,
+      name:"Test",
+      firstname:"test",
+      phone:"",
+      email:"rwdevops999@gmail.com",
+      password:"",
+      passwordless:true,
+      attemps:0,
+      createDate:new Date(),
+      blocked:false
   }
 
   const setAnUser = () => {
     login(testUser);
   }
 
-  const {push} = useRouter();
-
-  const gotoTaskPage = () => {
-    push("/task");
-  }
-
-  const getEnv = () => {
-    console.log("ENV", process.env.DEBUG);
+  const u: ExtendedUserType = {
+    id:2,
+    name:"New",
+    firstname:"user",
+    email:"test@test.com",
+    password:"27X11x49",
+    passwordless: false,
+    phone:"",
+    attemps:1,
+    blocked:true
   }
 
   const test = () => {
-    console.log(decrypt("7591ede799388623680aa8ae37ce095f60bad84341dbffd2af237862941c0542"));
+    handleUpdateUser(u, ()=>{});
   }
-
-  test();
-
+  
   const renderComponent = () => {
     return(
         <div className="w-[100%] h-[97%]">
           <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
             <div className="flex items-center space-x-1 ml-1">
-              <Button onClick={getEnv}>ENV</Button>
+              <Button onClick={setAnUser}>User</Button>
               <Label>Database:</Label>
               <EcafeButton caption="Clear Database" />
               <EcafeButton caption="Initialize Database" />
               <EcafeButton caption="Setup Countries" />
+              <Button onClick={test}>Test</Button>
             </div>
           </div>
           <div className="grid grid-cols-12">

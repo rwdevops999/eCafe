@@ -49,7 +49,7 @@ const LoginPassword = () => {
     }
   });
 
-  const {handleSubmit, getValues, register, formState: {errors}} = formMethods;
+  const {handleSubmit, getValues, setValue, register, formState: {errors}} = formMethods;
   const [viewPassword, setViewPassword] = useState<boolean>(false);
   const handleSwitchPassword = () => {
     setViewPassword(!viewPassword);
@@ -71,7 +71,7 @@ const LoginPassword = () => {
 
   const handleInvalidPassword = (attemps: number) => {
     logger.debug("LoginPassword", "Password invalid", "Show notification");
-    dialogTitleRef.current = `Invalid password (attemp ${attemps}/${MaxLoginAttemps})`;
+    dialogTitleRef.current = `Invalid password (attemp ${attemps+1}/${MaxLoginAttemps})`;
     dialogMessageRef.current = "Password incorrect. Retry Login again?";
     dialogButtonsRef.current = {leftButton: "Cancel", rightButton: "Retry"};
   
@@ -80,14 +80,23 @@ const LoginPassword = () => {
   
   const focusToPasswordInput = () => {
     const element: HTMLInputElement|null = document.getElementById("password") as HTMLInputElement;
-    element?.select();
+    if (element) {
+      element.focus();
+    }
 }
 
   useEffect(() => {
       focusToPasswordInput();
   }, []);
   
-  const taskCreatedCallback = () => {
+  const [retry, setRetry] = useState<number>(0);
+
+  useEffect(() => {
+    setValue("password", "");
+    focusToPasswordInput();
+}, [retry]);
+
+const taskCreatedCallback = () => {
     logger.debug("LoginMain", "Task Created");
   }
 
@@ -101,17 +110,25 @@ const LoginPassword = () => {
         login(user);
         push("/dashboard")
       } else {
-        user.attemps++;
-        if (user.attemps > MaxLoginAttemps) {
-          const _user: ExtendedUserType = {
-            name: user.name,
-            firstname: user.firstname,
-            email: user.email,
-            password: user.password,
-            phone: user.phone,
-            attemps: user.attemps,
-            blocked: user.blocked
-          }
+        const attemps: number = user.attemps + 1;
+        const _user: ExtendedUserType = {
+          id: user.id,
+          name: user.name,
+          firstname: user.firstname,
+          email: user.email,
+          password: user.password,
+          passwordless: user.passwordless,
+          phone: user.phone,
+          attemps: attemps,
+          blocked: user.blocked,
+          address: user.address,
+          roles: {},
+          policies: {},
+          groups: {}
+        }
+
+        if (attemps >= MaxLoginAttemps) {
+          _user.blocked = true;
           handleUpdateUser(_user, ()=>{});
 
           const task: TaskType = {
@@ -127,15 +144,6 @@ const LoginPassword = () => {
           
           handleAttempsExceeded();          
         } else {
-          const _user: ExtendedUserType = {
-            name: user.name,
-            firstname: user.firstname,
-            email: user.email,
-            password: user.password,
-            phone: user.phone,
-            attemps: user.attemps,
-          }
-
           handleUpdateUser(_user, ()=>{});
           handleInvalidPassword(user.attemps);
         }
@@ -158,11 +166,12 @@ const LoginPassword = () => {
 
   const handleRetryLogin = () => {
     logger.debug("LoginPassword", "handleRetryLogin");
-    cancelDialogAndRedirect("/login/password");
+    setRetry((x: number) => x+1);
+    cancelDialogAndRedirect("/login/password?userId="+userId);
   }
 
   const onSubmit = (data: any) => {
-    logger.debug("LoginOTP", "onSubmit Login Form");
+    logger.debug("LoginPassword", "onSubmit Login Form: ", userId);
     if (userId) {
       handleLoadUserById(parseInt(userId), userLoadedCallback);
     }

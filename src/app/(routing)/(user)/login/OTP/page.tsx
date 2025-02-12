@@ -10,18 +10,32 @@ import { useUser } from "@/hooks/use-user";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "@/lib/db";
 import { NotificationButtonsType, OtpType, UserType } from "@/types/ecafe";
+import { register } from "module";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FormSchema, FormSchemaType } from "./data/form-scheme";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 
 const LoginOTP = () => {
   const {push} = useRouter();
-  const {setUser} = useUser();
+  const {login} = useUser();
   const {debug} = useDebug();
 
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
- 
-  const [value, setValue] = useState("")
+
+  const formMethods = useForm<FormSchemaType>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      otpcode: "",
+    },
+  })
+
+  const {handleSubmit, getValues, setValue, register, formState: {errors}} = formMethods;
+
+  // const [value, setValue] = useState("")
   const searchParams = useSearchParams();
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -34,7 +48,9 @@ const LoginOTP = () => {
   const dialogButtonsRef = useRef<NotificationButtonsType>({leftButton: "No", rightButton: "Yes"});
   const dialogDataRef = useRef<any>(undefined);
   
+  logger.debug("LoginOTP", "Reading OTP ID");
   const otpId = searchParams.get("otpId");
+  logger.debug("LoginOTP", "OTP ID = " + otpId);
 
   if (otpId) {
     logger.debug("LoginOTP", "OTP for email", otpId);
@@ -42,7 +58,7 @@ const LoginOTP = () => {
 
   const handleInvalidOtpCode = (attemps: number) => {
     logger.debug("LoginOTP", "OTP code invalid", "Show notification");
-    dialogTitleRef.current = `Invalid OTP code (attemp ${attemps}/${MaxLoginAttemps})`;
+    dialogTitleRef.current = `Invalid OTP code (attemp ${attemps+1}/${MaxLoginAttemps})`;
     dialogMessageRef.current = "OTP code incorrect. Retry Login or OTP again?";
     dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Login", rightButton: "OTP"};
 
@@ -63,12 +79,31 @@ const LoginOTP = () => {
 
     if (data.status === 200) {
       logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
-      setUser(data.payload);
+      login(data.payload);
       push("/dashboard")
     } else {
       logger.debug("LoginOTP", "userLoadedCallback", "user not found -> ERROR");
     }
   }
+
+  const focusToOTPInput = () => {
+    const element: HTMLInputElement|null = document.getElementById("otpinput") as HTMLInputElement;
+    if (element) {
+      element.focus();
+    }
+  }
+
+  useEffect(() => {
+    setValue("otpcode", "");
+    focusToOTPInput();
+  }, []);
+
+  const [retry, setRetry] = useState<number>(0);
+
+  useEffect(() => {
+    setValue("otpcode", "");
+    focusToOTPInput();
+  }, [retry]);
 
   const setGuest = (_email: string) => {
     const user: UserType = {
@@ -82,22 +117,23 @@ const LoginOTP = () => {
     }
     logger.debug("LoginOTP", "OTP login as guest", "set user", JSON.stringify(user));
 
-    setUser(user);
+    login(user);
     push("/dashboard")
   }
 
   const otpLoadedCallback = (data: any) => {
     logger.debug("LoginOTP", "otpLoadedCallback", JSON.stringify(data));
     if (data.status === 200) {
-      const otp: OtpType = data.payload;
+      const otp: any = data.payload;
 
+      logger.debug("LoginOTP", "otpLoadedCallback", "value = ", JSON.stringify(getValues("otpcode")));
       logger.debug("LoginOTP", "otpLoadedCallback", "OTP = ", JSON.stringify(otp));
 
-      if (otp.otp !== value) {
+      if (otp.OTP !== getValues("otpcode")) {
         logger.debug("LoginOTP", "otpLoadedCallback", "OTP invalid");
         otp.attemps++;
 
-        if (otp.attemps > MaxLoginAttemps) {
+        if (otp.attemps >= MaxLoginAttemps) {
           handleAttempsExceeded();          
         } else {
           handleUpdateOtp(otp, ()=>{});
@@ -145,47 +181,69 @@ const LoginOTP = () => {
 
   const handleRetryOTP = () => {
     logger.debug("LoginOTP", "handleRetryOTP");
-    cancelDialogAndRedirect("/login/OTP");
+    setRetry((x: number) => x+1);
+    cancelDialogAndRedirect("/login/OTP?otpId="+otpId);
+  }
+
+  const onSubmit = (data: any) => {
+    logger.debug("LoginOTP", "onSubmit Login Form: ", otpId);
+    if (otpId) {
+      logger.debug("LoginOTP", "Load OTP with id", otpId);
+      handleLoadOTP(otpId, otpLoadedCallback);
+    }
   }
 
   return (
       <div className="w-[100%] h-[100%]">
         <div className="h-screen flex items-center justify-center">
             <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
-                  <CardHeader>
-                      <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Sign In</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                      <div className="block justify-center space-y-2">
-                        <div className="justify-center text-black text-sm">
-                          An email was sent to your account with a code. Enter this code here.
-                        </div>
-                        <div>
-                          <InputOTP
-                            maxLength={6}
-                            value={value}
-                            onChange={(value) => setValue(value)}
-                            autoFocus
-                          >
-                            <InputOTPGroup>
-                              <InputOTPSlot index={0}/>
-                              <InputOTPSlot index={1} />
-                              <InputOTPSlot index={2} />
-                            </InputOTPGroup>
-                            <InputOTPSeparator />
-                            <InputOTPGroup>
-                              <InputOTPSlot index={3} />
-                              <InputOTPSlot index={4} />
-                              <InputOTPSlot index={5} />
-                            </InputOTPGroup>
-                          </InputOTP>
-                        </div>                        
-                        <div className="flex justify-center">
-                          <Button className="w-[50%] font-bold bg-login-button text-white m-20px rounded-2xl border-0 transition-all" onClick={handleOTPLogin}>Log In</Button>
-                        </div>
+              <CardHeader>
+                  <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Sign In</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form {...formMethods}>
+                  <form className="form" onSubmit={handleSubmit(onSubmit)}>
+                    {/* <div className="block justify-center space-y-2"> */}
+                      {/* <div className="justify-center text-black text-sm">
+                        An email was sent to your account with a code. Enter this code here.
+                      </div> */}
+                      {/* <div> */}
+                      <FormField
+                        control={formMethods.control}
+                        name="otpcode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-black font-bold">OTP</FormLabel>
+                            <FormControl>
+                              <InputOTP maxLength={6} {...field} id="otpinput">
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={0}/>
+                                  <InputOTPSlot index={1} />
+                                  <InputOTPSlot index={2} />
+                                </InputOTPGroup>
+                                <InputOTPSeparator />
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={3} />
+                                  <InputOTPSlot index={4} />
+                                  <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                              </InputOTP>
+                            </FormControl>
+                            <FormDescription className="text-black">
+                              An email was sent to your account with a code. Enter this code here.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex justify-center">
+                        <Button className="w-[50%] font-bold bg-login-button text-white m-20px rounded-2xl border-0 transition-all" onClick={handleOTPLogin}>Log In</Button>
                       </div>
-                      </CardContent>
-              </Card>
+                    {/* </div> */}
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
           </div>
             <NotificationDialog  
                 _open={openDialog}

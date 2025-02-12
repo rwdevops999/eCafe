@@ -1,13 +1,9 @@
-import { EmailTemplate } from '@/app/(routing)/(user)/login/main/data/email-template';
-import { EmailSendType, EmailType } from '@/types/ecafe';
+import { EmailType } from '@/types/ecafe';
 import { NextRequest, NextResponse } from 'next/server';
-import { ErrorResponse, Resend } from 'resend';
 import * as nodemailer from 'nodemailer';
 import { createApiReponse } from '@/lib/utils';
 
 // import nodemailer from 'nodemailer';
-
-const resend = new Resend("re_SeGteF2V_Kb5S4zixiMJFUrFFeAa2dvXd");
 
 export async function POST(req: NextRequest) {
     const _data: EmailType = await req.json();
@@ -34,12 +30,7 @@ export async function POST(req: NextRequest) {
         })
         console.log("email sent");
 
-        const sendInfo: EmailSendType = {
-            otp: _data.OTPcode,
-            email: _data.destination,
-        }
-
-    return NextResponse.json(createApiReponse(200, sendInfo));
+    return NextResponse.json(createApiReponse(200, _data));
       } catch (err) {
         console.log("email error", err);
         return NextResponse.json(createApiReponse(500, err))

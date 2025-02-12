@@ -46,8 +46,12 @@ const LoginMain = () => {
     const {handleSubmit, setValue, register, formState: {errors}} = formMethods;
 
     const focusToEmailInput = () => {
-        const element: HTMLInputElement|null = document.getElementById("email") as HTMLInputElement;
-        element?.select();
+        logger.debug("MainLogin", "Focus On Email Input");
+        const element: HTMLInputElement|null = document.getElementById("emailinput") as HTMLInputElement;
+        logger.debug("MainLogin", "Focus On Email Input(element)", element);
+        if (element) {
+            element.focus();
+        }
     }
 
     useEffect(() => {
@@ -86,11 +90,13 @@ const LoginMain = () => {
     const sendEmailCallback = (data: any) => {
         logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(data));
         if (data.status === 200) {
+            const emailInfo: EmailType = data.payload;
+
             const info: OtpType = {
-                userId: data.userId,
-                otp: data.otp,
-                email: data.email,
-                attemps: 0,
+                userId: emailInfo.data,
+                otp: emailInfo.OTPcode,
+                email: emailInfo.destination,
+                attemps: emailInfo.attemps,
             }
 
             logger.debug("LoginMain", "sendEmailCallback", "Creating OTP", JSON.stringify(info));
@@ -108,14 +114,15 @@ const LoginMain = () => {
         push("/login/main");
     }
 
-    const generateOtpAndSendByEmail = (data: OtpType) => {
+    const generateOtpAndSendByEmail = (_data: OtpType) => {
         logger.debug("LoginMain", "generate OTP and ...");
         const OTP: string = generateOTP();
 
         const email: EmailType = {
-            destination: data.email,
+            destination: _data.email,
             OTPcode: OTP,
-            attemps: 0
+            attemps: 0,
+            data: _data.userId
         }
 
         logger.debug("LoginMain", "... send email", JSON.stringify(email));
@@ -145,21 +152,20 @@ const LoginMain = () => {
         dialogTitleRef.current = "User blocked";
         dialogMessageRef.current = "Your account is blocked. Please contact the admin?"
         dialogButtonsRef.current = {leftButton: "Cancel"};
+
+        setDialogState(true);
     }
 
     const userByEmailLoadedCallback = (_data: any, _email: string) => {
-        logger.debug("LoginMain", "userByEmailLoadedCallback", JSON.stringify(_data), _email);
+        logger.debug("LoginMain", "userByEmailLoadedCallback(data, email)", JSON.stringify(_data), _email);
 
         if (_data.status === 200) {
             const user: UserType = _data.payload;
+            logger.debug("LoginMain", "userByEmailLoadedCallback(user)", JSON.stringify(user));
 
             if (user.blocked) {
                 handleUserBlocked();
-            }
-
-            logger.debug("LoginMain", "userByEmailLoadedCallback", JSON.stringify(user));
-
-            if (user.passwordless) {
+            } else if (user.passwordless) {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
                 const otpData: OtpType = {
                     email: user.email,
@@ -178,7 +184,7 @@ const LoginMain = () => {
             logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");
             dialogTitleRef.current = "User not found";
             dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
-            dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
+            dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry", rightButton: "Use OTP"};
         
             const otpData: OtpType = {
                 attemps: 0,
@@ -213,7 +219,7 @@ const LoginMain = () => {
                                         {/* <Label className="col-span-2 text-black" htmlFor="email">Email:</Label> */}
                                         <Input
                                             type="text" 
-                                            id="email"
+                                            id="emailinput"
                                             placeholder="email..."
                                             className="h-8 col-span-12 text-black"
                                             {...register("email")}

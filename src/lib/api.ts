@@ -1,12 +1,12 @@
-import { CallbackFunctionSubjectLoaded, EmailType } from "@/types/ecafe"
+import { CallbackFunctionSubjectLoaded, EmailType, OtpType } from "@/types/ecafe"
 
 /**
  * DB
  */
-export const sendEmail = async (email: EmailType, _callback: CallbackFunctionSubjectLoaded) => {
+export const sendEmail = async (emailInfo: EmailType, _callback: CallbackFunctionSubjectLoaded) => {
   const res = await fetch('http://localhost:3000/api/send',{
     method: 'POST',
-    body: JSON.stringify(email),
+    body: JSON.stringify(emailInfo),
     headers: {
       'content-type': 'application/json'
     }
@@ -17,7 +17,7 @@ export const sendEmail = async (email: EmailType, _callback: CallbackFunctionSub
   });
 }
 
-export const handleSendEmail = async (email: EmailType, _callback: CallbackFunctionSubjectLoaded) => {
-  await sendEmail(email, _callback);
+export const handleSendEmail = async (emailInfo: EmailType, _callback: CallbackFunctionSubjectLoaded) => {
+  await sendEmail(emailInfo, _callback);
 }
 

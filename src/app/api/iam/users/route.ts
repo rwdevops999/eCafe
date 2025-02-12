@@ -56,15 +56,15 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
     blocked: data.blocked,
     address: {
       update: {
-        street: (data.address?.street ? data.address.street : ""),
-        number: (data.address?.number ? data.address.number : ""),
-        box: (data.address?.box ? data.address.box : ""),
-        city: (data.address?.city ? data.address.city : ""),
-        postalcode: (data.address?.postalcode ? data.address.postalcode : ""),
-        county: (data.address?.county ? data.address.county : ""),
+        street: data.address!.street,
+        number: data.address!.number,
+        box: data.address!.box,
+        city: data.address!.city,
+        postalcode: data.address!.postalcode,
+        county: data.address?.county,
         country: {
           connect: {
-            id: (data.address?.country ? data.address.country.id : null)
+            id: data.address!.country.id
           }
         }
       }
@@ -82,6 +82,47 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
       connect: data.groups?.selected
     }
   });
+}
+
+const  provisionUserForUpdate2 = (data: ExtendedUserType) => {
+  return ({
+      id: data.id,
+      name: data.name,
+      firstname: data.firstname,
+      phone: (data.phone ? data.phone : ""),
+      email: data.email,
+      password: data.passwordless ? "" : encrypt(data.password!),
+      passwordless: data.passwordless,
+      attemps: data.attemps,
+      blocked: data.blocked,
+      address: {
+        update: {
+          street: (data.address ? data.address.street : ""),
+          number: (data.address ? data.address.number : ""),
+          box: (data.address ? data.address.box : ""),
+          city: (data.address ? data.address.city : ""),
+          postalcode: (data.address ? data.address.postalcode : ""),
+          county: (data.address ? data.address.county : ""),
+          country: {
+            connect: {
+              id: (data.address ? data.address.country.id : null)
+            }
+          },
+        }
+      },
+      // roles: {
+      //   disconnect: data.roles?.removed,
+      //   connect: data.roles?.selected
+      // },
+      // policies: {
+      //   disconnect: data.policies?.removed,
+      //   connect: data.policies?.selected
+      // },
+      // groups: {
+      //   disconnect: data.groups?.removed,
+      //   connect: data.groups?.selected
+      // }
+    });
 }
 
 export async function POST(req: NextRequest) {
@@ -179,6 +220,13 @@ export async function GET(request: NextRequest) {
       const user = await prisma.user.findFirst({
         where: {
           email: _email
+        },
+        include: {
+          address: {
+            include: {
+              country: true
+            },
+          },
         }
       })
 
@@ -197,6 +245,13 @@ export async function GET(request: NextRequest) {
       const user = await prisma.user.findFirst({
         where: {
           id: parseInt(_id)
+        },
+        include: {
+          address: {
+            include: {
+              country: true
+            },
+          },
         }
       })
 
@@ -206,6 +261,8 @@ export async function GET(request: NextRequest) {
           user.password = decrypt(user.password);
           console.log("password for " + user.name + " is " + user.password);
         }
+
+        console.log("API LOAD BY ID" + JSON.stringify(user) );
 
         return Response.json(createApiReponse(200, user));
       }
@@ -267,9 +324,9 @@ export async function PUT(req: NextRequest) {
   const data: ExtendedUserType = await req.json();
 
   console.log("[API] UPDATE USER", JSON.stringify(data));
-  
+ 
   const  updatedUser = await prisma.user.update({
-    where: {
+      where: {
       id: data.id
     },
     data: provisionUserForUpdate(data) as any

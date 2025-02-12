@@ -4,13 +4,13 @@
 
 ### Enter the email
 
-01. [ ] Load User with this email
+01. [x] Load User with this email
 02. [ ] If user is not found, show notification
 03. [ ] Cancel the login from here
 04. [ ] Retry the login process
 05. [ ] Use OTP
 06. [ ] If user is found
-07. [ ] If user is blocked -> Notification -> /dashboard
+07. [x] If user is blocked -> Notification -> /dashboard
 08. [ ] user is passwordless
 09. [ ] >>>>> Generate OTP
 10. [ ] >>>>> Send Email with OTP
@@ -54,10 +54,10 @@
 
 # Happy Route (OTP)
 
-41. [ ] select login
-42. [ ] enter email
-43. [ ] get OTP code from email and enter OTP code
-44. [ ] user is logged in and set as active user
+41. [x] select login
+42. [x] enter email
+43. [x] get OTP code from email and enter OTP code
+44. [x] user is logged in and set as active user
 
 # Happy Route (Password)
 

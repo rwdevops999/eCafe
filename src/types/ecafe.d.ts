@@ -208,14 +208,10 @@ type EmailType = {
   destination: string,
   OTPcode: string,
   attemps: number,
+  data: any
 }
 
 /* Returned from email sender */
-type EmailSendType = {
-  otp: string,
-  email: string,
-}
-
 type NotificationButtonsType = {
   leftButton?: string,
   centerButton?: string,

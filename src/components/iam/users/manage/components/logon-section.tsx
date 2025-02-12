@@ -123,9 +123,9 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
                 />
               <Label
                 htmlFor="passwordless"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="col-span-4 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Passwordless
+                On-Time Password
               </Label>
               </div>
             </div>

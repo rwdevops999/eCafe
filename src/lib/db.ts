@@ -317,6 +317,7 @@ export const handleUpdateUser = async (_user: ExtendedUserType, _callback: Callb
 
 // OTP
 export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
+  console.log("OTP in DB.ts", JSON.stringify(_otp));
   await fetch('http://localhost:3000/api/otp',
     {
       method: 'POST',
