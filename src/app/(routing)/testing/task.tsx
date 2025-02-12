@@ -25,13 +25,22 @@ type TaskActionType = {
   func: () => void
 }
 
-const taskActions: TaskActionType[] = [{
+const taskActions: TaskActionType[] = [
+  {
   id: 1,
   type: "OTP",
   action: "Remove OTP",
   payload: undefined,
   func: () => {}
-}]
+  },
+  {
+    id: 2,
+    type: "USER",
+    action: "Unblock User",
+    payload: undefined,
+    func: () => {}
+    }
+]
 
 // FOR NOW UNTIL ALL IS KNOW, HARDCODED
 const Task = ({taskId = 0}:{taskId?: number}) => {
