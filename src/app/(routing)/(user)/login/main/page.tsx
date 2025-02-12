@@ -45,19 +45,19 @@ const LoginMain = () => {
 
     const {handleSubmit, setValue, register, formState: {errors}} = formMethods;
 
-    const focusToEmailInfo = () => {
+    const focusToEmailInput = () => {
         const element: HTMLInputElement|null = document.getElementById("email") as HTMLInputElement;
         element?.select();
     }
 
     useEffect(() => {
-        focusToEmailInfo();
+        focusToEmailInput();
     }, []);
 
     const [refocus, setRefocus] = useState<boolean>(false);
 
     useEffect(() => {
-        focusToEmailInfo();
+        focusToEmailInput();
     }, [refocus]);
 
     const taskCreatedCallback = () => {
@@ -174,22 +174,22 @@ const LoginMain = () => {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "WITH PASSWORD => Redirect to LoginPassword", user.id);
                 push("/login/password?userId="+user.id);
             }
+        } else {
+            logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");
+            dialogTitleRef.current = "User not found";
+            dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
+            dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
+        
+            const otpData: OtpType = {
+                attemps: 0,
+                email: _email,
+                otp: ""                 
+            }
+        
+            dialogDataRef.current = otpData;
+        
+            setDialogState(true);
         }
-          
-        logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");
-        dialogTitleRef.current = "User not found";
-        dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
-        dialogButtonsRef.current = {leftButton: "No", centerButton: "Yes", rightButton: "use OTP"};
-    
-        const otpData: OtpType = {
-            attemps: 0,
-            email: _email,
-            otp: ""                 
-        }
-    
-        dialogDataRef.current = otpData;
-    
-        setDialogState(true);
     }
 
     const onSubmit = (data: FormSchemaType) => {
@@ -228,7 +228,7 @@ const LoginMain = () => {
                     </CardContent>
                 </Card>
             </div>
-            <NotificationDialog  
+            {openDialog && <NotificationDialog  
                 _open={openDialog}
                 _title={dialogTitleRef.current}
                 _message={dialogMessageRef.current}
@@ -237,7 +237,7 @@ const LoginMain = () => {
                 _handleButtonCenter={handleRetryLogin}
                 _handleButtonRight={handleOTP}
                 _data={dialogDataRef.current}
-            />
+            />}
         </div>
     )
 }

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
@@ -21,7 +21,7 @@ import { useDebug } from "@/hooks/use-debug";
 
 const LoginPassword = () => {
   const searchParams = useSearchParams();
-  const {setUser} = useUser();
+  const {login} = useUser();
   const {push} = useRouter();
   const {debug} = useDebug();
 
@@ -78,6 +78,15 @@ const LoginPassword = () => {
     setDialogState(true);
   }
   
+  const focusToPasswordInput = () => {
+    const element: HTMLInputElement|null = document.getElementById("password") as HTMLInputElement;
+    element?.select();
+}
+
+  useEffect(() => {
+      focusToPasswordInput();
+  }, []);
+  
   const taskCreatedCallback = () => {
     logger.debug("LoginMain", "Task Created");
   }
@@ -89,7 +98,7 @@ const LoginPassword = () => {
       logger.debug("LoadPassword", "User found", JSON.stringify(user));
 
       if (user.password === getValues("password")) {
-        setUser(user);
+        login(user);
         push("/dashboard")
       } else {
         user.attemps++;
@@ -176,6 +185,7 @@ const LoginPassword = () => {
                                 <Input 
                                   type={viewPassword ? "text" : "password"}
                                   id="password"
+                                  autoComplete="on"
                                   placeholder="password..."
                                   className="h-8 col-span-11 text-black"
                                   {...register("password")}

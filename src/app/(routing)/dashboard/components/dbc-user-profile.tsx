@@ -10,6 +10,13 @@ import { ReactNode } from "react";
 const DbcUserProfile = ({className=""}:{className?:string}) => {
   const {user} = useUser();
 
+  if (typeof user?.createDate === 'string') {
+    let d: Date = new Date(user?.createDate);
+    
+    console.log("DBC USER PROFILE", d.toDateString());
+    user.createDate = d;
+  }
+
   const IsEmpty = (user: UserType|undefined, value: string | undefined): boolean => {
     return (! (value || value === ''));
   }

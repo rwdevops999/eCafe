@@ -11,7 +11,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import { useDebug } from "@/hooks/use-debug";
 
 const LoginLogout = () => {
-    const {user, setUser} = useUser();
+    const {isLoggedIn, logout} = useUser();
     const router = useRouter();
     const {debug} = useDebug();
 
@@ -23,12 +23,12 @@ const LoginLogout = () => {
     }
 
     const doLogout = () => {
-        setUser(undefined);
+        logout();
     }
 
     return (
         <div>
-            {user && 
+            {isLoggedIn() && 
                 <>
                     <div className="flex items-center">
                         <Button variant="ghost" onClick={doLogout} className="h-4">
@@ -38,7 +38,7 @@ const LoginLogout = () => {
                     </div>
             </>
         }
-            {!user && 
+            {!isLoggedIn() && 
                 <>
                     <div className="-ml-4 flex items-center">
                         <Button variant="ghost" onClick={doLogin} className="h-4">

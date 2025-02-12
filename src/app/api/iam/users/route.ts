@@ -158,9 +158,12 @@ const findAllUsers = async () => {
     }
   );
 
+  console.log("Decrypt passwords");
   users.forEach(user => {
     if (!user.passwordless) {
+      console.log("Decrypt password for " + user.name);
       user.password = decrypt(user.password);
+      console.log("password for " + user.name + " is " + user.password);
     }
   });
 
@@ -180,6 +183,12 @@ export async function GET(request: NextRequest) {
       })
 
       if (user) {
+        if (!user.passwordless) {
+          console.log("Decrypt password for " + user.name);
+          user.password = decrypt(user.password);
+          console.log("password for " + user.name + " is " + user.password);
+        }
+    
         return Response.json(createApiReponse(200, user));
       }
     }
@@ -192,6 +201,12 @@ export async function GET(request: NextRequest) {
       })
 
       if (user) {
+        if (!user.passwordless) {
+          console.log("Decrypt password for " + user.name);
+          user.password = decrypt(user.password);
+          console.log("password for " + user.name + " is " + user.password);
+        }
+
         return Response.json(createApiReponse(200, user));
       }
 

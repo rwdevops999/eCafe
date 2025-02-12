@@ -1,4 +1,4 @@
-# Login
+# Login  (user stories)
 
 ## LoginMain
 
@@ -61,7 +61,7 @@
 
 # Happy Route (Password)
 
-45. [ ] select login
-46. [ ] enter email
-47. [ ] enter password
-44. [ ] user is logged in and set as active user
+45. [x] select login
+46. [x] enter email
+47. [x] enter password
+44. [x] user is logged in and set as active user

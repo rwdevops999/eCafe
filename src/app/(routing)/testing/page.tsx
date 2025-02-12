@@ -5,7 +5,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import DbcCalendar from "../dashboard/components/dbc-calendar";
 import DbcUserProfile from "../dashboard/components/dbc-user-profile";
 import DbcTasks from "../dashboard/components/dbc-tasks";
-import { padZero } from "@/lib/utils";
+import { decrypt, padZero } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import { UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
 
 const Test = () => {
-  const {setUser} = useUser();
+  const {login} = useUser();
 
   const testUser: UserType = {
     name: "test",
@@ -26,7 +26,7 @@ const Test = () => {
   }
 
   const setAnUser = () => {
-    setUser(testUser);
+    login(testUser);
   }
 
   const {push} = useRouter();
@@ -35,19 +35,22 @@ const Test = () => {
     push("/task");
   }
 
+  const getEnv = () => {
+    console.log("ENV", process.env.DEBUG);
+  }
+
+  const test = () => {
+    console.log(decrypt("7591ede799388623680aa8ae37ce095f60bad84341dbffd2af237862941c0542"));
+  }
+
+  test();
+
   const renderComponent = () => {
     return(
-      <>
-      <Button onClick={setAnUser}>Set User</Button>&nbsp;
-      <Button onClick={gotoTaskPage}>Button Redirect</Button>&nbsp; 
-      {/* OK */}
-      <a href="/task">Href Redirect</a>&nbsp;
-      {/* NOK */}
-      <Link href="/task">Link Redirect</Link>
-      {/* OK */}
-        {/* <div className="w-[100%] h-[97%]">
+        <div className="w-[100%] h-[97%]">
           <div className="flex items-center h-[40px] space-x-2 border  border-foreground/20 rounded-sm m-1">
             <div className="flex items-center space-x-1 ml-1">
+              <Button onClick={getEnv}>ENV</Button>
               <Label>Database:</Label>
               <EcafeButton caption="Clear Database" />
               <EcafeButton caption="Initialize Database" />
@@ -61,8 +64,7 @@ const Test = () => {
             </div>
             <DbcTasks className="h-[65%] col-span-9 rounded-md border border-foreground/20"/>
           </div>
-        </div> */}
-      </>
+        </div>
     );
   };
 

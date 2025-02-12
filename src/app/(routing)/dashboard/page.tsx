@@ -13,9 +13,10 @@ import { useUser } from "@/hooks/use-user";
 import { testUser } from "./data/test-user";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
-  const {setUser} = useUser();
+  const {login, logout} = useUser();
   const {debug} = useDebug();
 
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
@@ -37,11 +38,11 @@ const Dashboard = () => {
   };
 
   const setTestUser = () => {
-    setUser(testUser);
+    login(testUser);
   }
 
   const clearTestUser = () => {
-    setUser(undefined);
+    logout();
   }
 
   return (

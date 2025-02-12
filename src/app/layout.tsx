@@ -24,7 +24,8 @@ export default function RootLayout({
       <head>
         <title>♨️ eCAFé</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        </head>
+        <script src="https://unpkg.com/favloader@0.4.4"></script>
+      </head>
       <body
         className="antialiased"
       >
