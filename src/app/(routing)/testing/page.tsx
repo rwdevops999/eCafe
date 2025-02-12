@@ -12,6 +12,8 @@ import { ExtendedUserType, UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
 import { handleUpdateUser } from "@/lib/db";
 import Task from "./task";
+import { useState } from "react";
+import TaskDialog from "./task-dialog";
 
 const Test = () => {
   const {login} = useUser();
@@ -48,12 +50,25 @@ const Test = () => {
   const test = () => {
     handleUpdateUser(u, ()=>{});
   }
-  
+
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleDialogOpen = () => {
+    setOpen((oldOpen: boolean) => ! oldOpen);
+  }
+
+  const handleDialogClose = () => {
+    setOpen(false);
+  }
+
   const renderComponent = () => {
     console.log("TEST");
 
     return (
-      <Task taskId={20}/>
+      <div>
+        <Button onClick = {handleDialogOpen}>open dialog</Button>
+        <TaskDialog _taskId={20} _open={open} handleDialogClose={handleDialogClose}/>
+      </div>
     );
   };
 
