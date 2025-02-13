@@ -72,8 +72,8 @@ const LoginMain = () => {
         logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", JSON.stringify(data));
 
         const task: TaskType = {
-            name: "Remove",
-            description: "Remove from OTP",
+            name: "Remove OTP",
+            description: `Remove code for OTP ${data.otp}`,
             subject: "OTP",
             subjectId: data.id,
             status: "open"

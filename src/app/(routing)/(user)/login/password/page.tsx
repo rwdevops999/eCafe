@@ -132,8 +132,8 @@ const taskCreatedCallback = () => {
           handleUpdateUser(_user, ()=>{});
 
           const task: TaskType = {
-              name: "Unblock",
-              description: "Unblock User",
+              name: "Unblock User",
+              description: `Unblock the user from email ${user.email}`,
               subject: "User",
               subjectId: user.id,
               status: "open"

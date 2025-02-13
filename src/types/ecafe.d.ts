@@ -227,6 +227,9 @@ type OtpType = {
   userId?: number,
 }
 
+/**
+ * name will be the action so the name and the actions in task are preferably the same
+ */
 type TaskType = {
   id?: number,
   name: string,
