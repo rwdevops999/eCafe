@@ -15,7 +15,7 @@ import { cn, padZero } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
-import { CalendarDays, MailCheck, MailOpen } from "lucide-react";
+import { CalendarDays, MailCheck, MailOpen, ShieldX } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
 /**
@@ -95,7 +95,7 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
     return (
     <div className="flex items-center space-x-1">
       {selectedTask && <Badge variant="secondary" className={cn(selectedTask.status === 'open' ? "text-red-500" : "text-green-500", "cursor-default hover:bg-secondary rounded-xl")}>{selectedTask.status}</Badge>}
-      {selectedTask && (selectedTask.status === 'open') ? <MailOpen className="text-red-500" width={16} height={16}/> : <MailCheck className="text-green-500" width={16} height={16}/>}
+      {selectedTask && (selectedTask.status === 'open') ? <ShieldX className="text-red-500 animate-pulse" width={16} height={16}/> : <MailCheck className="text-green-500" width={16} height={16}/>}
     </div>
     );
   }

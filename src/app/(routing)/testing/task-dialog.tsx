@@ -1,10 +1,9 @@
 'use client'
 
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import Task from "./task";
-import { Root, VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Root } from "@radix-ui/react-visually-hidden";
 
 const TaskDialog = ({_open, _taskId = 0, handleDialogClose}:{_open: boolean; _taskId?: number; handleDialogClose(): void;}) => {
     const [dialogState, setDialogState] = useState<boolean>(false);

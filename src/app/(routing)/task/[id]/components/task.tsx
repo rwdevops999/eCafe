@@ -94,8 +94,8 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   const TaskStatus = (): ReactNode => {
     return (
     <div className="flex items-center space-x-1">
-      {selectedTask && <Badge variant="secondary" className={cn(selectedTask.status === 'open' ? "text-red-500" : "text-green-500", "cursor-default hover:bg-secondary rounded-xl")}>{selectedTask.status}</Badge>}
-      {selectedTask && (selectedTask.status === 'open') ? <MailOpen className="text-red-500" width={16} height={16}/> : <MailCheck className="text-green-500" width={16} height={16}/>}
+      {selectedTask && <Badge variant="secondary" className={cn(selectedTask.status === 'open' ? "text-red-500" : "text-green-500", "animate-caret-blink cursor-default hover:bg-secondary rounded-xl")}>{selectedTask.status}</Badge>}
+      {selectedTask && (selectedTask.status === 'open') ? <MailOpen className="text-red-500 animate-caret-blink" width={16} height={16}/> : <MailCheck className="text-green-500" width={16} height={16}/>}
     </div>
     );
   }
@@ -121,6 +121,9 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   const handleExecute = () => {
+  }
+
+  const handleClose = () => {
     handleDialogClose();
   }
 
@@ -189,7 +192,11 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
         </CardContent>
         <CardFooter className="flex justify-end min-h-[10px] items-end w-full border border-foreground/20 rounded-sm bg-foreground/20">
           <div className="pt-3" >
-            {isTaskOpen() && <EcafeButton caption="Execute" clickHandler={handleExecute}/>}
+            {isTaskOpen() && 
+            <div className="flex space-x-2">
+            <EcafeButton caption="close" clickHandler={handleClose}/>
+            <EcafeButton caption="Execute" clickHandler={handleExecute}/>
+            </div>}
           </div>
         </CardFooter>
       </Card>
