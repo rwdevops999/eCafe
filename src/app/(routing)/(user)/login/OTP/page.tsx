@@ -140,16 +140,25 @@ const LoginOTP = () => {
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
-        otp.used = true;
-        handleUpdateOtp(otp, ()=>{});
-
-        logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid");
-        if (otp.userId && otp.userId > 0) {
-          logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "Load User", otp.userId);
-          handleLoadUserById(otp.userId, userLoadedCallback);
+        if (otp.used) {
+          logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
+          dialogTitleRef.current = `OTP code invalid`;
+          dialogMessageRef.current = "OTP code already used. Retry Login?";
+          dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Login"};
+      
+          setDialogState(true);
         } else {
-          logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "No User => Guest", otp.email);
-          setGuest(otp.email);
+          otp.used = true;
+          handleUpdateOtp(otp, ()=>{});
+
+          logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid");
+          if (otp.userId && otp.userId > 0) {
+            logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "Load User", otp.userId);
+            handleLoadUserById(otp.userId, userLoadedCallback);
+          } else {
+            logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "No User => Guest", otp.email);
+            setGuest(otp.email);
+          }
         }
       }
     } else {

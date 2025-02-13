@@ -348,22 +348,8 @@ const loadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded,
     });
 }
 
-const loadOTP2 = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`)
-    .then((response) => response.json())
-    .then((response) => {
-      console.log("REPLY");
-      _callback(response, additional);
-    });
-}
-
 export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
   await loadOTP(_otpId, _callback, additional);
-}
-
-export const handleLoadOTP2 = async (_email: string, _date: Date, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  console.log("LOAd OTP2");
-  await loadOTP2(_email, _date, _callback, additional);
 }
 
 const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
