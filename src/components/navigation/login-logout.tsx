@@ -30,8 +30,8 @@ const LoginLogout = () => {
         <div>
             {isLoggedIn() && 
                 <>
-                    <div className="flex items-center">
-                        <Button variant="ghost" onClick={doLogout} className="h-4">
+                    <div className="-ml-4 flex items-center">
+                        <Button variant="ghost" onClick={doLogout} className="h-4 ml-1">
                             <LogOut size={18} className="mr-2"/>
                             Log Out
                         </Button>
@@ -41,7 +41,7 @@ const LoginLogout = () => {
             {!isLoggedIn() && 
                 <>
                     <div className="-ml-4 flex items-center">
-                        <Button variant="ghost" onClick={doLogin} className="h-4">
+                        <Button variant="ghost" onClick={doLogin} className="h-4 ml-1">
                             <LogIn size={18} className="mr-2" />
                             Log In
                         </Button>

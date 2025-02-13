@@ -6,7 +6,9 @@ import { useTranslation } from "react-i18next";
 import { SidebarUserType } from "@/data/navigation-scheme";
 import UserInfo from "./user-info";
 import Link from "next/link";
-import LoginLogout from "../ecafe/login-logout";
+import Profile from "./profile";
+import Notification from "./notification";
+import LoginLogout from "./login-logout";
 
 const NavUser = ({user}:{user:SidebarUserType}) => {
   const {t} = useTranslation();
@@ -50,14 +52,16 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="mb-1">
                     <div className="ml-1 flex items-center cursor-pointer space-x-2">
-                      <Briefcase size={18}/>
-                      <Link href="/user/profile" className="capitalize">{isClient ? t('profile') : 'profile'}</Link>
+                      <Profile />
+                      {/* <Briefcase size={18}/>
+                      <Link href="/profile" className="capitalize">{isClient ? t('profile') : 'profile'}</Link> */}
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="mb-1">
                     <div className="ml-1 flex space-x-2 items-center cursor-pointer">
-                      <Bell size={18}/>
-                      <Link href="/user/notifications" className="capitalize">{isClient ? t('notifications') : 'notifications'}</Link>
+                      <Notification />
+                      {/* <Bell size={18}/>
+                      <Link href="/user/notifications" className="capitalize">{isClient ? t('notifications') : 'notifications'}</Link> */}
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

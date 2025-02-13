@@ -430,10 +430,6 @@ export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctio
 
 const prisma = new PrismaClient()
 
-function lowerCase(name: string): string {
-  return name.substring(0, 1).toLowerCase() + name.substring(1)
-}
-
 const tableNames = ['Action', 'Address', 'Country', 'Group','OTP', 'Policy', 'Role', 'Service', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
 const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
 

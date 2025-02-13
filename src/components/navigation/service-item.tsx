@@ -6,7 +6,7 @@ import { Collapsible } from "@/components/ui/collapsible";
 import { useTranslation } from "react-i18next";
 import { SidebarServiceType } from "@/data/navigation-scheme";
 
-const ServiceItem = ({service, reload, setReload}:{service:SidebarServiceType; reload: number; setReload(x: any)}) => {
+const ServiceItem = ({service, reload, setReload}:{service:SidebarServiceType; reload: number; setReload(x: any): void;}) => {
     const {t} = useTranslation();
 
     const [isClient, setIsClient] = useState<boolean>(false);
