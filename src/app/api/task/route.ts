@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     tasks = await prisma.task.findMany();
   }
 
-  return Response.json(tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime()));
+  return Response.json(createApiReponse(200, tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
 }
 
 export async function PUT(request: NextRequest) {

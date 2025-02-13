@@ -1,4 +1,5 @@
 import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
+import { PrismaClient } from '@prisma/client'
 
 /**
  * DB
@@ -377,16 +378,16 @@ export const handleDeleteFromOtpById = (_otpId: number, _callback: CallbackFunct
   deleteFromOtpById(_otpId, _callback);
 }
 
-export const deleteFromOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded) => {
+export const deleteFromOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
   await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`,{
       method: 'DELETE',
   })
   .then(response => response.json())
-  .then(response => _callback(response));
+  .then(response => _callback(response, additional));
 }
 
-export const handleDeletefromOtpByEmailAndDate = (_email: string, _expireDate: string, _callback: CallbackFunctionSubjectLoaded) => {
-  deleteFromOtpByEmailAndDate(_email, _expireDate, _callback);
+export const handleDeletefromOtpByEmailAndDate = (_email: string, _expireDate: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+  deleteFromOtpByEmailAndDate(_email, _expireDate, _callback, additional);
 }
 
 // TASKS
@@ -425,4 +426,18 @@ const loadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoade
 
 export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
   await loadTask(_taskId, _callback, additional);
+}
+
+const prisma = new PrismaClient()
+
+function lowerCase(name: string): string {
+  return name.substring(0, 1).toLowerCase() + name.substring(1)
+}
+
+const tableNames = ['Action', 'Address', 'Country', 'Group','OTP', 'Policy', 'Role', 'Service', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
+const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
+
+export const flushAll = async () => {
+  for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
 }

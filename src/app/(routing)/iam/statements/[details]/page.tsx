@@ -5,7 +5,7 @@
 
 import StatementDetails from "@/components/iam/statements/view/statement-details";
 import { separator_ampersand, separator_equals } from "@/data/constants";
-import { isNumber, log } from "@/lib/utils";
+import { isNumber } from "@/lib/utils";
 
 const Statement = async ({ params }: { params: { details: string } }) => {
   const {details} = await(params);

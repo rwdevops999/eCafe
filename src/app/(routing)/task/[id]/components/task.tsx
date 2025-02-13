@@ -213,11 +213,10 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
         </CardContent>
         <CardFooter className="flex justify-end min-h-[10px] items-end w-full border border-foreground/20 rounded-sm bg-foreground/20">
           <div className="pt-3" >
-            {isTaskOpen() && 
             <div className="flex space-x-2">
-            <EcafeButton caption="close" clickHandler={handleClose}/>
-            <EcafeButton caption="Execute" clickHandler={handleExecute}/>
-            </div>}
+              <EcafeButton caption="close" clickHandler={handleClose}/>
+              {isTaskOpen() && <EcafeButton caption="Execute" clickHandler={handleExecute}/>}
+            </div>
           </div>
         </CardFooter>
       </Card>

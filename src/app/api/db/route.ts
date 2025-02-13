@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { Country } from "@/types/ecafe";
 import { loadCountriesFromFile } from "@/lib/utils";
@@ -123,21 +123,20 @@ export async function GET(request: NextRequest) {
    });
 }
 
-const flush = async () => {
-  const models = Object.keys(prisma).filter((key) => key[0] !== "_");
+const prisma = new PrismaClient()
 
-  const promises = models.map((name) => {
-    console.log("[DB] Flushing", name);
+const protectedTableNames = ['Action', 'Country', 'Service'];
+const tableNames = ['Address', 'Group','OTP', 'Policy', 'Role', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
+const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
 
-    // @ts-expect-error
-    return prisma[name].deleteMany();
-  });
-
-  await Promise.all(promises);
+export const flushAll = async () => {
+  // for (const tableName of protectedTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
 }
 
 export async function DELETE(request: NextRequest) {
-  await flush();
+  await flushAll();
 
   return new Response(JSON.stringify("flushed database"), {
     headers: { "content-type": "application/json" },

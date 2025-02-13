@@ -21,9 +21,13 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
   const [loader, setLoader] = useState<boolean>(false);
 
   const [tasksData, setTasksData] = useState<TaskData[]>([]);
-  const tasksLoadedCallback = (tasks: TaskType[]) => {
-    logger.debug("DbcTask", "tasks loaded", JSON.stringify(tasks));
-    setTasksData(mapTasksToData(tasks));
+  const tasksLoadedCallback = (data: any) => {
+    logger.debug("DbcTask", "tasks loaded", JSON.stringify(data));
+    if (data.status === 200) {
+      const tasks: TaskType[] = data.payload;
+      
+      setTasksData(mapTasksToData(tasks));
+    }
     setLoader(false);
   }
 

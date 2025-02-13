@@ -4,7 +4,7 @@ import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { handleClearDB, initDB } from "@/lib/db";
+import { flushAll, handleClearDB, initDB } from "@/lib/db";
 import DbcTasks from "./components/dbc-tasks";
 import DbcCalendar from "./components/dbc-calendar";
 import DbcUserProfile from "./components/dbc-user-profile";

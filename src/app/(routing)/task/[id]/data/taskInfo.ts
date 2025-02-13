@@ -3,6 +3,9 @@ import { OtpType } from "@/types/ecafe";
 
 export const ACTION_TYPE_OTP="OTP"
 export const ACTION_TYPE_USER="USER"
+export const actionTypes: string[] = [ACTION_TYPE_OTP, ACTION_TYPE_USER];
+
+export const taskStatusses: string[] = ["open", "completed"];
 
 export const ACTION_REMOVE_OTP="Remove OTP"
 export const ACTION_UNBLOCK_USER="Unblock User"
@@ -32,39 +35,48 @@ const updateTaskStatus = async (_taskId: number, _status: string) => {
         .then(response => console.log("UPDATE TASK RESPONSE", JSON.stringify(response)));
 }
 
-function converToLocalTime(date: Date) {
-    
-    let s: string = date.toISOString().replace('T', ' ').slice(0, date.toISOString().length-1);
-    console.log("ISO = ", s);
-
-    return s;
-}
-
-const subtractHours = (_date: string, _day: number): string => {
-    let date: Date = new Date(_date);
-
-    date.setHours(date.getHours() - 1);
-
-    return converToLocalTime(date);
+const convertToLocalTime = (date: Date): string => {
+    return new Date(new Date().toString().split('GMT')[0]+' UTC').toISOString();
 }
 
 const otpDeletedCallback = () => {
     console.log("OTP DELETED");
 }
 
-const otpDeletedCallbackWithData = (data: any) => {
-    console.log("OTP DELETED : DATA => " + JSON.stringify(data.payload));
+const loadedOtpCallback = (data: any, info: ActionExecutionType) => {
+    console.log("TaskInfo", "loadedOtpCallback", JSON.stringify(data));
+    if (data.status === 404) {
+        console.log("TaskInfo", "otpDeletedCallbackWithData", `OTP ${info.subjectId} is deleted => task is complete`);
+        updateTaskStatus(info.taskId, "completed");
+    } else {
+        console.log("TaskInfo", "otpDeletedCallbackWithData", `OTP ${info.subjectId} is not yet deleted => task is NOT complete`);
+    }
 }
 
-const otpLoadedCallback = (data: any, related: boolean) => {
-    console.log("TaskInfo", "optLoadedCallback", JSON.stringify(data), related);
+const otpDeletedCallbackWithData = (data: any, info: ActionExecutionType) => {
+    console.log("TaskInfo", "otpDeletedCallbackWithData", "OTP DELETED : DATA => ", JSON.stringify(data.payload));
+
+    if (data.status === 410) {
+        // payload is something like {count: n}
+        const response: any = data.payload;
+
+        if (response.count > 0) {
+            handleLoadOTP(info.subjectId.toString(), loadedOtpCallback, info);
+        }
+    }
+}
+
+const otpLoadedCallback = (data: any, info: ActionExecutionType) => {
+    console.log("TaskInfo", "optLoadedCallback", JSON.stringify(data));
     if (data.status === 200) {
         const otp: OtpType = data.payload;
+        console.log("TaskInfo", "optLoadedCallback", "PAYLOAD", JSON.stringify(otp));
 
-        if (related) {
-            console.log("TaskInfo", "optLoadedCallback", "GET OTPS");
-            handleDeletefromOtpByEmailAndDate(otp.email, subtractHours(otp.createDate!, 1), otpDeletedCallbackWithData);
+        if (info.related) {
+            console.log("TaskInfo", "optLoadedCallback", "RELATED");
+            handleDeletefromOtpByEmailAndDate(otp.email, convertToLocalTime(new Date()), otpDeletedCallbackWithData, info);
         } else {
+            console.log("TaskInfo", "optLoadedCallback", "NOT RELATED");
             handleDeleteFromOtpById(otp.id!, otpDeletedCallback);
         }
     } else {
@@ -74,8 +86,9 @@ const otpLoadedCallback = (data: any, related: boolean) => {
 
 export const handleRemoveOTP = (_info: ActionExecutionType) => {
     console.log("TaskInfo", "handleRemoveOTP", JSON.stringify(_info));
-    handleLoadOTP(_info.subjectId.toString(), otpLoadedCallback, _info.related);
-    updateTaskStatus(_info.taskId, "completed");
+    console.log("TaskInfo", "handleRemoveOTP", `loading OTP with id ${_info.subjectId}`);
+
+    handleLoadOTP(_info.subjectId.toString(), otpLoadedCallback, _info);
 }
 
 export const handleUserUnblock = (_info: ActionExecutionType) => {
@@ -98,4 +111,3 @@ export const actionFunctions: ActionFunction[] = [
         func: handleUserUnblock
     }
 ]
-

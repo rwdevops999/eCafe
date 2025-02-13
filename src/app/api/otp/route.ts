@@ -92,12 +92,15 @@ export async function DELETE(request: NextRequest) {
   }
 
   const _email = urlParams.get('email');
-  const _expdate = urlParams.get('expdate');
+  let _expdate = urlParams.get('expdate');
+  console.log("[API] PARAM(expdate)", _expdate);
 
   if (_email && _expdate) {
+    _expdate = _expdate.replace('T', ' ').slice(0,_expdate.length - 1);
+    console.log("[API] DELETING OTPs by email and expiration date", _email, _expdate);
+
     const date: Date = new Date(_expdate);
 
-    console.log("[API] DELETING OTPs by email a,nd expration date", _email, _expdate);
     const otps = await prisma.oTP.deleteMany({
       where: {
         AND: {
