@@ -17,6 +17,7 @@ import { useUser } from "@/hooks/use-user";
 import { MaxLoginAttemps } from "@/data/constants";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { useDebug } from "@/hooks/use-debug";
+import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
 
 
 const LoginPassword = () => {
@@ -132,9 +133,9 @@ const taskCreatedCallback = () => {
           handleUpdateUser(_user, ()=>{});
 
           const task: TaskType = {
-              name: "Unblock User",
+              name: ACTION_UNBLOCK_USER,
               description: `Unblock the user from email ${user.email}`,
-              subject: "User",
+              subject: ACTION_TYPE_USER,
               subjectId: user.id,
               status: "open"
           }

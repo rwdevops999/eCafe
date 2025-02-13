@@ -8,7 +8,7 @@ const createOtp = async (data: OtpType) => {
   
      await prisma.oTP.create({
       data: {
-        OTP: data.otp,
+        OTP: data.OTP,
         email: data.email,
         attemps: data.attemps,
         userId: data.userId
@@ -69,9 +69,50 @@ export async function PUT(req: NextRequest) {
       id: data.id
     },
     data: {
-      attemps: data.attemps
+      attemps: data.attemps,
+      used: data.used
     }
   });
 
   return Response.json(createApiReponse(200, updatedOtp));
+}
+
+export async function DELETE(request: NextRequest) {
+  const urlParams = request.nextUrl.searchParams
+  const otpId = urlParams.get('otpId');
+
+  if (otpId) {
+    const otp = await prisma.oTP.delete({
+      where: {
+        id: parseInt(otpId)
+      }
+    });
+
+    return Response.json(createApiReponse(410, otp));
+  }
+
+  const _email = urlParams.get('email');
+  const _expdate = urlParams.get('expdate');
+
+  if (_email && _expdate) {
+    const date: Date = new Date(_expdate);
+
+    console.log("[API] DELETING OTPs by email a,nd expration date", _email, _expdate);
+    const otps = await prisma.oTP.deleteMany({
+      where: {
+        AND: {
+          email: {
+            equals: _email
+          },
+          createDate: {
+            lte: date
+          }
+        }
+      }
+    })
+
+    return Response.json(createApiReponse(410, otps));
+  }
+
+  return Response.json(createApiReponse(400, "Invalid Parameters"));
 }

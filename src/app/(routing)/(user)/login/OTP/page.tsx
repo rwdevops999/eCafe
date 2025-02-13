@@ -140,6 +140,9 @@ const LoginOTP = () => {
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
+        otp.used = true;
+        handleUpdateOtp(otp, ()=>{});
+
         logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid");
         if (otp.userId && otp.userId > 0) {
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "Load User", otp.userId);

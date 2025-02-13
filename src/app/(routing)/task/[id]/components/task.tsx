@@ -16,44 +16,23 @@ import { TaskType } from "@/types/ecafe";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 import { CalendarDays, MailCheck, MailOpen } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { ActionExecutionType, ActionFunction, actionFunctions } from "../data/taskInfo";
 
 /**
  * Functions can't be stored in the database, so we need to store them in a .ts file
  */
-type TaskActionType = {
-  id: number,
-  type: string,
-  action: string,
-  payload: any|undefined,
-  func: () => void
-}
-
-const taskActions: TaskActionType[] = [
-  {
-  id: 1,
-  type: "OTP",
-  action: "Remove OTP",
-  payload: undefined,
-  func: () => {}
-  },
-  {
-    id: 2,
-    type: "USER",
-    action: "Unblock User",
-    payload: undefined,
-    func: () => {}
-    }
-]
-
 // FOR NOW UNTIL ALL IS KNOW, HARDCODED
+
 const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClose(): void;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const [selectedTask, setSelectedTask] = useState<TaskType|undefined>(undefined);
-  const [selectedTaskAction, setSelectedTaskAction] = useState<TaskActionType|undefined>(undefined);
+  const [selectedTaskAction, setSelectedTaskAction] = useState<ActionFunction|undefined>(undefined);
   const [related, setRelated] = useState<boolean>(true);
+
+  const taskToExecute = useRef<string|undefined>(undefined);
 
   const taskLoadedCallback = (_response: any) => {
     // logger.debug("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
@@ -64,6 +43,15 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
       
       logger.debug("Task", "taskLoadedCallback(task)", JSON.stringify(task));
       setSelectedTask(task);
+
+      const actionFunction: ActionFunction|undefined = actionFunctions.find((action) => action.action === task.name)
+      logger.debug("Task", "taskLoadedCallback(actionFunction)", JSON.stringify(actionFunction));
+
+      if (actionFunction) {
+        logger.debug("Task", "taskLoadedCallback", "SetInfo");
+        setSelectedTaskAction(actionFunction);
+        taskToExecute.current = actionFunction.id.toString();
+      }
     }
   }
 
@@ -109,7 +97,7 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
 
     const id: number = parseInt(taskActionId);
 
-    const taskAction: TaskActionType|undefined = taskActions.find(action => action.id === id);
+    const taskAction: ActionFunction|undefined = actionFunctions.find(action => action.id === id);
 
     setSelectedTaskAction(taskAction);
   }
@@ -121,11 +109,42 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   const handleExecute = () => {
+    logger.debug("Task", "Execute(selectedTask, related) ...", JSON.stringify(selectedTaskAction), related);
+
+    // execute function of selectedTaskAction (with related flag)
+    // using selectedTask.subjectId and selectedTask.used flag and related flag
+
+    logger.debug("Task", "... on", JSON.stringify(selectedTask));
+
+    if (selectedTask && (selectedTaskAction?.type === selectedTask.subject) && (selectedTaskAction?.action === selectedTask.name)) {
+      const actionExection: ActionExecutionType = {
+        taskId: selectedTask?.id!,
+        subjectId: selectedTask?.subjectId!,
+        related: related
+      }
+
+      if (selectedTaskAction) {
+        selectedTaskAction.func(actionExection);
+      } else {
+        logger.debug("Task", "NO TASK SELECTED");
+      }
+
+    } else {
+      logger.debug("Task", "EXECUTION NOT ALLOWED");
+    }
+
+    handleClose();
   }
 
   const handleClose = () => {
     handleDialogClose();
   }
+
+  const handleTaskSelect = (value: string) => {
+    logger.debug("Task", "handleTaskSelect(value)", value);
+    handleChangeTaskAction(value);
+    taskToExecute.current = value;
+  };
 
   return (
     <div className="-m-5 min-w-[100%] h-[80%]">
@@ -163,8 +182,10 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
               <div className="flex items-center space-x-5">
                 <Label className="text-background mr-10">Action:</Label>
                 <Select
-                  onValueChange={(value) => handleChangeTaskAction(value)}
-                  defaultValue = {selectedTaskAction?.action}
+                  value = {selectedTaskAction?.id.toString()}
+                  onValueChange={(value) => {
+                    handleTaskSelect(value);
+                  }}
                 >
                   <SelectTrigger className="text-background w-[90%]">
                     <SelectValue placeholder="select an action ..." />
@@ -172,7 +193,7 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Actions</SelectLabel>
-                        {taskActions.map((action) =>
+                        {actionFunctions.map((action) =>
                             <SelectItem key={action.id} value={action.id.toString()}>{action.action}</SelectItem>
                           )}
                     </SelectGroup>

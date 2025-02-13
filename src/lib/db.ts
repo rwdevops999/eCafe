@@ -311,6 +311,20 @@ export const handleUpdateUser = async (_user: ExtendedUserType, _callback: Callb
   await updateUser(_user, _callback);
 }
 
+const unblockUser = async (_userId: number, _callback: CallbackFunctionDefault) => {
+  await fetch(`http://localhost:3000/api/iam/users?userId=${_userId}`,
+    {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => _callback());
+}
+
+export const handleUnblockUser = async (_userId: number, _callback: CallbackFunctionDefault) => {
+  await unblockUser(_userId, _callback);
+}
+
 // OTP
 export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
   console.log("OTP in DB.ts", JSON.stringify(_otp));
@@ -326,16 +340,30 @@ export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjec
     .then(response => _callback(response));
 }
 
-const loadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded) => {
+const loadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
   await fetch("http://localhost:3000/api/otp?otpId=" + _otpId)
     .then((response) => response.json())
     .then((response) => {
-      _callback(response);
+      _callback(response, additional);
     });
 }
 
-export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded) => {
-  await loadOTP(_otpId, _callback);
+const loadOTP2 = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+  await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`)
+    .then((response) => response.json())
+    .then((response) => {
+      console.log("REPLY");
+      _callback(response, additional);
+    });
+}
+
+export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+  await loadOTP(_otpId, _callback, additional);
+}
+
+export const handleLoadOTP2 = async (_email: string, _date: Date, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+  console.log("LOAd OTP2");
+  await loadOTP2(_email, _date, _callback, additional);
 }
 
 const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
@@ -351,6 +379,28 @@ const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
 
 export const handleUpdateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
   await updateOtp(_otp, _callback);
+}
+
+export const deleteFromOtpById = async (_otpId: number, _callback: CallbackFunctionDefault) => {
+  await fetch("http://localhost:3000/api/otp?otpId="+_otpId,{
+      method: 'DELETE',
+  }).then((response: Response) => _callback());
+}
+
+export const handleDeleteFromOtpById = (_otpId: number, _callback: CallbackFunctionDefault) => {
+  deleteFromOtpById(_otpId, _callback);
+}
+
+export const deleteFromOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded) => {
+  await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`,{
+      method: 'DELETE',
+  })
+  .then(response => response.json())
+  .then(response => _callback(response));
+}
+
+export const handleDeletefromOtpByEmailAndDate = (_email: string, _expireDate: string, _callback: CallbackFunctionSubjectLoaded) => {
+  deleteFromOtpByEmailAndDate(_email, _expireDate, _callback);
 }
 
 // TASKS
@@ -381,12 +431,12 @@ export const handleLoadOpenTasks = async (_callback: CallbackFunctionSubjectLoad
   await loadTasks(true, _callback);
 }
 
-const loadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded) => {
+const loadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded, additional: any) => {
   await fetch("http://localhost:3000/api/task?taskId="+_taskId)
     .then((response) => response.json())
-    .then((response) => _callback(response));
+    .then((response) => _callback(response, additional));
 }
 
-export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded) => {
-  await loadTask(_taskId, _callback);
+export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+  await loadTask(_taskId, _callback, additional);
 }

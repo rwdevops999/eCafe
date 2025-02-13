@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { createApiReponse, stringToBoolean } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const createTask = async (data: TaskType) => {
     let task: any;
@@ -65,4 +65,32 @@ export async function GET(request: NextRequest) {
   }
 
   return Response.json(tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime()));
+}
+
+export async function PUT(request: NextRequest) {
+const searchParams = request.nextUrl.searchParams
+
+const _taskId = searchParams.get('taskId');  // passed as ...?service=Stock => service = "Stock"
+const _status = searchParams.get('status');  // passed as ...?service=Stock => service = "Stock"
+
+  console.log("[API] Task Id: " + _taskId);
+  console.log("[API] Status: " + _status);
+
+  if (_taskId && _status) {
+    const updatedTask = await prisma.task.update({
+      where: {
+        id: parseInt(_taskId)
+      },
+      data: {
+        status: _status
+      }
+    });
+
+    return NextResponse.json(updatedTask);
+  }
+
+  return new Response("Parameters Error", {
+    headers: { "content-type": "application/json" },
+    status: 400,
+ });
 }

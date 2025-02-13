@@ -33,14 +33,14 @@ const taskActions: TaskActionType[] = [
   {
   id: 1,
   type: "OTP",
-  action: "Remove OTP",
+  action: ACTION_REMOVE_OTP,
   payload: undefined,
   func: () => {}
   },
   {
     id: 2,
     type: "USER",
-    action: "Unblock User",
+    action: ACTION_UNBLOCK_USER,
     payload: undefined,
     func: () => {}
     }

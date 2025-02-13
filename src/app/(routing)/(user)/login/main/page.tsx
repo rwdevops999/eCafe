@@ -15,6 +15,7 @@ import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useDebug } from "@/hooks/use-debug";
+import { ACTION_REMOVE_OTP, ACTION_TYPE_OTP } from "@/app/(routing)/task/[id]/data/taskInfo";
  
 const LoginMain = () => {
     const {push} = useRouter();
@@ -72,11 +73,11 @@ const LoginMain = () => {
         logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", JSON.stringify(data));
 
         const task: TaskType = {
-            name: "Remove OTP",
-            description: `Remove code for OTP ${data.otp}`,
-            subject: "OTP",
+            name: ACTION_REMOVE_OTP,
+            description: `Remove code for OTP ${data.OTP}`,
+            subject: ACTION_TYPE_OTP,
             subjectId: data.id,
-            status: "open"
+            status: "open",
         }
 
         logger.debug("LoginMain", "otpCreatedCallback", "Create Task", JSON.stringify(task));
@@ -94,9 +95,10 @@ const LoginMain = () => {
 
             const info: OtpType = {
                 userId: emailInfo.data,
-                otp: emailInfo.OTPcode,
+                OTP: emailInfo.OTPcode,
                 email: emailInfo.destination,
                 attemps: emailInfo.attemps,
+                used: false
             }
 
             logger.debug("LoginMain", "sendEmailCallback", "Creating OTP", JSON.stringify(info));
@@ -171,7 +173,7 @@ const LoginMain = () => {
                     email: user.email,
                     attemps: 0,
                     userId: user.id,
-                    otp: ""
+                    OTP: ""
                 }
 
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "GenerateOtp and Send email", JSON.stringify(otpData));
@@ -189,7 +191,7 @@ const LoginMain = () => {
             const otpData: OtpType = {
                 attemps: 0,
                 email: _email,
-                otp: ""                 
+                OTP: ""                 
             }
         
             dialogDataRef.current = otpData;

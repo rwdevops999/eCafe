@@ -222,19 +222,21 @@ type NotificationButtonsType = {
 type OtpType = {
   id?: number,
   email: string,
-  otp: string,
+  OTP: string,
   attemps: number,
   userId?: number,
+  used?: boolean,
+  createDate?: string
 }
 
 /**
  * name will be the action so the name and the actions in task are preferably the same
  */
 type TaskType = {
-  id?: number,
-  name: string,
+  id?: number
+  name: string
   description: string
-  subject: string,
+  subject: string
   subjectId?: number
   status: "open" | "completed"
   createDate?: string

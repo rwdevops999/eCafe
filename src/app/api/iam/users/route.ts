@@ -321,15 +321,33 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const data: ExtendedUserType = await req.json();
+  const searchParams = req.nextUrl.searchParams
+  const userId = searchParams.get('userId');  // passed as ...?service=Stock => service = "Stock"
 
-  console.log("[API] UPDATE USER", JSON.stringify(data));
- 
-  const  updatedUser = await prisma.user.update({
-      where: {
-      id: data.id
+  if (! userId) {
+    const data: ExtendedUserType = await req.json();
+
+    console.log("[API] UPDATE USER", JSON.stringify(data));
+  
+    const updatedUser = await prisma.user.update({
+        where: {
+        id: data.id
+      },
+      data: provisionUserForUpdate(data) as any
+    });
+
+    return NextResponse.json(updatedUser);
+  }
+
+  // UNBLOCK USER
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: parseInt(userId)
     },
-    data: provisionUserForUpdate(data) as any
+    data: {
+      attemps: 0,
+      blocked: false
+    }
   });
 
   return NextResponse.json(updatedUser);
