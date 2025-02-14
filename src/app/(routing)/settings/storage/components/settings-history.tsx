@@ -23,7 +23,7 @@ const SettingsHistory = () => {
         logger.debug("History", "handleClearHistory");
     
         initDB('History', historyCleared);
-        addHistory(createHistoryType("History Cleared", "Cleared the old history data", "SettingsHistory"), () => {})
+        addHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
     }
     
     const renderComponent = () => {

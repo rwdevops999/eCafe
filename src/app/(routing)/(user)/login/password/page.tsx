@@ -10,7 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
+import { addHistory, createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ExtendedUserType, NotificationButtonsType, TaskType, UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
@@ -18,6 +18,7 @@ import { MaxLoginAttemps } from "@/data/constants";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { useDebug } from "@/hooks/use-debug";
 import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
+import { createHistoryType } from "@/lib/utils";
 
 
 const LoginPassword = () => {
@@ -97,10 +98,6 @@ const LoginPassword = () => {
     focusToPasswordInput();
 }, [retry]);
 
-const taskCreatedCallback = () => {
-    logger.debug("LoginMain", "Task Created");
-  }
-
   const userLoadedCallback = (data: any) => {
     if (data.status === 200) {
       const user: UserType = data.payload;
@@ -108,6 +105,7 @@ const taskCreatedCallback = () => {
       logger.debug("LoadPassword", "User found", JSON.stringify(user));
 
       if (user.password === getValues("password")) {
+        addHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
         login(user);
         push("/dashboard")
       } else {
@@ -130,6 +128,7 @@ const taskCreatedCallback = () => {
 
         if (attemps >= MaxLoginAttemps) {
           _user.blocked = true;
+          addHistory(createHistoryType("action", "Invalid login", `${user.email} will be blocked (too many attemps)`, "Login[Password]"));
           handleUpdateUser(_user, ()=>{});
 
           const task: TaskType = {
@@ -141,11 +140,13 @@ const taskCreatedCallback = () => {
           }
           
           logger.debug("LoginPassword", "userLoadedCallback", "Create Task", JSON.stringify(task));
-          createTask(task, taskCreatedCallback);
+          addHistory(createHistoryType("action", "Task created", `Unblock ${user.email}`, "Login[Password]"));
+          createTask(task, () => {});
           
           handleAttempsExceeded();          
         } else {
           handleUpdateUser(_user, ()=>{});
+          addHistory(createHistoryType("action", "User updated", `Attemps adjusted`, "Login[Password]"));
           handleInvalidPassword(user.attemps);
         }
       }

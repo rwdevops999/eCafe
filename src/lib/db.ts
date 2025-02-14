@@ -441,7 +441,7 @@ export const flushAll = async () => {
 // HISTORY
 // Use 
 // createHistoryType to create an instance of HistoryType
-export const addHistory = async (_history: HistoryType, _callback: CallbackFunctionDefault) => {
+export const addHistory = async (_history: HistoryType, _callback?: CallbackFunctionDefault) => {
   await fetch('http://localhost:3000/api/history',
     {
       method: 'POST',
@@ -449,7 +449,7 @@ export const addHistory = async (_history: HistoryType, _callback: CallbackFunct
       headers: {
         'content-type': 'application/json'
         }
-    }).then(response => _callback());
+    }).then(response => (_callback ? _callback() : () => {}));
 }
 
 const loadHistory = async (_callback: CallbackFunctionSubjectLoaded) => {

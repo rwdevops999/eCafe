@@ -6,6 +6,7 @@ export const ACTION_TYPE_USER="USER"
 export const actionTypes: string[] = [ACTION_TYPE_OTP, ACTION_TYPE_USER];
 
 export const taskStatusses: string[] = ["open", "completed"];
+export const historyTypes: string[] = ["info", "action"];
 
 export const ACTION_REMOVE_OTP="Remove OTP"
 export const ACTION_UNBLOCK_USER="Unblock User"

@@ -8,7 +8,7 @@ import { MaxLoginAttemps } from "@/data/constants";
 import { useDebug } from "@/hooks/use-debug";
 import { useUser } from "@/hooks/use-user";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "@/lib/db";
+import { addHistory, handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "@/lib/db";
 import { NotificationButtonsType, OtpType, UserType } from "@/types/ecafe";
 import { register } from "module";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/form-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { createHistoryType } from "@/lib/utils";
 
 
 const LoginOTP = () => {
@@ -79,6 +80,7 @@ const LoginOTP = () => {
 
     if (data.status === 200) {
       logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
+      addHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
       login(data.payload);
       push("/dashboard")
     } else {
@@ -117,6 +119,7 @@ const LoginOTP = () => {
     }
     logger.debug("LoginOTP", "OTP login as guest", "set user", JSON.stringify(user));
 
+    addHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
     login(user);
     push("/dashboard")
   }
@@ -134,13 +137,16 @@ const LoginOTP = () => {
         otp.attemps++;
 
         if (otp.attemps >= MaxLoginAttemps) {
+          addHistory(createHistoryType("info", "Invalid login", `${data.email} attemps exceeded.`, "Login[OTP]"));
           handleAttempsExceeded();          
         } else {
           handleUpdateOtp(otp, ()=>{});
+          addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${data.OTP}.`, "Login[OTP]"));
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
         if (otp.used) {
+          addHistory(createHistoryType("info", "Invalid login", `${data.OTP} was already used for ${data.email}.`, "Login[OTP]"));
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
           dialogTitleRef.current = `OTP code invalid`;
           dialogMessageRef.current = "OTP code already used. Retry Login?";

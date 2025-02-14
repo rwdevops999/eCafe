@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 
 const renderNormal = (str: string): ReactNode => {
     return (
-        <div className="-p-2 flex items-center h-[8px]">
+        <div className="-p-2 flex items-center h-[10px]">
             {str}
         </div>
     );
@@ -16,7 +16,7 @@ const renderNormal = (str: string): ReactNode => {
 
 const renderLink = (id: number, str: string): ReactNode => {
     return (
-        <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
+        <div className="-p-2 flex items-center h-[10px] underline text-blue-400">
             <Link href={`/task/${id}`}>{str}</Link>
         </div>
     );
@@ -32,10 +32,33 @@ export const columns: ColumnDef<HistoryData>[] = [
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center ml-4 h-[8px]">
+                <div className="-p-2 flex items-center ml-4 h-[10px]">
                     {getValue<string>()}
                 </div>
             )
+        },
+
+        footer: props => props.column.id,
+    },
+    {
+        accessorKey: 'type',
+
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Type" />
+        ),
+
+        cell: ({ row, getValue }) => {
+            return(
+                <div className="-p-2 flex items-center ml-2 h-[10px]">
+                    <Badge className={`ml-2 w-[35%] border border-foreground/30 ${row.original.type === 'info' ? 'text-blue-500' : 'text-red-500'}`} variant="outline">
+                        {getValue<string>()}
+                    </Badge>
+                </div>
+            )
+        },
+
+        filterFn: (row, id, value) => {
+            return value.includes(row.original.type);
         },
 
         footer: props => props.column.id,
@@ -49,7 +72,7 @@ export const columns: ColumnDef<HistoryData>[] = [
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center h-[8px]">
+                <div className="-p-2 flex items-center h-[10px]">
                     {getValue<string>()}
                 </div>
             )
@@ -66,7 +89,7 @@ export const columns: ColumnDef<HistoryData>[] = [
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center ml-5 h-[8px]">
+                <div className="-p-2 flex items-center ml-5 h-[10px]">
                     {getValue<string>()}
                 </div>
             )
@@ -85,7 +108,7 @@ export const columns: ColumnDef<HistoryData>[] = [
             const date: string = getValue<string>();
 
             return(
-                <div className="-p-2 flex items-center ml-5 h-[8px]">
+                <div className="-p-2 flex items-center ml-5 h-[10px]">
                     {date.replace('T', ' ').slice(0, date.length - 5)}
                 </div>
             )

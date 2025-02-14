@@ -1,5 +1,7 @@
+'use client'
+
 import { Column } from "@tanstack/react-table"
-import { Check, PlusCircle } from "lucide-react"
+import { Check, PlusCircle, SquareX, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -7,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
+import { useState } from "react"
+import { PopoverClose } from "@radix-ui/react-popover"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -22,10 +26,20 @@ export function DataTableFacetedFilter<TData, TValue>({
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as string[])
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const handleOpenPopover = () => {
+    setIsOpen(true)
+  }
+
+  const handlClosePopover = () => {
+    setIsOpen(false)
+  }
+
   return (
-    <Popover>
+    <Popover open={isOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button variant="outline" size="sm" className="h-8 border-dashed" onClick={handleOpenPopover}>
           <PlusCircle />
           {title}
           {selectedValues?.size > 0 && (
@@ -111,7 +125,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => {
+                      column?.setFilterValue(undefined); handlClosePopover()
+                    }}
                     className="justify-center text-center"
                   >
                     Clear filters
@@ -121,6 +137,11 @@ export function DataTableFacetedFilter<TData, TValue>({
             )}
           </CommandList>
         </Command>
+        <PopoverClose asChild>
+          <div className="flex justify-center">
+            <SquareX width={16} height={16} className="cursor-pointer" onClick={handlClosePopover}/>
+          </div>
+        </PopoverClose>
       </PopoverContent>
     </Popover>
   )

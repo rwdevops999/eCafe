@@ -38,6 +38,7 @@ export const taskDataScheme = z.object({
 
 export const historyDataScheme = z.object({
     title: z.string(),
+    type: z.string(),
     description: z.string(),
     originator: z.string(),
     date: z.string(),

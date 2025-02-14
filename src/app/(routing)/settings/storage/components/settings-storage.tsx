@@ -8,11 +8,12 @@ import { Label } from '@/components/ui/label';
 import { allItems, workingItems } from '@/data/constants';
 import { useDebug } from '@/hooks/use-debug';
 import { ConsoleLogger } from '@/lib/console.logger';
-import { handleClearDB, initDB } from '@/lib/db';
+import { addHistory, handleClearDB, initDB } from '@/lib/db';
 import { Database, Info } from 'lucide-react';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
 import HoverInfo from './hover-info';
+import { createHistoryType } from '@/lib/utils';
 
 const SettingsStorage = () => {
     const {debug} = useDebug();
@@ -22,6 +23,7 @@ const SettingsStorage = () => {
 
     const databaseCleared = () => {
         toast.success("Database cleared.")
+        addHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
     }
 
     const handleClearDatabase = (_dummy: boolean): void => {
@@ -32,6 +34,7 @@ const SettingsStorage = () => {
 
     const databaseInitialised = () => {
         toast.success("Database initialised.")
+        addHistory(createHistoryType("info", "Database initialised", "Database startup tables set up", "Settings[Storage]"), () => {})
     }
 
     const handleSetupDatabase = (_dummy: boolean): void => {
@@ -42,6 +45,7 @@ const SettingsStorage = () => {
 
     const dataCleared = () => {
         toast.success("Working data removed.")
+        addHistory(createHistoryType("info", "Data tables clear", "Cleared the working", "Settings[Storage]"), () => {})
     }
 
     const handleClearData = (_dummy: boolean): void => {

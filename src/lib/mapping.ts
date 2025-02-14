@@ -325,6 +325,7 @@ export const mapHistoryToData = (history: HistoryType[]|undefined): HistoryData[
     result = history.map((historyEntry: HistoryType) => {
       const data: HistoryData = {
         title: historyEntry.title,
+        type: historyEntry.type,
         description: historyEntry.description,
         originator: historyEntry.originator,
         date: historyEntry.createDate??"",

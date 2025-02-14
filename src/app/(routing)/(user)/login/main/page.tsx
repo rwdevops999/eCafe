@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
-import { createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
+import { addHistory, createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
 import { EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
-import { generateOTP } from "@/lib/utils";
+import { createHistoryType, generateOTP } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -67,10 +67,13 @@ const LoginMain = () => {
 
     const taskCreatedCallback = () => {
         logger.debug("LoginMain", "Task Created");
+        addHistory(createHistoryType("action", "Task created", `Task created to remove the OTP code`, "Login[Email]"));
     }
 
     const otpCreatedCallback = (data: any) => {
         logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", JSON.stringify(data));
+
+        addHistory(createHistoryType("action", "OTP created", `OTP with id ${data.id} created`, "Login[Email]"));
 
         const task: TaskType = {
             name: ACTION_REMOVE_OTP,
@@ -101,6 +104,7 @@ const LoginMain = () => {
                 used: false
             }
 
+            addHistory(createHistoryType("info", "Email sending", `Emailed OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}`, "Login[Email]"));
             logger.debug("LoginMain", "sendEmailCallback", "Creating OTP", JSON.stringify(info));
             createOTP(info, otpCreatedCallback);
         } else {
@@ -151,7 +155,7 @@ const LoginMain = () => {
     
     const handleUserBlocked = () => {
         logger.debug("LoginMain", "handleUserBlocked", "User is blocked => Show notification");
-        dialogTitleRef.current = "User blocked";
+        dialogTitleRef.current = "User is blocked";
         dialogMessageRef.current = "Your account is blocked. Please contact the admin?"
         dialogButtonsRef.current = {leftButton: "Cancel"};
 
@@ -166,6 +170,7 @@ const LoginMain = () => {
             logger.debug("LoginMain", "userByEmailLoadedCallback(user)", JSON.stringify(user));
 
             if (user.blocked) {
+                addHistory(createHistoryType("info", "Invalid login", `Blocked user ${_email} tried to log in.`, "Login[Email]"));
                 handleUserBlocked();
             } else if (user.passwordless) {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
@@ -202,6 +207,7 @@ const LoginMain = () => {
 
     const onSubmit = (data: FormSchemaType) => {
         logger.debug("LoginMain", "SUBMITTING");
+        addHistory(createHistoryType("info", "Login try", `${data.email} tries to login`, "Login[Email]"));
         handleLoadUserByEmail(data.email, userByEmailLoadedCallback)
     }
 
