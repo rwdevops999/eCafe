@@ -181,7 +181,7 @@ data.Services.push(
     {
         id: 5,
         tkey: 'history',
-        url: '#',
+        url: '/history',
         icon: History,
     }
 );

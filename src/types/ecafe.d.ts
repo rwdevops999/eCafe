@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dataScheme, taskDataScheme } from "@/data/schemes";
+import { dataScheme, historyDataScheme, taskDataScheme } from "@/data/schemes";
 
 type CallbackFunctionDefault = () => void;
 type CallbackFunctionSubjectLoaded = (data: any[], additional?: any) => void;
@@ -255,3 +255,4 @@ type HistoryType = {
   createDate?: string
 }
 
+type HistoryData = z.infer<typeof historyDataScheme>

@@ -26,7 +26,7 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
     if (data.status === 200) {
       const tasks: TaskType[] = data.payload;
       
-      setTasksData(mapTasksToData(tasks));
+      setTasksData(mapTasksToData(tasks, 5));
     }
     setLoader(false);
   }

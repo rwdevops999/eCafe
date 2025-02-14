@@ -23,20 +23,20 @@ const Task = () => {
     const [mappedTasks, setMappedTasks] = useState<TaskData[]>([]);
 
     const tasksLoadedCallback = (data: any): void => {
-        logger.debug("TEST", "tasksLoadedCallback", JSON.stringify(data));
+        logger.debug("Task", "tasksLoadedCallback", JSON.stringify(data));
         if (data.status === 200) {
         const tasks: TaskType[] = data.payload;
 
-        setMappedTasks(mapTasksToData(tasks));
+        setMappedTasks(mapTasksToData(tasks, 0));
         } else {
-        logger.debug("TEST", "tasksLoadedCallback", "Error", data.payload);
+        logger.debug("Task", "tasksLoadedCallback", "Error", data.payload);
         }
 
         setLoader(false);
     }
 
     useEffect(() => {
-        logger.debug("TEST", "UserEffect[]");
+        logger.debug("Task", "UserEffect[]");
         setLoader(true);
         handleLoadTasks(tasksLoadedCallback);
     }, []);

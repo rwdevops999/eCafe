@@ -35,3 +35,11 @@ export const taskDataScheme = z.object({
     status: z.string(),
     children: z.array(z.any()).optional(),
 });
+
+export const historyDataScheme = z.object({
+    title: z.string(),
+    description: z.string(),
+    originator: z.string(),
+    date: z.string(),
+    children: z.array(z.any()).optional(),
+});

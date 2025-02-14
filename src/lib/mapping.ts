@@ -1,4 +1,4 @@
-import { Data, GroupType, ServiceType, TaskData, TaskType, UserType } from "@/types/ecafe";
+import { Data, GroupType, HistoryData, HistoryType, ServiceType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 import { padZero } from "./utils";
 
@@ -291,11 +291,14 @@ export const mapUsersToData = (users: UserType[]): Data[] => {
 }
 
 
-export const mapTasksToData = (tasks: TaskType[]|undefined): TaskData[] => {
+export const mapTasksToData = (tasks: TaskType[]|undefined, size: number): TaskData[] => {
   let result: TaskData[] = [];
 
   if (tasks) {
-    let slicedTasks: TaskType[] = tasks.slice(0, 5);
+    let slicedTasks: TaskType[] = tasks;
+    if (size > 0) {
+      slicedTasks = slicedTasks.slice(0, size);
+    }
 
     result = slicedTasks.map((task: any) => {
       const data: TaskData = {
@@ -305,6 +308,26 @@ export const mapTasksToData = (tasks: TaskType[]|undefined): TaskData[] => {
         description: task.description,
         type: task.subject,
         status: task.status,
+        children: []
+      }
+
+      return data;
+    });
+  }
+
+  return result;
+}
+
+export const mapHistoryToData = (history: HistoryType[]|undefined): HistoryData[] => {
+  let result: HistoryData[] = [];
+
+  if (history) {
+    result = history.map((historyEntry: HistoryType) => {
+      const data: HistoryData = {
+        title: historyEntry.title,
+        description: historyEntry.description,
+        originator: historyEntry.originator,
+        date: historyEntry.createDate??"",
         children: []
       }
 
