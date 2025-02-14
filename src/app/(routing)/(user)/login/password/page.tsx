@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { addHistory, createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
@@ -19,6 +19,7 @@ import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { useDebug } from "@/hooks/use-debug";
 import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
 import { createHistoryType } from "@/lib/utils";
+import { useProgressBar } from "@/hooks/use-progress-bar";
 
 
 const LoginPassword = () => {
@@ -26,6 +27,17 @@ const LoginPassword = () => {
   const {login} = useUser();
   const {push} = useRouter();
   const {debug} = useDebug();
+  const progress = useProgressBar();
+
+  const progressPush = (href: string) => {
+      progress.start(); // show the indicator
+  
+      startTransition(() => {
+        push(href);
+        progress.done(); // only runs when the destination page is fully loaded
+        });
+  }
+
 
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
@@ -107,7 +119,7 @@ const LoginPassword = () => {
       if (user.password === getValues("password")) {
         addHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
         login(user);
-        push("/dashboard")
+        progressPush("/dashboard")
       } else {
         const attemps: number = user.attemps + 1;
         const _user: ExtendedUserType = {
@@ -158,7 +170,7 @@ const LoginPassword = () => {
   const cancelDialogAndRedirect = (url: string) => {
     logger.debug("LoginPassword", "Close dialog and redirect", url);
     setDialogState(false);
-    push(url);
+    progressPush(url);
   }
   
   const handleCancelLogin = () => {

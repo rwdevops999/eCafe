@@ -6,7 +6,7 @@ import { FormSchema, FormSchemaType } from "./data/form-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { addHistory, createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
 import { EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useDebug } from "@/hooks/use-debug";
 import { ACTION_REMOVE_OTP, ACTION_TYPE_OTP } from "@/app/(routing)/task/[id]/data/taskInfo";
+import { useProgressBar } from "@/hooks/use-progress-bar";
  
 const LoginMain = () => {
     const {push} = useRouter();
@@ -43,6 +44,17 @@ const LoginMain = () => {
             keepErrors: true
         }
     });
+
+    const progress = useProgressBar();
+
+    const progressPush = (href: string) => {
+       progress.start(); // show the indicator
+   
+       startTransition(() => {
+         push(href);
+         progress.done(); // only runs when the destination page is fully loaded
+         });
+    }
 
     const {handleSubmit, setValue, register, formState: {errors}} = formMethods;
 
@@ -88,7 +100,7 @@ const LoginMain = () => {
 
         logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
         setDialogState(false);
-        push("/login/OTP?otpId="+data.id);
+        progressPush("/login/OTP?otpId="+data.id);
     }
 
     const sendEmailCallback = (data: any) => {
@@ -117,7 +129,7 @@ const LoginMain = () => {
         setDialogState(false);
         setValue("email", "");
         setRefocus((old: boolean) => !old);
-        push("/login/main");
+        progressPush("/login/main");
     }
 
     const generateOtpAndSendByEmail = (_data: OtpType) => {
@@ -139,7 +151,7 @@ const LoginMain = () => {
         logger.debug("LoginMain", "Close Dialog and redirect to URL", url);
 
         setDialogState(false);
-        push(url);
+        progressPush(url);
     }
 
     const handleOTP = (name: string, data: OtpType) => {
@@ -185,7 +197,7 @@ const LoginMain = () => {
                 generateOtpAndSendByEmail(otpData);
             } else {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "WITH PASSWORD => Redirect to LoginPassword", user.id);
-                push("/login/password?userId="+user.id);
+                progressPush("/login/password?userId="+user.id);
             }
         } else {
             logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");

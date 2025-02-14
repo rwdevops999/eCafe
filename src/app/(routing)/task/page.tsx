@@ -18,7 +18,7 @@ const Task = () => {
     const {debug} = useDebug();
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-      const [loader, setLoader] = useState<boolean>(false);
+    const [loader, setLoader] = useState<boolean>(false);
 
     const [mappedTasks, setMappedTasks] = useState<TaskData[]>([]);
 

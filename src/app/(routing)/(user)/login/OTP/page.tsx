@@ -12,12 +12,13 @@ import { addHistory, handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "
 import { NotificationButtonsType, OtpType, UserType } from "@/types/ecafe";
 import { register } from "module";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/form-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { createHistoryType } from "@/lib/utils";
+import { useProgressBar } from "@/hooks/use-progress-bar";
 
 
 const LoginOTP = () => {
@@ -75,6 +76,17 @@ const LoginOTP = () => {
     setDialogState(true);
   }
 
+  const progress = useProgressBar();
+
+  const progressPush = (href: string) => {
+      progress.start(); // show the indicator
+  
+      startTransition(() => {
+        push(href);
+        progress.done(); // only runs when the destination page is fully loaded
+        });
+  }
+
   const userLoadedCallback = (data: any) => {
     logger.debug("LoginOTP", "OTP login login success", "data", JSON.stringify(data));
 
@@ -82,7 +94,7 @@ const LoginOTP = () => {
       logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
       addHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
       login(data.payload);
-      push("/dashboard")
+      progressPush("/dashboard")
     } else {
       logger.debug("LoginOTP", "userLoadedCallback", "user not found -> ERROR");
     }
@@ -121,7 +133,7 @@ const LoginOTP = () => {
 
     addHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
     login(user);
-    push("/dashboard")
+    progressPush("/dashboard")
   }
 
   const otpLoadedCallback = (data: any) => {
@@ -184,7 +196,7 @@ const LoginOTP = () => {
   const cancelDialogAndRedirect = (url: string) => {
     logger.debug("LoginOTP", "Close dialog and redirect", url);
     setDialogState(false);
-    push(url);
+    progressPush(url);
   }
   
   const handleCancelLogin = () => {
