@@ -9,6 +9,7 @@ const createHistory = async (data: HistoryType) => {
   
     await prisma.history.create({
       data: {
+        type: data.type,
         title: data.title,
         description: data.description,
         originator: data.originator,
