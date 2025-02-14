@@ -247,7 +247,7 @@ type ApiResponseType = {
   payload: any
 }
 
-export type typeType = "info" | "action";
+export type typeType = TYPE_INFO | TYPE_ACTION;
 
 type HistoryType = {
   id?: number,

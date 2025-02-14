@@ -1,12 +1,9 @@
-"use client"
-
 import { DataTableToolbarProps, Table } from "@tanstack/react-table"
 import { X } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { DataTableFacetedFilter } from "@/components/datatable/data-table-faceted-filter"
-import { actionFunctions, actionTypes, historyTypes, taskStatusses } from "../../task/[id]/data/taskInfo"
 
 export function DataTableToolbar<TData>({
   table,
@@ -28,7 +25,7 @@ export function DataTableToolbar<TData>({
           <DataTableFacetedFilter
             column={table.getColumn("type")}
             title="Type"
-            options={historyTypes}
+            options={["info", "action"]}
           />
         )}
         {isFiltered && (

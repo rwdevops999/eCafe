@@ -1,7 +1,7 @@
 'use client'
 
 import { Column } from "@tanstack/react-table"
-import { Check, PlusCircle, SquareX, X } from "lucide-react"
+import { Check, PlusCircle, SquareX } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
