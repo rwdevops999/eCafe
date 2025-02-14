@@ -12,6 +12,7 @@ import { I18nextProvider } from "react-i18next";
 import { UserProvider } from "@/hooks/use-user";
 import { DebugProvider } from "@/hooks/use-debug";
 import { Toaster } from "sonner";
+import ProgressBar from "./components/progress-bar";
 
 export default function RootLayout({
   children,
@@ -35,16 +36,18 @@ export default function RootLayout({
             <I18nextProvider i18n={i18n}>
               <SidebarProvider open={open} onOpenChange={(open:boolean) => setOpen(open)}>
                 <Theme>
-                  <AppSidebar />
+                <ProgressBar>
+                <AppSidebar />
                   <div className="flex items-center h-[2%]">
                     <SidebarTrigger className="w-[20px] h-[18px] hover:bg-background focus:outline-none"/>
                     <ArrowLeftRight className="mr-1" size="12"/>
                   </div>
-                  <div className="w-svw h-svw rounded-lg">
-                    {children}
-                    <Toaster richColors position="top-center"/>
+                  <div className="w-svw h-svw rounded-lg" id="XXX1">
+                      {children}
+                      <Toaster richColors position="top-center"/>
                   </div>
-                </Theme>
+                  </ProgressBar>
+                  </Theme>
               </SidebarProvider>
             </I18nextProvider>
           </UserProvider>

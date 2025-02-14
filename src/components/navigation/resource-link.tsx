@@ -3,6 +3,7 @@ import { SidebarResourceType } from "@/data/navigation-scheme";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import ProgressLink from "../ecafe/progress-link";
 
 const ResourceLink = ({resource}:{resource:SidebarResourceType}) => {
     const {t} = useTranslation();
@@ -16,10 +17,12 @@ const ResourceLink = ({resource}:{resource:SidebarResourceType}) => {
     const renderComponent = () => {
         return (
             <SidebarMenuButton asChild className="-ml-1">
-                <Link href={resource.url}>
+                <ProgressLink href={resource.url} className="flex items-center">
+        {/* <Link href={resource.url}> */}
                     <resource.icon />
                     <span className="capitalize">{isClient ? t(resource.tkey) : resource.tkey}</span>
-                </Link>
+                {/* </Link> */}
+                </ProgressLink>
             </SidebarMenuButton>
         );
     }

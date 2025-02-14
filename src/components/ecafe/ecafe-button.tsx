@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import ProgressLink from "./progress-link";
 
 /**
  * Application button (orange background) with a caption and (optional)url/handler
@@ -36,9 +37,11 @@ const EcafeButton = (
         <div>
             {!(url || clickHandler) &&  <Button hidden={hidden} type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>}
             {url && 
-                <Link href={url!}>
+                <ProgressLink href={url!}>
+                {/* <Link href={url!}> */}
                     <Button hidden={hidden} id={id} type={type} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" disabled={! enabled}>{caption}</Button>
-                </Link>
+                {/* </Link> */}
+                </ProgressLink>
             }    
             {!url && clickHandler && 
                 <Button hidden={hidden} type={type} id={id} size="sm" className={cn("bg-orange-400 hover:bg-orange-600", className)} variant="default" onClick={() => clickHandler(clickValue)} disabled={! enabled}>{caption}</Button>

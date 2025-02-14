@@ -23,18 +23,18 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
   }
 
   const renderComponent = () => {
-    return (
-      <SidebarMenu className="-ml-2">
+      return (
+        <SidebarMenu id="ecafe_sidebar" className="-ml-2">
         <SidebarMenuItem>
           <DropdownMenu>
           <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <UserInfo user={user} />
-                <ChevronsUpDown className="ml-auto size-4" />
-          </SidebarMenuButton>
+            <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <UserInfo user={user} />
+                  <ChevronsUpDown className="ml-auto size-4"/>
+            </SidebarMenuButton>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
@@ -44,7 +44,7 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
               sideOffset={4}
             >
                 <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="ml-1 flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-foreground/10">
                     <UserInfo user={user} />
                   </div>
                 </DropdownMenuLabel>
@@ -67,7 +67,7 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogin}>
-                  <div className="ml-1 flex space-x-2 items-center cursor-pointer">
+                  <div className="flex space-x-2 items-center cursor-pointer">
                     <LoginLogout />
                   </div>
                 </DropdownMenuItem>

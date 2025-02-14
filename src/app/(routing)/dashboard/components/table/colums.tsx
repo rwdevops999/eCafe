@@ -1,5 +1,5 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
-import { Button } from "@/components/ui/button";
+import ProgressLink from "@/components/ecafe/progress-link";
 import { TaskData } from "@/types/ecafe";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -16,7 +16,8 @@ const renderNormal = (str: string): ReactNode => {
 const renderLink = (id: number, str: string): ReactNode => {
     return (
         <div className="-p-2 flex items-center h-[8px] underline text-blue-400">
-            <Link href={`/task/${id}`}>{str}</Link>
+            {/* <Link href={`/task/${id}`}>{str}</Link> */}
+            <ProgressLink href={`/task/${id}`}>{str}</ProgressLink>
         </div>
     );
 };

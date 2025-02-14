@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Data } from "@/types/ecafe";
+import ProgressLink from "@/components/ecafe/progress-link";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -30,7 +31,8 @@ export const columns: ColumnDef<Data>[] = [
                 {row.getIsExpanded() ? '📭' : '📬'}
                 </Button>
               ) : ('')}&nbsp;{row.depth === 1 ? 
-                    <Link className="text-blue-400 underline" href={`http://localhost:3000/iam/statements/service=${row.original.other?.serviceId}&sid=${row.original.name}`}>{row.original.name}</Link>
+                    <ProgressLink className="text-blue-400 underline" href={`http://localhost:3000/iam/statements/service=${row.original.other?.serviceId}&sid=${row.original.name}`}>{row.original.name}</ProgressLink>
+                    // {/* <Link className="text-blue-400 underline" href={`http://localhost:3000/iam/statements/service=${row.original.other?.serviceId}&sid=${row.original.name}`}>{row.original.name}</Link> */}
                     :  row.original.name}
                   &nbsp;
                   {row.original.other?.managed ? 'Ⓜ️' : ''}
@@ -38,6 +40,7 @@ export const columns: ColumnDef<Data>[] = [
                 </div>
             );
         },
+
 
         footer: props => props.column.id,
     },

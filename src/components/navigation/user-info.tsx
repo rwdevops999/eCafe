@@ -6,7 +6,7 @@ const UserInfo = ({user}:{user:SidebarUserType}) => {
         return (
             <>
                 <Avatar className="h-8 w-8 rounded-lg">
-                    {user.avatar === '' ? <AvatarImage alt={user.name} className="h-8 w-8"/> : <AvatarImage src={user.avatar} alt={user.name} className="h-8 w-8"/>}
+                    {user.avatar === '' ? <AvatarImage alt={user.name} className="h-8 w-8 bg-foreground/10" /> : <AvatarImage src={user.avatar} alt={user.name} className="h-8 w-8"/>}
                     <AvatarFallback className="rounded-lg bg-background/10">☕</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

@@ -16,6 +16,7 @@ import { useUser } from "@/hooks/use-user";
 import { useDebug } from "@/hooks/use-debug";
 import { useEffect } from "react";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { Button } from "../ui/button";
 
 const data: SidebarType = {
 };
@@ -321,15 +322,19 @@ const AppSidebar = () => {
         avatar: user ? `https://ui-avatars.com/api/?name=${user.firstname} ${user.name}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
     };
 
+    const handleClickie = () => {
+        console.log("Clickie");
+    }
+
     const renderComponent = () => {
         logger.debug("SideBar", "RENDER");
+        
         return (
             <Sidebar collapsible="icon">
                 <SidebarHeader>
                     <NavHeader header={data.Header!} />
                 </SidebarHeader>
                 <SidebarContent>
-                <></>
                     <NavTools tkey="tools" tools={data.Tools!}></NavTools>
                     <NavServices tkey="services" services={data.Services!}></NavServices>
                     <NavResources tkey="managemenent" resources={data.Resources!}></NavResources>

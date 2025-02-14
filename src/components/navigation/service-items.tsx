@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { SidebarServiceType } from "@/data/navigation-scheme";
+import ProgressLink from "../ecafe/progress-link";
 
 const ServiceItems = ({service}:{service: SidebarServiceType}) => {
   const {t} = useTranslation();
@@ -30,11 +31,13 @@ const ServiceItems = ({service}:{service: SidebarServiceType}) => {
                   <SidebarMenuSub>
                   {service.children?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.tkey}>
-                      <SidebarMenuSubButton asChild>
-                      <Link href={subItem.url} className="capitalize">
-                          {isClient ? t(subItem.tkey) : subItem.tkey}
-                      </Link>
-                      </SidebarMenuSubButton>
+                        <SidebarMenuSubButton asChild>
+                          <ProgressLink href={subItem.url} className="capitalize">
+                          {/* <Link href={subItem.url} className="capitalize"> */}
+                              {isClient ? t(subItem.tkey) : subItem.tkey}
+                          {/* </Link> */}
+                          </ProgressLink>
+                        </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                   ))}
                   </SidebarMenuSub>

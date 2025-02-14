@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Data } from "@/types/ecafe";
+import ProgressLink from "@/components/ecafe/progress-link";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -30,7 +31,8 @@ export const columns: ColumnDef<Data>[] = [
                 {row.getIsExpanded() ? '📭' : '📬'}
                 </Button>
               ) : ('')}&nbsp;{row.depth === 1 ?
-                    <Link className="text-blue-400 underline" href={`http://localhost:3000/iam/policies/policy=${row.original.id}`}>{row.original.name}</Link>
+                    <ProgressLink className="text-blue-400 underline" href={`http://localhost:3000/iam/policies/policy=${row.original.id}`}>{row.original.name}</ProgressLink>
+                // <Link className="text-blue-400 underline" href={`http://localhost:3000/iam/policies/policy=${row.original.id}`}>{row.original.name}</Link>
                     :  row.original.name}
                   &nbsp;
                   {row.original.other?.managed ? 'Ⓜ️' : ''}
