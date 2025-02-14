@@ -52,7 +52,6 @@ const TestStorage = () => {
         return (
             <div className='w-full h-full border rounded-lg'>
                 <PageTitle title='Storage'/>
-                {/* <Database /> */}
                 <Card className="w-full h-[30%] border-foreground/30">
                 <CardHeader>
                     <div className="flex space-x-2 items-center">

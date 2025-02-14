@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 import * as  fs from 'fs';
 import * as path from 'path';
-import { ApiResponseType, Country, Data } from "@/types/ecafe";
+import { ApiResponseType, Country, Data, HistoryType } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
 
 
@@ -173,3 +173,11 @@ export const stringToBoolean = (str: string): boolean => {
 }
 
 export const padZero = (num: number, length: number, prefix: string = ""): string => `${prefix}`+`${(num + "").padStart(length, "0")}`;
+
+export const createHistoryType = (_title: string, _description: string, _originator: string): HistoryType => {
+  return {
+    title: _title,
+    description: _description,
+    originator: _originator
+  }
+}

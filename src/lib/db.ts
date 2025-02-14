@@ -1,4 +1,4 @@
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
+import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, HistoryType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
 import { PrismaClient } from '@prisma/client'
 
 /**
@@ -437,3 +437,30 @@ export const flushAll = async () => {
   for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
   for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
 }
+
+// HISTORY
+// Use 
+// createHistoryType to create an instance of HistoryType
+export const addHistory = async (_history: HistoryType, _callback: CallbackFunctionDefault) => {
+  await fetch('http://localhost:3000/api/history',
+    {
+      method: 'POST',
+      body: JSON.stringify(_history),
+      headers: {
+        'content-type': 'application/json'
+        }
+    }).then(response => _callback());
+}
+
+const loadHistory = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await fetch("http://localhost:3000/api/history")
+    .then((response) => response.json())
+    .then((response) => {
+      _callback(response);
+    });
+}
+
+export const handleLoadHistory = async (_callback: CallbackFunctionSubjectLoaded) => {
+  await loadHistory(_callback);
+}
+

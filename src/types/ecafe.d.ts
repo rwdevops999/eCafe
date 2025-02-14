@@ -246,3 +246,12 @@ type ApiResponseType = {
   status: number,
   payload: any
 }
+
+type HistoryType = {
+  id?: number,
+  title: string,
+  description: string,
+  originator: string,
+  createDate?: string
+}
+

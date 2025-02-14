@@ -157,5 +157,5 @@ model History {
   title String
   description String
   originator String
-  createdDate DateTime? @default(now())
+  createDate DateTime? @default(now())
 }
