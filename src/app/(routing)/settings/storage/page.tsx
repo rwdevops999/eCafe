@@ -1,7 +1,8 @@
 import PageBreadCrumbs from '@/components/ecafe/page-bread-crumbs';
 import PageTitle from '@/components/ecafe/page-title';
 import React from 'react'
-import SettingsStorage from './components/storage';
+import SettingsStorage from './components/settings-storage';
+import SettingsHistory from './components/settings-history';
 
 const Storage = () => {
   return (
@@ -13,6 +14,7 @@ const Storage = () => {
         </div>
         <div className="space-y-2">
           <SettingsStorage />
+          <SettingsHistory />
         </div>
       </div>
       </>

@@ -9,6 +9,7 @@ const prisma = new PrismaClient()
 
 const startupTableNames = ['Action', 'Country', 'Service'];
 const tableNames = ['Address', 'Group','OTP', 'Policy', 'Role', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
+const permanentTables = ['History']
 const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
 
 const flushStartup = async () => {
