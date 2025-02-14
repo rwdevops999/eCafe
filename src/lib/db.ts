@@ -4,20 +4,21 @@ import { PrismaClient } from '@prisma/client'
 /**
  * DB
  */
-export const initDB = async (table: string) => {
-  const res = await fetch('http://localhost:3000/api/db?table='+table,{
+export const initDB = async (_table: string, _callback: CallbackFunctionDefault) => {
+  const res = await fetch('http://localhost:3000/api/db?table='+_table,{
     method: 'POST',
     body: JSON.stringify("initialise DB?"),
     headers: {
       'content-type': 'application/json'
     }
-  })        
+  }).then((response: Response) => _callback());
 }
 
-export const handleClearDB = async (_callback: CallbackFunctionDefault) => {
-  await fetch("http://localhost:3000/api/db",{
-      method: 'DELETE',
-  }).then((response: Response) => _callback());
+export const handleClearDB = async (startup: boolean, _callback: CallbackFunctionDefault) => {
+  // await fetch("http://localhost:3000/api/db?startup="+startup,{
+  //     method: 'DELETE',
+  // }).then((response: Response) => _callback());
+  _callback();
 }
 
 

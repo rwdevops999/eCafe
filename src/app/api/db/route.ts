@@ -125,18 +125,30 @@ export async function GET(request: NextRequest) {
 
 const prisma = new PrismaClient()
 
-const protectedTableNames = ['Action', 'Country', 'Service'];
+const startupTableNames = ['Action', 'Country', 'Service'];
 const tableNames = ['Address', 'Group','OTP', 'Policy', 'Role', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
 const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
 
-export const flushAll = async () => {
-  // for (const tableName of protectedTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+export const flushAll = async (initStartup: boolean) => {
+  if (initStartup) {
+    for (const tableName of startupTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  }
+
   for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
   for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
 }
 
 export async function DELETE(request: NextRequest) {
-  await flushAll();
+  const urlParams = request.nextUrl.searchParams
+  const startup = urlParams.get('startup');
+
+  let initStartup: boolean = false;
+
+  if (startup) {
+    initStartup = startup.toLowerCase() === 'true';
+  } 
+
+  await flushAll(initStartup);
 
   return new Response(JSON.stringify("flushed database"), {
     headers: { "content-type": "application/json" },

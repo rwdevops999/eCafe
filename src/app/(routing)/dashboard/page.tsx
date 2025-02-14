@@ -25,18 +25,6 @@ const Dashboard = () => {
     logger.debug("Dashboard", "Database cleared");
   }
 
-  const clearDB = () => {
-    handleClearDB(databaseCleared);
-  };
-
-  const initializeDB = () => {
-    initDB('*');
-  };
-
-  const provisionCountries = () => {
-    initDB('country');
-  };
-
   const setTestUser = () => {
     login(testUser);
   }
@@ -54,10 +42,6 @@ const Dashboard = () => {
           <div className="flex items-center space-x-1 ml-1">
             <UserPlus width={16} height={16} onClick={setTestUser}/>
             <UserMinus width={16} height={16} onClick={clearTestUser}/>
-            <Label>Database:</Label>
-            <EcafeButton caption="Clear Database" clickHandler={clearDB} />
-            <EcafeButton caption="Initialize Database" clickHandler={initializeDB} />
-            <EcafeButton caption="Setup Countries" clickHandler={provisionCountries} />
           </div>
         </div>}
         <div className="grid grid-cols-12">

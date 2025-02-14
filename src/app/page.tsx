@@ -1,10 +1,7 @@
 'use client'
 
-import LoadDebug from "@/components/ecafe/load-debug";
 import { useDebug } from "@/hooks/use-debug";
-import { useUser } from "@/hooks/use-user";
 import { stringToBoolean } from "@/lib/utils";
-import { UserType } from "@/types/ecafe";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

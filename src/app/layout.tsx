@@ -11,6 +11,7 @@ import i18n from './i18n';
 import { I18nextProvider } from "react-i18next";
 import { UserProvider } from "@/hooks/use-user";
 import { DebugProvider } from "@/hooks/use-debug";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -41,6 +42,7 @@ export default function RootLayout({
                   </div>
                   <div className="w-svw h-svw rounded-lg">
                     {children}
+                    <Toaster richColors position="top-center"/>
                   </div>
                 </Theme>
               </SidebarProvider>

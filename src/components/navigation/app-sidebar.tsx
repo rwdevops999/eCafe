@@ -269,7 +269,7 @@ data.Resources.push(
             {
                 tkey: 'storage',
                 icon: Database,
-                url: "#",
+                url: "/settings/storage",
             },
             {
                 tkey: 'limits',
