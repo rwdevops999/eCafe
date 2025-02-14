@@ -1,10 +1,40 @@
-import prisma from "@/lib/prisma";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { Country } from "@/types/ecafe";
 import { loadCountriesFromFile } from "@/lib/utils";
 import { serviceMappings, ServiceMappingType } from "./setup/setup";
-import { allItems } from "@/data/constants";
+import { allItems, workingItems } from "@/data/constants";
+
+const prisma = new PrismaClient()
+
+const startupTableNames = ['Action', 'Country', 'Service'];
+const tableNames = ['Address', 'Group','OTP', 'Policy', 'Role', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
+const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
+
+const flushStartup = async () => {
+  for (const tableName of startupTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+}
+
+const flushData = async () => {
+  for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+}
+
+const flushRelations = async () => {
+  for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+}
+
+const flushTable = async (tableName : string) => {
+  await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+}
+
+export const flushAll = async (initStartup: boolean) => {
+  if (initStartup) {
+    flushStartup();
+  }
+
+  flushData();
+  flushRelations();
+}
 
 const provisionServiceActions = (_service: ServiceMappingType) => {
   let actions: Prisma.ActionCreateInput[] = [];
@@ -38,34 +68,6 @@ const provisionServices = (_services: ServiceMappingType[]) => {
   })
 }
 
-const clearServices = async () => {
-  await prisma.service.deleteMany({});
-}
-
-const clearActions = async () => {
-  await prisma.action.deleteMany({});
-}
-
-const clearPolicies = async () => {
-  await prisma.policy.deleteMany({});
-};
-
-const clearStatements = async () => {
-  await prisma.statementAction.deleteMany({});
-  await prisma.serviceStatement.deleteMany({});
-};
-
-const clearCountryTable = async () => {
-  await prisma.country.deleteMany({});
-};
-
-const clearDB = async() => {
-    await clearPolicies();
-    await clearStatements();
-    await clearServices();
-    await clearActions();
-};
-
 const provisionCountries = (filename: string) => {
   const countries: Country[] = loadCountriesFromFile(filename);
 
@@ -86,12 +88,16 @@ export async function POST(request: NextRequest) {
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
   
     if (table === allItems) {
-      await clearDB();
+      flushAll(true);
       provisionServices(serviceMappings);
     }
 
+    if (table === workingItems) {
+      flushAll(false);
+    }
+
     if (table === 'country') {
-      await clearCountryTable();
+      flushTable('Country');
       provisionCountries('./public/country/country-codes.json');
     }
 
@@ -121,21 +127,6 @@ export async function GET(request: NextRequest) {
       headers: { "content-type": "application/json" },
       status: 204,
    });
-}
-
-const prisma = new PrismaClient()
-
-const startupTableNames = ['Action', 'Country', 'Service'];
-const tableNames = ['Address', 'Group','OTP', 'Policy', 'Role', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
-const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
-
-export const flushAll = async (initStartup: boolean) => {
-  if (initStartup) {
-    for (const tableName of startupTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
-  }
-
-  for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
-  for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
 }
 
 export async function DELETE(request: NextRequest) {

@@ -15,10 +15,9 @@ export const initDB = async (_table: string, _callback: CallbackFunctionDefault)
 }
 
 export const handleClearDB = async (startup: boolean, _callback: CallbackFunctionDefault) => {
-  // await fetch("http://localhost:3000/api/db?startup="+startup,{
-  //     method: 'DELETE',
-  // }).then((response: Response) => _callback());
-  _callback();
+  await fetch("http://localhost:3000/api/db?startup="+startup,{
+      method: 'DELETE',
+  }).then((response: Response) => _callback());
 }
 
 

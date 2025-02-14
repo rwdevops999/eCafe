@@ -1,6 +1,7 @@
 import { CountryType, LanguageType, ServiceType } from "@/types/ecafe";
 
 export const allItems = '*';
+export const workingItems = '#';
 
 export const paginationSizes = [10, 15, 20, 25, 30, 35, 40, 45, 50];
 
