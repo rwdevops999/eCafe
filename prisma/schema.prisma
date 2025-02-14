@@ -151,3 +151,11 @@ model Task {
   subjectId Int?
   createDate DateTime? @default(now())
 }
+
+model History {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  originator String
+  createdDate DateTime? @default(now())
+}
