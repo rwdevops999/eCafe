@@ -8,6 +8,7 @@ import { CountryType } from "@/types/ecafe";
 import { handleLoadCountries } from "@/lib/db";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { ApiResponseType } from "@/types/db";
 
 const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}) => {
   const {register, setValue, getValues} = formMethods;
@@ -25,9 +26,11 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
 
   const [countries, setCountries] = useState<CountryType[]>([]);
 
-  const countriesLoadedCallback = (data: CountryType[]) => {
-    logger.debug("AddressSection", "ADRESS LOADED COUNTRIES");
-    setCountries(data);
+  const countriesLoadedCallback = (data: ApiResponseType): void => {
+    if (data.status === 200) {
+      logger.debug("AddressSection", "ADRESS LOADED COUNTRIES");
+      setCountries(data.payload);
+    }
   }
 
   useEffect(() => {

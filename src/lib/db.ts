@@ -42,9 +42,6 @@ export const handleLoadLanguages = async (_callback: CallbackFunctionWithData): 
   await loadLanguages(_callback);
 }
 
-
-
-
 /**
  * COUNTRIES
  */

@@ -292,7 +292,7 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   }
 
   const countries = useRef<CountryType[]>([])
-  const countriesLoadedCallback = (data: ApiResponseType) => {
+  const countriesLoadedCallback = (data: ApiResponseType): void => {
     if (data.status === 200) {
       countries.current = data.payload;
     }
