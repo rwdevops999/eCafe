@@ -112,6 +112,7 @@
 5. [ ] validation is only required when the sum of attached roles/policies and groups is more than 2
 6. [ ] creation is only possible when validation is valid (or no more than 1 dependency is used)
 7. [ ] clicking on dependecy goes to that dependency screen
+8. [ ] an user can be blocked
 
 ### update
 1. [ ] name and firstname and email are mandatory
@@ -122,6 +123,7 @@
 6. [ ] update is only possible when validation is valid (or no more than 1 dependency is used)
 7. [ ] update is immediate
 8. [ ] clicking on dependecy goes to that dependency screen
+9. [ ] an user can be blocked
 
 ### validation
 1. [ ] if not more than one dependency is selected, no validation is required

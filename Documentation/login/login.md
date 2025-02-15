@@ -1,67 +1,29 @@
 # Login  (user stories)
 
+1. [ ] Goto login screen (email) with login menu item 
+
 ## LoginMain
 
 ### Enter the email
-
-01. [x] Load User with this email
-02. [ ] If user is not found, show notification
-03. [ ] Cancel the login from here
-04. [ ] Retry the login process
-05. [ ] Use OTP
-06. [ ] If user is found
-07. [x] If user is blocked -> Notification -> /dashboard
-08. [ ] user is passwordless
-09. [ ] >>>>> Generate OTP
-10. [ ] >>>>> Send Email with OTP
-11. [ ] >>>>> Create OTP entry in DB
-12. [ ] >>>>> Create Task for this OTP
-13. [ ] >>>>> Redirect to LoginOTP (with OTP id)
-14. [ ] user has password
-15. [ ] >>>>> Redirect to LoginPassword (with userId)
+1. [ ] enter the email
+2. [ ] if the user is blocked, show notification (R)=> Home
+3. [ ] continue to the next screen (OTP or PASSWORD)
 
 ## LoginOTP
-
-15. [ ] Enter OTP code and login
-16. [ ] Load OTP From DB
-17. [ ] Check if value entered is valid 
-18. [ ] >>> Invalid -> add an attemp
-19. [ ] >>>>> # attemps exceeded -> Notification
-20. [ ] >>>>>>> Cancel: back to dashboard
-21. [ ] >>>>>>> Retry : back to login screen
-22. [ ] >>>>> # attemps not exceeded -> Notification
-23. [ ] >>>>>>> update attemps in OTP
-24. [ ] >>>>>>>>> Cancel -> Notification -> /dashboard
-25. [ ] >>>>>>>>> OTP -> Notification -> /login/OTP
-26. [ ] >>>>>>>>> Login -> Notification -> /Login/main
-27. [ ] >>> Valid code: Exist user id
-28. [ ] >>>>> NO: set user as guest (email): UserType with only email present (firstname = guest) => dashboard
-29. [ ] >>>>> YES: load user information
-30. [ ] >>>>>>> User Not Found : is normally impossible -> console log
-31. [ ] >>>>>>> User Found : set User as logged in => dashboard
+1. [ ] enter the OTP code from email
+2. [ ] OTP code is valid. Login as guest or authorized user (R)=> Dashboard
+3. [ ] OTP code is invalid, attemps not execeeded. (R)=> Login[email] or Login[OTP]
+4. [ ] OTP code is invalid, attemps execeeded. Valid user -> Block account (R)=> Home
+5. [ ] OTP code is invalid, attemps execeeded. Guest -> (R)=> Login[email]
 
 ## LoginPassword
+1. [ ] enter the password
+2. [ ] password is valid, Login as authorized user (R)=> Dashboard
+3. [ ] password is invalid, attemps not exceeded. Attemps updated (R)=> Login[password]
+4. [ ] password is invalid, attemps exceeded. Account blocked (R)=> Dashboard
 
-32. [ ] Enter password and login
-33. [ ] Load User Information from DB
-34. [ ] Check if password entered is valid
-35. [ ] >>> Valid -> set User as logged in => dashboard
-36. [ ] >>> Invalid -> add an attemp
-37. [ ] >>>>> # attemps exceeded -> Notification user blocked
-38. [ ] >>>>> # attemps not exceeded -> Notification
-39. [ ] >>>>> Cancel -> /dashboard
-40. [ ] >>>>> Retry -> /Login/Password
+## stories
 
-# Happy Route (OTP)
-
-41. [x] select login
-42. [x] enter email
-43. [x] get OTP code from email and enter OTP code
-44. [x] user is logged in and set as active user
-
-# Happy Route (Password)
-
-45. [x] select login
-46. [x] enter email
-47. [x] enter password
-44. [x] user is logged in and set as active user
+1. [ ] user with password
+2. [ ] user with OTP
+3. [ ] guest

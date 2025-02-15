@@ -10,7 +10,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 import { addHistory, createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
 import { EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
-import { createHistoryType, generateOTP } from "@/lib/utils";
+import { createHistoryType, generateOTP, js } from "@/lib/utils";
 import { handleSendEmail } from "@/lib/api";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -83,9 +83,8 @@ const LoginMain = () => {
     }
 
     const otpCreatedCallback = (data: any) => {
-        logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", JSON.stringify(data));
-
-        addHistory(createHistoryType("action", "OTP created", `OTP with id ${data.id} created`, "Login[Email]"));
+        logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", js(data));
+        addHistory(createHistoryType("action", "OTP Created", `OTP ${data.OTP} created for ${data.email}`, "Login[Email]"));
 
         const task: TaskType = {
             name: ACTION_REMOVE_OTP,
@@ -95,7 +94,6 @@ const LoginMain = () => {
             status: "open",
         }
 
-        logger.debug("LoginMain", "otpCreatedCallback", "Create Task", JSON.stringify(task));
         createTask(task, taskCreatedCallback);
 
         logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
@@ -105,6 +103,7 @@ const LoginMain = () => {
 
     const sendEmailCallback = (data: any) => {
         logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(data));
+
         if (data.status === 200) {
             const emailInfo: EmailType = data.payload;
 
@@ -116,8 +115,6 @@ const LoginMain = () => {
                 used: false
             }
 
-            addHistory(createHistoryType("info", "Email sending", `Emailed OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}`, "Login[Email]"));
-            logger.debug("LoginMain", "sendEmailCallback", "Creating OTP", JSON.stringify(info));
             createOTP(info, otpCreatedCallback);
         } else {
             logger.debug("LoginMain", "sendEmailCallback", "Send error", JSON.stringify(data.payload));
@@ -132,19 +129,8 @@ const LoginMain = () => {
         progressPush("/login/main");
     }
 
-    const generateOtpAndSendByEmail = (_data: OtpType) => {
-        logger.debug("LoginMain", "generate OTP and ...");
-        const OTP: string = generateOTP();
-
-        const email: EmailType = {
-            destination: _data.email,
-            OTPcode: OTP,
-            attemps: 0,
-            data: _data.userId
-        }
-
-        logger.debug("LoginMain", "... send email", JSON.stringify(email));
-        handleSendEmail(email, sendEmailCallback);
+    const sendByEmail = (_emailInfo: EmailType) => {
+        logger.debug("LoginMain", "... send email", js(_emailInfo));
     }
 
     const closeDialogAndRedirect = (url: string) => {
@@ -156,18 +142,28 @@ const LoginMain = () => {
 
     const handleOTP = (name: string, data: OtpType) => {
         logger.debug("LoginMain", "handleOTP");
-        generateOtpAndSendByEmail(data);
+
+        const emailInfo: EmailType = {
+            destination:data.email,
+            OTPcode: generateOTP(),
+            attemps: 0,
+            data: data.userId
+        }
+
+        logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
+        addHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
+        handleSendEmail(emailInfo, sendEmailCallback);
     }
 
     const handleCancelLogin = (name: string) => {
         logger.debug("LoginMain", "handleCancelLogin");
     
-        closeDialogAndRedirect("/dashboard");
+        closeDialogAndRedirect("/");
     }
     
     const handleUserBlocked = () => {
         logger.debug("LoginMain", "handleUserBlocked", "User is blocked => Show notification");
-        dialogTitleRef.current = "User is blocked";
+        dialogTitleRef.current = "Your account is blocked";
         dialogMessageRef.current = "Your account is blocked. Please contact the admin?"
         dialogButtonsRef.current = {leftButton: "Cancel"};
 
@@ -175,32 +171,33 @@ const LoginMain = () => {
     }
 
     const userByEmailLoadedCallback = (_data: any, _email: string) => {
-        logger.debug("LoginMain", "userByEmailLoadedCallback(data, email)", JSON.stringify(_data), _email);
+        logger.debug("LoginMain", "userByEmailLoadedCallback(data, email)", "user loaded using the email?", js(_data), _email);
 
         if (_data.status === 200) {
             const user: UserType = _data.payload;
-            logger.debug("LoginMain", "userByEmailLoadedCallback(user)", JSON.stringify(user));
+            logger.debug("LoginMain", "userByEmailLoadedCallback(user)", "user is in DB", js(user));
 
             if (user.blocked) {
                 addHistory(createHistoryType("info", "Invalid login", `Blocked user ${_email} tried to log in.`, "Login[Email]"));
                 handleUserBlocked();
             } else if (user.passwordless) {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
-                const otpData: OtpType = {
-                    email: user.email,
+                const emailInfo: EmailType = {
+                    destination:user.email,
+                    OTPcode: generateOTP(),
                     attemps: 0,
-                    userId: user.id,
-                    OTP: ""
+                    data: _data.userId
                 }
 
-                logger.debug("LoginMain", "userByEmailLoadedCallback", "GenerateOtp and Send email", JSON.stringify(otpData));
-                generateOtpAndSendByEmail(otpData);
+                logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
+                addHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
+                handleSendEmail(emailInfo, sendEmailCallback);
             } else {
-                logger.debug("LoginMain", "userByEmailLoadedCallback", "WITH PASSWORD => Redirect to LoginPassword", user.id);
+                logger.debug("LoginMain", "userByEmailLoadedCallback", "User wants to login with password => Redirect to LoginPassword", user.id);
                 progressPush("/login/password?userId="+user.id);
             }
         } else {
-            logger.debug("LoginMain", "userByEmailLoadedCallback", "Some Problem => Show notification");
+            logger.debug("LoginMain", "userByEmailLoadedCallback", "User not in DB treat as guest => Show notification");
             dialogTitleRef.current = "User not found";
             dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
             dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry", rightButton: "Use OTP"};

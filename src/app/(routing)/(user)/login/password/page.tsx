@@ -18,9 +18,8 @@ import { MaxLoginAttemps } from "@/data/constants";
 import NotificationDialog from "@/components/ecafe/notification-dialog";
 import { useDebug } from "@/hooks/use-debug";
 import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
-import { createHistoryType } from "@/lib/utils";
+import { createHistoryType, js } from "@/lib/utils";
 import { useProgressBar } from "@/hooks/use-progress-bar";
-
 
 const LoginPassword = () => {
   const searchParams = useSearchParams();
@@ -29,7 +28,7 @@ const LoginPassword = () => {
   const {debug} = useDebug();
   const progress = useProgressBar();
 
-  const progressPush = (href: string) => {
+  const redirect = (href: string) => {
       progress.start(); // show the indicator
   
       startTransition(() => {
@@ -44,7 +43,7 @@ const LoginPassword = () => {
   const userId = searchParams.get("userId");
 
   if (userId) {
-    logger.debug("LoginPasswor", "userId", userId);
+    logger.debug("LoginPassword", "userId", userId);
   }
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -100,28 +99,51 @@ const LoginPassword = () => {
 }
 
   useEffect(() => {
+      logger.debug("LoginPassword", "useEffect[]", userId);
       focusToPasswordInput();
   }, []);
-  
+
+  const user = useRef<UserType|undefined>(undefined);
+
+  const userLoadedOnEntryCallback = (data: any) => {
+    if (data.status === 200) {
+      logger.debug("LoginPassword", "User loaded on entry", userId);
+      user.current = data.payload; 
+    }
+  }
+
+  useEffect(() => {
+    logger.debug("LoginPassword", "useEffect[userId]", userId);
+    if (userId) {
+      handleLoadUserById(parseInt(userId), userLoadedOnEntryCallback);
+    }      
+
+    focusToPasswordInput();
+  }, [userId]);
+
   const [retry, setRetry] = useState<number>(0);
 
   useEffect(() => {
+    logger.debug("LoginPassword", "useEffect[retry]", retry);
     setValue("password", "");
     focusToPasswordInput();
-}, [retry]);
+  }, [retry]);
 
   const userLoadedCallback = (data: any) => {
     if (data.status === 200) {
       const user: UserType = data.payload;
 
-      logger.debug("LoadPassword", "User found", JSON.stringify(user));
+      logger.debug("LoadPassword", "User found", js(user));
 
       if (user.password === getValues("password")) {
+        logger.debug("LoadPassword", "Password correct => user is OK");
         addHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
         login(user);
-        progressPush("/dashboard")
+        redirect("/dashboard")
       } else {
+        logger.debug("LoadPassword", "Password incorrect => user is NOK");
         const attemps: number = user.attemps + 1;
+
         const _user: ExtendedUserType = {
           id: user.id,
           name: user.name,
@@ -138,8 +160,11 @@ const LoginPassword = () => {
           groups: {}
         }
 
+        logger.debug("LoadPassword", "Attemps = ", attemps);
+
         if (attemps >= MaxLoginAttemps) {
           _user.blocked = true;
+          logger.debug("LoadPassword", "Too many login tries => block user", attemps);
           addHistory(createHistoryType("action", "Invalid login", `${user.email} will be blocked (too many attemps)`, "Login[Password]"));
           handleUpdateUser(_user, ()=>{});
 
@@ -157,6 +182,7 @@ const LoginPassword = () => {
           
           handleAttempsExceeded();          
         } else {
+          logger.debug("LoadPassword", "Login failed => updating attemps", attemps);
           handleUpdateUser(_user, ()=>{});
           addHistory(createHistoryType("action", "User updated", `Attemps adjusted`, "Login[Password]"));
           handleInvalidPassword(user.attemps);
@@ -170,12 +196,12 @@ const LoginPassword = () => {
   const cancelDialogAndRedirect = (url: string) => {
     logger.debug("LoginPassword", "Close dialog and redirect", url);
     setDialogState(false);
-    progressPush(url);
+    redirect(url);
   }
   
   const handleCancelLogin = () => {
     logger.debug("LoginPassword", "handleCancelLogin");
-    cancelDialogAndRedirect("/dashboard");
+    cancelDialogAndRedirect("/");
   }
 
   const handleRetryLogin = () => {
@@ -185,10 +211,22 @@ const LoginPassword = () => {
   }
 
   const onSubmit = (data: any) => {
-    logger.debug("LoginPassword", "onSubmit Login Form: ", userId);
-    if (userId) {
+    logger.debug("LoginPassword", "onSubmit Login Form: ");
+    if (user.current) {
+      logger.debug("LoginPassword", "user already loaded continue working with it");
+      userLoadedCallback({status: 200, payload: user.current});
+    } else if (userId) {
+      logger.debug("LoginPassword", "user not yet loaded -> load user with userId", userId);
       handleLoadUserById(parseInt(userId), userLoadedCallback);
     }
+  }
+
+  const getUserName = (): string => {
+    if (user.current) {
+      return (`${user.current.firstname} ${user.current.name}`);
+    }
+
+    return 'Guest';
   }
 
   return (
@@ -196,7 +234,7 @@ const LoginPassword = () => {
         <div className="h-screen flex items-center justify-center">
             <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
                 <CardHeader>
-                    <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400 mb-5">Sign In</CardTitle>
+                    <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400 mb-5">Hello {getUserName()}. Enter your password</CardTitle>
                     <CardTitle className="flex justify-center text-center font-black text-sm text-black/50">Enter your password</CardTitle>
                 </CardHeader>
                 <CardContent>

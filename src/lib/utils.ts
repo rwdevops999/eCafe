@@ -182,3 +182,7 @@ export const createHistoryType = (_type: typeType, _title: string, _description:
     originator: _originator
   }
 }
+
+export const js = (object: any): string {
+  return JSON.stringify(object);
+}

@@ -8,8 +8,8 @@ import { MaxLoginAttemps } from "@/data/constants";
 import { useDebug } from "@/hooks/use-debug";
 import { useUser } from "@/hooks/use-user";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { addHistory, handleLoadOTP, handleLoadUserById, handleUpdateOtp } from "@/lib/db";
-import { NotificationButtonsType, OtpType, UserType } from "@/types/ecafe";
+import { addHistory, createTask, handleLoadOTP, handleLoadUserById, handleUpdateOtp, handleUpdateUser } from "@/lib/db";
+import { ExtendedUserType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { register } from "module";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useEffect, useRef, useState } from "react";
@@ -17,16 +17,24 @@ import { useForm } from "react-hook-form";
 import { FormSchema, FormSchemaType } from "./data/form-scheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { createHistoryType } from "@/lib/utils";
+import { createHistoryType, js } from "@/lib/utils";
 import { useProgressBar } from "@/hooks/use-progress-bar";
+import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
 
 
 const LoginOTP = () => {
   const {push} = useRouter();
   const {login} = useUser();
   const {debug} = useDebug();
+  const searchParams = useSearchParams();
+  const progress = useProgressBar();
 
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
+  const otpId = searchParams.get("otpId");
+  if (otpId) {
+    logger.debug("LoginOTP", "OTP Login", otpId);
+  }
 
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
@@ -34,35 +42,28 @@ const LoginOTP = () => {
       otpcode: "",
     },
   })
-
   const {handleSubmit, getValues, setValue, register, formState: {errors}} = formMethods;
-
-  // const [value, setValue] = useState("")
-  const searchParams = useSearchParams();
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const setDialogState = (state: boolean): void => {
       setOpenDialog(state);
   }
 
+  const user = useRef<UserType|undefined>(undefined);
+  const otp = useRef<OtpType|undefined>(undefined);
+
+  const [retry, setRetry] = useState<number>(0);
+
   const dialogTitleRef = useRef<string>("");
   const dialogMessageRef = useRef<string>("");
   const dialogButtonsRef = useRef<NotificationButtonsType>({leftButton: "No", rightButton: "Yes"});
   const dialogDataRef = useRef<any>(undefined);
   
-  logger.debug("LoginOTP", "Reading OTP ID");
-  const otpId = searchParams.get("otpId");
-  logger.debug("LoginOTP", "OTP ID = " + otpId);
-
-  if (otpId) {
-    logger.debug("LoginOTP", "OTP for email", otpId);
-  }
-
   const handleInvalidOtpCode = (attemps: number) => {
     logger.debug("LoginOTP", "OTP code invalid", "Show notification");
     dialogTitleRef.current = `Invalid OTP code (attemp ${attemps+1}/${MaxLoginAttemps})`;
     dialogMessageRef.current = "OTP code incorrect. Retry Login or OTP again?";
-    dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Login", rightButton: "OTP"};
+    dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Back to Login", rightButton: "Retry OTP"};
 
     setDialogState(true);
   }
@@ -71,14 +72,21 @@ const LoginOTP = () => {
     logger.debug("LoginOTP", "OTP login attemps exceed", "Show notification");
     dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
     dialogMessageRef.current = "Too many retries. Retry Login ?";
-    dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Login"};
+    dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry Login"};
 
     setDialogState(true);
   }
 
-  const progress = useProgressBar();
+  const handleAccountBlocked = () => {
+    logger.debug("LoginOTP", "OTP Account is blocked", "Show notification");
+    dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
+    dialogMessageRef.current = "Your cccount is blocked. Contact your admin.";
+    dialogButtonsRef.current = {leftButton: "Cancel"};
 
-  const progressPush = (href: string) => {
+    setDialogState(true);
+  }
+
+  const redirect = (href: string) => {
       progress.start(); // show the indicator
   
       startTransition(() => {
@@ -87,6 +95,44 @@ const LoginOTP = () => {
         });
   }
 
+  const focusToOTPInput = () => {
+    setValue("otpcode", "");
+
+    const element: HTMLInputElement|null = document.getElementById("otpinput") as HTMLInputElement;
+    if (element) {
+      element.focus();
+    }
+  }
+
+  const userLoadedOnEntryCallback = (data: any) => {
+    if (data.status === 200) {
+      user.current = data.payload; 
+      logger.debug("LoginPassword", "User loaded on entry", data.payload.id);
+    }
+  }
+
+  const otpLoadedOnEntryCallback = (data: any) => {
+    if (data.status === 200) {
+      const otpData: OtpType = data.payload;
+      logger.debug("LoginPassword", "Otp loaded on entry", otpData.id);
+
+      otp.current = otpData;
+      handleLoadUserById(otpData.userId!, userLoadedOnEntryCallback)
+    }
+  }
+  
+  useEffect(() => {
+    if (otpId) {
+      handleLoadOTP(otpId, otpLoadedOnEntryCallback)
+    }
+
+    focusToOTPInput();
+  }, []);
+
+  useEffect(() => {
+    focusToOTPInput();
+  }, [retry]);
+
   const userLoadedCallback = (data: any) => {
     logger.debug("LoginOTP", "OTP login login success", "data", JSON.stringify(data));
 
@@ -94,30 +140,11 @@ const LoginOTP = () => {
       logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
       addHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
       login(data.payload);
-      progressPush("/dashboard")
+      redirect("/dashboard")
     } else {
       logger.debug("LoginOTP", "userLoadedCallback", "user not found -> ERROR");
     }
   }
-
-  const focusToOTPInput = () => {
-    const element: HTMLInputElement|null = document.getElementById("otpinput") as HTMLInputElement;
-    if (element) {
-      element.focus();
-    }
-  }
-
-  useEffect(() => {
-    setValue("otpcode", "");
-    focusToOTPInput();
-  }, []);
-
-  const [retry, setRetry] = useState<number>(0);
-
-  useEffect(() => {
-    setValue("otpcode", "");
-    focusToOTPInput();
-  }, [retry]);
 
   const setGuest = (_email: string) => {
     const user: UserType = {
@@ -133,7 +160,7 @@ const LoginOTP = () => {
 
     addHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
     login(user);
-    progressPush("/dashboard")
+    redirect("/dashboard")
   }
 
   const otpLoadedCallback = (data: any) => {
@@ -141,18 +168,58 @@ const LoginOTP = () => {
     if (data.status === 200) {
       const otp: any = data.payload;
 
-      logger.debug("LoginOTP", "otpLoadedCallback", "value = ", JSON.stringify(getValues("otpcode")));
-      logger.debug("LoginOTP", "otpLoadedCallback", "OTP = ", JSON.stringify(otp));
+      logger.debug("LoginOTP", "otpLoadedCallback", "entered value = ", JSON.stringify(getValues("otpcode")));
+      logger.debug("LoginOTP", "otpLoadedCallback", "stored OTP = ", JSON.stringify(otp));
 
       if (otp.OTP !== getValues("otpcode")) {
         logger.debug("LoginOTP", "otpLoadedCallback", "OTP invalid");
+        addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${data.OTP}.`, "Login[OTP]"));
+
         otp.attemps++;
+
+        handleUpdateOtp(otp, ()=>{});
 
         if (otp.attemps >= MaxLoginAttemps) {
           addHistory(createHistoryType("info", "Invalid login", `${data.email} attemps exceeded.`, "Login[OTP]"));
-          handleAttempsExceeded();          
+
+          if (user.current) {
+            const _user: ExtendedUserType = {
+              id: user.current.id,
+              name: user.current.name,
+              firstname: user.current.firstname,
+              email: user.current.email,
+              password: user.current.password,
+              passwordless: user.current.passwordless,
+              phone: user.current.phone,
+              attemps: otp.attemps,
+              blocked: true,
+              address: user.current.address,
+              roles: {},
+              policies: {},
+              groups: {}
+            }
+          
+            handleUpdateUser(_user, ()=>{});
+
+            const task: TaskType = {
+                name: ACTION_UNBLOCK_USER,
+                description: `Unblock the user from email ${user.current.email}`,
+                subject: ACTION_TYPE_USER,
+                subjectId: user.current.id,
+                status: "open"
+            }
+                    
+            logger.debug("LoginPassword", "userLoadedCallback", "Create Task", js(task));
+            addHistory(createHistoryType("action", "Task created", `Unblock ${user.current.email}`, "Login[Password]"));
+            createTask(task, () => {});
+          
+            handleAccountBlocked();
+          } else {
+            handleAttempsExceeded();
+          }
         } else {
-          handleUpdateOtp(otp, ()=>{});
+          logger.debug("LoginOTP", "otpLoadedCallback", "Update attemps");
+
           addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${data.OTP}.`, "Login[OTP]"));
           handleInvalidOtpCode(otp.attemps);
         }
@@ -162,7 +229,7 @@ const LoginOTP = () => {
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
           dialogTitleRef.current = `OTP code invalid`;
           dialogMessageRef.current = "OTP code already used. Retry Login?";
-          dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Login"};
+          dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry"};
       
           setDialogState(true);
         } else {
@@ -170,7 +237,10 @@ const LoginOTP = () => {
           handleUpdateOtp(otp, ()=>{});
 
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid");
-          if (otp.userId && otp.userId > 0) {
+          if (user.current) {
+            logger.debug("LoginOTP", "otpLoadedCallback", "user already loaded: use it", user.current.id);
+            userLoadedCallback({status: 200, payload: user.current});
+          } else if (otp.userId && otp.userId > 0) {
             logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "Load User", otp.userId);
             handleLoadUserById(otp.userId, userLoadedCallback);
           } else {
@@ -196,12 +266,12 @@ const LoginOTP = () => {
   const cancelDialogAndRedirect = (url: string) => {
     logger.debug("LoginOTP", "Close dialog and redirect", url);
     setDialogState(false);
-    progressPush(url);
+    redirect(url);
   }
   
   const handleCancelLogin = () => {
     logger.debug("LoginOTP", "handleCancelLogin");
-    cancelDialogAndRedirect("/dashboard");
+    cancelDialogAndRedirect("/");
   }
 
   const handleRetryLogin = () => {
@@ -211,16 +281,30 @@ const LoginOTP = () => {
 
   const handleRetryOTP = () => {
     logger.debug("LoginOTP", "handleRetryOTP");
-    setRetry((x: number) => x+1);
+    // setRetry((x: number) => x+1);
     cancelDialogAndRedirect("/login/OTP?otpId="+otpId);
   }
 
   const onSubmit = (data: any) => {
     logger.debug("LoginOTP", "onSubmit Login Form: ", otpId);
     if (otpId) {
-      logger.debug("LoginOTP", "Load OTP with id", otpId);
-      handleLoadOTP(otpId, otpLoadedCallback);
+      if (otp.current) {
+        logger.debug("LoginOTP", "OTP with id already loaded", otp.current.id);
+
+        otpLoadedCallback({status: 200, payload: otp.current});
+      } else if (otpId) {
+        logger.debug("LoginOTP", "Load OTP with id", otpId);
+        handleLoadOTP(otpId, otpLoadedCallback);
+      }
     }
+  }
+
+  const getUserName = (): string => {
+    if (user.current) {
+      return (`${user.current.firstname} ${user.current.name}`);
+    }
+
+    return 'Guest';
   }
 
   return (
@@ -228,7 +312,7 @@ const LoginOTP = () => {
         <div className="h-screen flex items-center justify-center">
             <Card className="mt-[20%] max-w-[350px] bg-[#F8F9FD] rounded-3xl p-[25px] border-[5px] border-solid border-[#FFFFFF] bg-login-pattern shadow-login-shadow m-5">
               <CardHeader>
-                  <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Sign In</CardTitle>
+                  <CardTitle className="flex justify-center text-center font-black text-3xl text-blue-400">Hello {getUserName()}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Form {...formMethods}>

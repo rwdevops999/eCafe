@@ -11,7 +11,7 @@ const createOtp = async (data: OtpType) => {
         OTP: data.OTP,
         email: data.email,
         attemps: data.attemps,
-        userId: data.userId
+        userId: data.userId,
       }
     }).then((response) => {
       otp = response;
@@ -42,7 +42,6 @@ const findOtpById = async (_id: number) => {
 
   return otp;
 }
-
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams

@@ -23,7 +23,8 @@ import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
 import { handleCreateStatement, handleLoadServicesWithServiceName } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
-
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const FormSchema = z.object({
   sid: z.string().min(3).max(25),
@@ -32,6 +33,9 @@ const FormSchema = z.object({
 type FormSchemaType = z.infer<typeof FormSchema>;
 
 const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x:any): void;}) => {
+  const {debug} = useDebug();
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const [loader, setLoader] = useState<boolean>(false);
 
   /**
@@ -67,6 +71,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
+    logger.debug("CreateStatementDialog", "Services Loaded", JSON.stringify(data));
     services.current = data;
     setActionsData(mapServiceActionsToData(services.current));
   }
@@ -133,9 +138,10 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   };
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    const statement = prepareCreateStatement(data);
+    const statement: StatementType|undefined = prepareCreateStatement(data);
 
     if  (statement) {
+      logger.debug("CreateStatementDialog", `Statement ${statement.sid} created`, JSON.stringify(data));
       handleCreateStatement(statement, statementCreatedCallback);
       handleDialogState(false);
     }
@@ -146,16 +152,19 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }
 
   const changeAccessValue = (value: string) => {
+    logger.debug("CreateStatementDialog", `Access value changed`, value);
     access.current = value;
   }
 
   const changeManaged = (checked: CheckedState) => {
     if (typeof checked === 'boolean') {
+      logger.debug("CreateStatementDialog", `managed changed`, checked);
       managed.current = checked;
     }
   }
 
   const handleChangeService = (_service: string) => {
+    logger.debug("CreateStatementDialog", `service changed`, _service);
     setSelectedService(_service);
     handleLoadServicesWithServiceName(_service, servicesLoadedCallback);
   }

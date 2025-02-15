@@ -74,6 +74,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   }
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
+    logger.debug("StatementDetails", "Services loaded", JSON.stringify(data));
     services.current = data;
 
     setSelectedService(_service);
@@ -98,6 +99,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
+    logger.debug("StatementDetails", "Service changed", _service);
     setLoader(true);
     const serviceId: number = prepareStatementsLoad(_service, '*');
     handleLoadStatements(serviceId, '*', statementsLoadedCallback);
@@ -136,7 +138,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
   /** for admin only later on */
   const handleDeleteManagedStatement = (statement: Data) => {
-    logger.debug("StatementDetails", `Forced deleting managed statement ${statement.name}`);
+    logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
     addHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
     handleDeleteStatement(statement.id, statementDeletedCallback);
     setAlert(undefined);
@@ -145,7 +147,6 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   const handleAction = (action: string, statement: Data) => {
     if (action === action_delete) {
       if (statement.other?.managed) {
-        logger.debug("StatementDetails", `Deleting managed statement ${statement.name}?`);
         const alert = {
           open: true,
           error: true,
@@ -161,7 +162,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         if (alert.error) {
           setAlert(alert);
         } else {
-          addHistory(createHistoryType("info", "Statement delete", "Statement ${statement.name} is deleted", "Statement"));
+          addHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
           handleDeleteStatement(statement.id, statementDeletedCallback);
         }
       }
@@ -175,28 +176,28 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   const renderComponent = () => {
     if (alert && alert.open) {
         return (<AlertMessage alert={alert}></AlertMessage>)
-      }
+    }
 
-      return (
-        <div>
-          <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
-          <div className="flex space-x-2 items-center">
-            <PageTitle className="m-2" title={`Overview service statements for ${serviceName.current === 'All' ? 'All Services' : serviceName.current}`} />
-            <EcafeLoader className={loader ? "" : "hidden"}/>
-          </div>
-            {!loader && 
-              <div className="flex items-center justify-between p-5">
-                <ServiceSelect defaultService={serviceName.current} forceAll={true} handleChangeService={handleChangeService}/>
-                <StatementCreateDialog _service={serviceName.current} _enabled={statementsLoaded.current} setReload={setReload} /> 
-              </div>
-            }
-          <div className="block space-y-5">
-            {statementData && 
-              <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} expandAll={isNumber(selectedService)}/>
-            }
-          </div>
+    return (
+      <div>
+        <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
+        <div className="flex space-x-2 items-center">
+          <PageTitle className="m-2" title={`Overview service statements for ${serviceName.current === 'All' ? 'All Services' : serviceName.current}`} />
+          <EcafeLoader className={loader ? "" : "hidden"}/>
         </div>
-      )
+          {!loader && 
+            <div className="flex items-center justify-between p-5">
+              <ServiceSelect defaultService={serviceName.current} forceAll={true} handleChangeService={handleChangeService}/>
+              <StatementCreateDialog _service={serviceName.current} _enabled={statementsLoaded.current} setReload={setReload} /> 
+            </div>
+          }
+        <div className="block space-y-5">
+          {statementData && 
+            <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} expandAll={isNumber(selectedService)}/>
+          }
+        </div>
+      </div>
+    )
     }
 
     return (<>{renderComponent()}</>);
