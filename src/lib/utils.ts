@@ -7,7 +7,7 @@ import * as  fs from 'fs';
 import * as path from 'path';
 import { Country, Data, HistoryType, typeType } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
-import { ApiResponseType, apiResponseType } from "@/types/db";
+import { ApiResponseType } from "@/types/db";
 
 
 
@@ -180,15 +180,35 @@ export const createHistoryType = (_type: typeType, _title: string, _description:
   }
 }
 
-export const js = (object: any): string {
+/**
+ * created for shortening JSON.stringify
+ * 
+ * @param object: parameter for JSON.stringify
+ * 
+ * @returns string
+ */
+export const js = (object: any): string => {
   return JSON.stringify(object);
 }
 
-export const createApiResponse = (_status: number, _info: string, _payload: any): apiResponseType => {
+/**
+ * create Api Response with given the values
+ * 
+ * @param _status: response status
+ * @param _info: info of what is contained in the payload 
+ * @param _payload: the payload
+ * 
+ * @returns ApiReponseType
+ */
+export const createApiResponse = (_status: number, _info: string, _payload: any): ApiResponseType => {
   return {status: _status, info: _info, payload: _payload};
 }
 
-// Database
+/**
+ * create an empty Api Response (status = 200)
+ * 
+ * @returns ApiResponseType
+ */
 export const createEmptyApiReponse = (): ApiResponseType => {
   return (
     {

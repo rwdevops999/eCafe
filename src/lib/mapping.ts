@@ -1,4 +1,4 @@
-import { Data, GroupType, HistoryData, HistoryType, ServiceType, TaskData, TaskType, UserType } from "@/types/ecafe";
+import { Data, GroupType, HistoryData, HistoryType, ServiceType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 import { padZero } from "./utils";
 
@@ -199,6 +199,27 @@ export const mapStatementsToData = (statements: any[] | undefined, services?: an
   return result;
 };
 
+export const mapStatementToDataArray = (statement: StatementType | undefined, services?: any[]): Data[] => {
+  let result: Data[] = [];
+
+  if (statement) {
+    result.push({
+        id: statement.id,
+        name: statement.sid,
+        description: statement.description,
+        children: mapActionsToData(statement.actions, statement.permission),
+        other: {
+          serviceId: statement.serviceId,
+          serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
+          managed: statement.managed,
+          access: statement.permission
+          }
+    })
+  }
+
+  return result;
+};
+
 export const mapPoliciesToData = (policies: any[] | undefined): Data[] => {
   let result: Data[] = [];
 
@@ -247,6 +268,19 @@ export const mapServicesToData = (_services: ServiceType[]): Data[] => {
           description: service.name,
           children: service.actions
       };
+  });
+
+  return dataArray;
+}
+
+export const mapServiceToDataArray = (_service: ServiceType): Data[] => {
+  const dataArray: Data[] = [];
+  
+  dataArray.push({
+    id: _service.id,
+    name: _service.name,
+    description: _service.name,
+    children: _service.actions
   });
 
   return dataArray;

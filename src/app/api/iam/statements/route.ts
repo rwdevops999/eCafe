@@ -1,5 +1,7 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
+import { createApiResponse, createEmptyApiReponse } from "@/lib/utils";
+import { ApiResponseType } from "@/types/db";
 import { StatementType } from "@/types/ecafe";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
@@ -18,8 +20,8 @@ const findAllStatementsByServiceId = async (_serviceId: number) => {
   return statements;
 }
 
-const findStatementsByServiceIdAndSidName = async (_serviceId: number, _sid: string) => {
-  const statements = await prisma.serviceStatement.findMany(
+const findStatementByServiceIdAndSidName = async (_serviceId: number, _sid: string) => {
+  const statements = await prisma.serviceStatement.findFirst(
     {
       where: { 
         serviceId: _serviceId,
@@ -53,14 +55,23 @@ export async function GET(request: NextRequest) {
     const serviceId = searchParams.get('serviceId');  // passed as ...?service=Stock => service = "Stock"
     const sid = searchParams.get('sid');  // passed as ...?service=Stock => service = "Stock"
 
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
+
     if  (serviceId && parseInt(serviceId) !== 0) {
       if (sid === allItems) {
-      const statements = await findAllStatementsByServiceId(parseInt(serviceId));
+        const statements: StatementType[] = await findAllStatementsByServiceId(parseInt(serviceId));
 
-      return Response.json(statements);
+        apiResponse.info = "Payload: StatementType[]";
+        apiResponse.payload = statements;
+
+        return Response.json(apiResponse);
       } else if (sid) {
-        const statements = await findStatementsByServiceIdAndSidName(parseInt(serviceId), sid);
-        return Response.json(statements);
+        const statement: StatementType|null = await findStatementByServiceIdAndSidName(parseInt(serviceId), sid);
+
+        apiResponse.info = "Payload: StatementType";
+        apiResponse.payload = statement;
+
+        return Response.json(apiResponse);
       }
     }
 
@@ -107,33 +118,38 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const created = await prisma.serviceStatement.create({data: statement});
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return new Response(JSON.stringify(created), {
-        headers: { "content-type": "application/json" },
-        status: 201,
-     });
+    const created: StatementType = await prisma.serviceStatement.create({data: statement});
+
+    apiResponse.status = 201;
+    apiResponse.info = "PAYLOAD: ";
+    apiResponse.payload = created;
+    
+    return Response.json(apiResponse);
 }
 
 export async function DELETE(request: NextRequest) {
   const urlParams = request.nextUrl.searchParams
   const statementId = urlParams.get('statementId');
 
+  let apiResponse: ApiResponseType = createEmptyApiReponse();
+
   if  (statementId) {
-    const data = await prisma.serviceStatement.delete(
+    const statement: StatementType = await prisma.serviceStatement.delete(
       {
         where: {id: parseInt(statementId)}
       }
     );
 
-    return new Response(JSON.stringify(`deleted ${data}`), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-   });
+    apiResponse.info = "Payload: StatementType";
+    apiResponse.payload = statement;
+
+    return Response.json(apiResponse);
   }
 
-    return new Response(JSON.stringify(`not deleted: statement id undefined`), {
-      headers: { "content-type": "application/json" },
-      status: 400,
-   });
+  apiResponse.status = 400;
+  apiResponse.info = "Not deleted because id is not defined";
+  
+  return Response.json(apiResponse);
 }

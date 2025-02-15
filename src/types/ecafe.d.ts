@@ -146,29 +146,6 @@ type RoleType = {
   users?: UserType[]
 }
 
-type StatementType = {
-  id: number,
-  serviceId: number,
-  sid: string,
-  description: string,
-  permission: string,
-  managed: boolean,
-  createDate?: Date,
-  updateDate?: Date,
-  service?: ServiceType,
-  actions?: StatementActionType[],
-  policies?: PolicyType[]
-}   
-
-type ServiceType = {
-  id: number,
-  name: string,
-  createDate?: Date,
-  updateDate?: Date,
-  actions?: ActionType[],
-  statements?: StatementType[],
-}  
-
 type ExtendedUserType = {
   id?: number,
   name: string,
@@ -258,3 +235,26 @@ export type CountryType = {
   dialCode: string | null,
   code: string | null,
 }
+
+type ServiceType = {
+  id: number,
+  name: string,
+  createDate: Date,
+  updateDate: Date,
+  actions?: ActionType[],
+  statements?: StatementType[],
+}  
+
+type StatementType = {
+  id: number,
+  serviceId: number,
+  sid: string,
+  description: string,
+  permission: string,
+  managed: boolean,
+  createDate: Date,
+  updateDate: Date,
+  service?: ServiceType,
+  actions?: StatementActionType[],
+  policies?: PolicyType[]
+}   

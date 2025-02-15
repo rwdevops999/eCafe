@@ -22,11 +22,12 @@ import { alertcolumns } from "@/components/ecafe/table/alert-columns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertTableType, AlertType, Data, PolicyType, ServiceType, StatementType } from "@/types/ecafe";
 import { allItems } from "@/data/constants";
-import { mapStatementsToData } from "@/lib/mapping";
+import { mapStatementsToData, mapStatementToDataArray } from "@/lib/mapping";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { handleCreatePolicy, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import { validateMappedData } from "@/lib/validate";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { ApiResponseType } from "@/types/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -116,19 +117,25 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
 
   const services = useRef<ServiceType[]>([]);
 
-  const statementsLoadedCallback = (data: StatementType[]) => {
-    setStatements(data);
+  const statementsLoadedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+        const statements: StatementType[] = data.payload;
 
-    const sd: Data[] = mapStatementsToData(data, services.current);
-    setStatementData(sd);
+        setStatements(statements);
+
+        setStatementData(mapStatementsToData(statements, services.current));
+    }
+    
     setLoader(false);
   }
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
-    services.current = data;
-    setSelectedService(allItems);
-    const serviceId = prepareStatementsLoad(allItems, allItems);
-    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
+  const servicesLoadedCallback = (data: ApiResponseType): void => {
+    if (data.status === 200) {
+      services.current = data.payload;
+      setSelectedService(allItems);
+      const serviceId = prepareStatementsLoad(allItems, allItems);
+      handleLoadStatements(serviceId, '*', statementsLoadedCallback);
+    }
   }
 
   useEffect(() => {

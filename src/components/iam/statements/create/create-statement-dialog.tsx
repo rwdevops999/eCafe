@@ -21,10 +21,12 @@ import { Row } from "@tanstack/react-table"
 import { Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
-import { handleCreateStatement, handleLoadServicesWithServiceName } from "@/lib/db";
+import { handleCreateStatement, handleLoadServiceByName } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { ApiResponseType } from "@/types/db";
+import { js } from "@/lib/utils";
 
 const FormSchema = z.object({
   sid: z.string().min(3).max(25),
@@ -70,16 +72,20 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
    */
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
-    logger.debug("CreateStatementDialog", "Services Loaded", JSON.stringify(data));
-    services.current = data;
-    setActionsData(mapServiceActionsToData(services.current));
+  const servicesLoadedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+      const service: ServiceType = data.payload;
+
+      logger.debug("CreateStatementDialog", "Services Loaded", js(service));
+      services.current = [service];
+      setActionsData(mapServiceActionsToData(services.current));
+    }
   }
 
   const resetAll = () => {
     access.current = defaultAccess;
     reset();
-    handleLoadServicesWithServiceName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServiceByName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
@@ -88,7 +94,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }, [open]);
 
   useEffect(() => {
-    handleLoadServicesWithServiceName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServiceByName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, []);
 
@@ -120,10 +126,14 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
         permission: access.current,
         managed: managed.current,
         actions: _actions,
+        createDate: new Date(),
+        updateDate: new Date(),
         service: {
           id: _service.id,
           name: _service.name,
           actions: _service.actions,
+          createDate: new Date(),
+          updateDate: new Date(),
           statements: []
         },
         policies: []
@@ -133,8 +143,10 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
     return undefined;
   }
 
-  const statementCreatedCallback = () => {
-    setReload((x:any) => x+1);
+  const statementCreatedCallback = (data: ApiResponseType) => {
+    if (data.status === 201) {
+      setReload((x:any) => x+1);
+    }
   };
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
@@ -166,7 +178,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const handleChangeService = (_service: string) => {
     logger.debug("CreateStatementDialog", `service changed`, _service);
     setSelectedService(_service);
-    handleLoadServicesWithServiceName(_service, servicesLoadedCallback);
+    handleLoadServiceByName(_service, servicesLoadedCallback);
   }
 
   const renderDialog = () => {

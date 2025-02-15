@@ -135,7 +135,7 @@ export async function GET(request: NextRequest): Promise<Response> {
       return Response.json(apiResponse);
     }
     
-    return new Response(createApiResponse(204, "NoData", undefined));
+    return Response.json(createApiResponse(204, "NoData", undefined));
 }
 
 export async function DELETE(request: NextRequest) {

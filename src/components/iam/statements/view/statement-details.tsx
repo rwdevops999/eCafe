@@ -13,12 +13,13 @@ import { Button } from "@/components/ui/button";
 import AlertMessage from "@/components/ecafe/alert-message";
 import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
-import { mapStatementsToData } from "@/lib/mapping";
-import { createHistoryType, isNumber } from "@/lib/utils";
+import { mapStatementsToData, mapStatementToDataArray } from "@/lib/mapping";
+import { createHistoryType, isNumber, js } from "@/lib/utils";
 import { addHistory, handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
+import { ApiResponseType } from "@/types/db";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
   const {debug} = useDebug();
@@ -65,11 +66,27 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return serviceId;
   }
 
-  const statementsLoadedCallback = (data: StatementType[]) => {
-    logger.debug("StatementDetails", "Statements loaded", JSON.stringify(data));
-    setStatements(data);
-    setStatementData(mapStatementsToData(data, services.current));
-    statementsLoaded.current = true;
+  const statementsLoadedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+      if (Array.isArray(data.payload)) {
+        logger.debug("StatementDetails", "Statement loaded", js(data.payload));
+
+        const statements: StatementType[] = data.payload;
+  
+        setStatements(statements);
+        setStatementData(mapStatementsToData(statements, services.current));
+      } else {
+        logger.debug("StatementDetails", "Statement loaded", js(data.payload));
+
+        const statement: StatementType = data.payload;
+  
+        setStatements([statement]);
+        setStatementData(mapStatementToDataArray(statement, services.current));
+      }
+
+      statementsLoaded.current = true;
+    }
+
     setLoader(false);
   }
 
@@ -107,8 +124,10 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     serviceName.current = _service === allItems ? 'All' : _service;
   }
 
-  const statementDeletedCallback = () => {
-    setReload((x:any) => x+1);
+  const statementDeletedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+      setReload((x:any) => x+1);
+    }
   }
 
   const statementInPolicy = (_statement: Data): AlertType => {

@@ -11,6 +11,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { allItems } from "@/data/constants";
 import { ServiceType } from "@/types/ecafe";
 import { handleLoadServices } from "@/lib/db";
+import { ApiResponseType } from "@/types/db";
 
 /**
  * Loads the services from API and let us select a service through a combo
@@ -25,11 +26,13 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
-  const servicesLoadedCallback = (data: ServiceType[]) => {
-    if (defaultService === allItems || forceAll) {
-      setServices(["All", ...data.map(service => service.name)]);
-    } else {
-      setServices(data.map(service => service.name));
+  const servicesLoadedCallback = (data: ApiResponseType): void => {
+    if (data.status === 200) {
+      if (defaultService === allItems || forceAll) {
+        setServices(["All", ...data.payload.map((service: ServiceType) => service.name)]);
+      } else {
+        setServices(data.payload.map((service: ServiceType) => service.name));
+      }
     }
   }
 

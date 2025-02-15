@@ -1,5 +1,7 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
+import { createApiResponse, createEmptyApiReponse } from "@/lib/utils";
+import { ServiceType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
 const determineIncludes = (depth: number): any => {
@@ -14,10 +16,10 @@ const determineIncludes = (depth: number): any => {
     return includes;
 }
 
-const findServiceFromServiceName = async (_service: string, depth: number) => {
+const findServiceByName = async (_service: string, depth: number) => {
     let includes = determineIncludes(depth);
 
-    const service = await prisma.service.findMany({
+    const service = await prisma.service.findFirst({
         where: { 
             name: _service 
         },
@@ -47,6 +49,8 @@ export async function GET(request: NextRequest) {
     const paramService = searchParams.get('service');
     const paramDepth = searchParams.get('depth');
     
+    const apiResponse = createEmptyApiReponse();
+
     let depth = -1;
     if (paramDepth) {
         depth = parseInt(paramDepth);
@@ -54,16 +58,23 @@ export async function GET(request: NextRequest) {
 
     if (paramService) {
         if  (paramService !== allItems) {
-            const service = await findServiceFromServiceName(paramService, depth);
+            const service: ServiceType|null = await findServiceByName(paramService, depth);
             if (service) {
+                apiResponse.info = "Payload: ServiceType";
+                apiResponse.payload = service;
+
                 return Response.json(service);
             }
 
-            return Response.json([]);
+            apiResponse.info = "Service not found";
+
+            return Response.json(apiResponse);
         }
     }
 
-    const services = await findAllServices(depth);
+    const services: ServiceType[] = await findAllServices(depth);
+    apiResponse.info = "Payload: ServiceType[]";
+    apiResponse.payload = services.sort((a, b) => a.name.localeCompare(b.name));
 
-    return Response.json(services.sort((a, b) => a.name.localeCompare(b.name)));
+    return Response.json(apiResponse);
 }
