@@ -1,6 +1,7 @@
 # merge branch develop to main
 
 git status
+git branch => tells wether to use main or master
 git checkout main
 git merge develop
 git push

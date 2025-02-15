@@ -10,31 +10,40 @@ import { useDebug } from '@/hooks/use-debug';
 import { ConsoleLogger } from '@/lib/console.logger';
 import { addHistory, handleClearDB, initDB } from '@/lib/db';
 import { Database, Info } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { toast } from 'sonner';
 import HoverInfo from './hover-info';
 import { createHistoryType } from '@/lib/utils';
+import { ApiResponseType } from '@/types/db';
 
 const SettingsStorage = () => {
     const {debug} = useDebug();
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none') });
 
-    const [startupData, setStartupData] = useState<boolean>(false);
+    const startupData = useRef<boolean>(false);
 
-    const databaseCleared = () => {
-        toast.success("Database cleared.")
-        addHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
+    const setStartupData = (checked: boolean): void => {
+        startupData.current = checked;
+    }
+
+    const databaseCleared = (_response: ApiResponseType): void => {
+        if (_response.status === 200) {
+            toast.success("Database cleared.")
+            addHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
+        }
     }
 
     const handleClearDatabase = (_dummy: boolean): void => {
         logger.debug("Storage", "handleClearDatabase");
 
-        handleClearDB(startupData, databaseCleared);
+        handleClearDB(startupData.current, databaseCleared);
     }
 
-    const databaseInitialised = () => {
-        toast.success("Database initialised.")
-        addHistory(createHistoryType("info", "Database initialised", "Database startup tables set up", "Settings[Storage]"), () => {})
+    const databaseInitialised = (_response: ApiResponseType): void => {
+        if (_response.status === 200) {
+            toast.success("Database initialised.")
+            addHistory(createHistoryType("info", "Database initialised", "Database startup tables set up", "Settings[Storage]"), () => {})
+        }
     }
 
     const handleSetupDatabase = (_dummy: boolean): void => {
@@ -43,9 +52,11 @@ const SettingsStorage = () => {
         initDB(allItems, databaseInitialised);
     }
 
-    const dataCleared = () => {
-        toast.success("Working data removed.")
-        addHistory(createHistoryType("info", "Data tables clear", "Cleared the working", "Settings[Storage]"), () => {})
+    const dataCleared = (_response: ApiResponseType): void => {
+        if (_response.status === 200) {
+            toast.success("Working data removed.")
+            addHistory(createHistoryType("info", "Data tables clear", "Database work tables are cleared", "Settings[Storage]"), () => {})
+        }
     }
 
     const handleClearData = (_dummy: boolean): void => {
@@ -54,8 +65,11 @@ const SettingsStorage = () => {
         initDB(workingItems, dataCleared);
     }
 
-    const countriesLoaded = () => {
-        toast.info("Countries loaded.")
+    const countriesLoaded = (_response: ApiResponseType): void => {
+        if (_response.status === 200) {
+            toast.info("Countries loaded.")
+            addHistory(createHistoryType("info", "Country tables loaded", "Country table resetted", "Settings[Storage]"), () => {})
+        }
     }
 
     const handleLoadCountries = (_dummy: boolean): void => {
@@ -87,7 +101,7 @@ const SettingsStorage = () => {
                                 <div className="col-span-4 flex space-x-2 items-center">
                                 <Checkbox
                                     id="startup"
-                                    checked={startupData}
+                                    checked={startupData.current}
                                     onCheckedChange={(value) => setStartupData(typeof value === 'boolean' ? value : false)}
                             />
                                 <Label

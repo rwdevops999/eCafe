@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useDebug } from '@/hooks/use-debug';
 import { ConsoleLogger } from '@/lib/console.logger';
 import { addHistory, initDB } from '@/lib/db';
-import { createHistoryType } from '@/lib/utils';
+import { createHistoryType, js } from '@/lib/utils';
 import { History } from 'lucide-react';
 import React from 'react'
 import { toast } from 'sonner';
@@ -15,7 +15,9 @@ const SettingsHistory = () => {
     const {debug} = useDebug();
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none') });
 
-    const historyCleared = () => {
+    const historyCleared = (data: any) => {
+        logger.debug("History", "handleClearHistory", js(data));
+        addHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
         toast.success("History cleared.")
     }
     
@@ -23,7 +25,6 @@ const SettingsHistory = () => {
         logger.debug("History", "handleClearHistory");
     
         initDB('History', historyCleared);
-        addHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
     }
     
     const renderComponent = () => {

@@ -1,9 +1,10 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { Country } from "@/types/ecafe";
-import { loadCountriesFromFile } from "@/lib/utils";
+import { createEmptyApiReponse, js, loadCountriesFromFile } from "@/lib/utils";
 import { serviceMappings, ServiceMappingType } from "./setup/setup";
 import { allItems, workingItems } from "@/data/constants";
+import { ApiResponseType } from "@/types/db";
 
 const prisma = new PrismaClient()
 
@@ -88,23 +89,28 @@ export async function POST(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
   
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
+
     if (table === allItems) {
       flushAll(true);
       provisionServices(serviceMappings);
+      apiResponse.info = "flushed all tables and provisioned services. No payload";
     }
 
     if (table === workingItems) {
       flushAll(false);
+      apiResponse.info = "flushed all working tables (like User, Role, ...). No payload";
     }
 
     if (table === 'country') {
       flushTable('Country');
       provisionCountries('./public/country/country-codes.json');
+      apiResponse.info = "flushed COUNTRY table and provisioned it. No payload";
     }
 
-    return new Response(JSON.stringify("DB Initialised"), {
+    return new Response(js(apiResponse), {
         headers: { "content-type": "application/json" },
-        status: 200,
+        status: apiResponse.status,
      });
 }
 
@@ -134,6 +140,8 @@ export async function DELETE(request: NextRequest) {
   const urlParams = request.nextUrl.searchParams
   const startup = urlParams.get('startup');
 
+  let apiResponse: ApiResponseType = createEmptyApiReponse();
+
   let initStartup: boolean = false;
 
   if (startup) {
@@ -141,9 +149,7 @@ export async function DELETE(request: NextRequest) {
   } 
 
   await flushAll(initStartup);
+  apiResponse.info = `Deleted all tables. Startup data included = ${initStartup}`;
 
-  return new Response(JSON.stringify("flushed database"), {
-    headers: { "content-type": "application/json" },
-    status: 200,
- });
+  return Response.json(apiResponse);
 }

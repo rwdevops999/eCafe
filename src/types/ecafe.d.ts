@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { dataScheme, historyDataScheme, taskDataScheme } from "@/data/schemes";
+import { apiResponseType } from "./db";
 
-type CallbackFunctionDefault = () => void;
-type CallbackFunctionSubjectLoaded = (data: any[], additional?: any) => void;
-type CallbackFunctionDependencyLoaded = (subject: any, data: any[]) => void;
+type CallbackFunctionNoParam = () => void;
+type CallbackFunctionWithData = (data: apiResponseType, additional?: any) => void;
 
-type CallbackFunctionLoggedIn = () => void;
+
+
 
 type BreadCrumbsType = z.infer<typeof breadCrumbsScheme>
 
@@ -240,11 +241,6 @@ type TaskType = {
   subjectId?: number
   status: "open" | "completed"
   createDate?: string
-}
-
-type ApiResponseType = {
-  status: number,
-  payload: any
 }
 
 export type typeType = "info" | "action";

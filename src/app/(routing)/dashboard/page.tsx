@@ -1,19 +1,14 @@
 'use client'
 
-import EcafeButton from "@/components/ecafe/ecafe-button";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { flushAll, handleClearDB, initDB } from "@/lib/db";
 import DbcTasks from "./components/dbc-tasks";
 import DbcCalendar from "./components/dbc-calendar";
 import DbcUserProfile from "./components/dbc-user-profile";
-import { User, UserMinus, UserPlus } from "lucide-react";
+import { UserMinus, UserPlus } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { testUser } from "./data/test-user";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const {login, logout} = useUser();

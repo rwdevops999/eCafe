@@ -1,23 +1,31 @@
-import { CallbackFunctionDefault, CallbackFunctionSubjectLoaded, ExtendedGroupType, ExtendedUserType, HistoryType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
+import { ApiResponseType } from "@/types/db";
+import { CallbackFunctionNoParam, CallbackFunctionWithData, ExtendedGroupType, ExtendedUserType, HistoryType, LanguageType, OtpType, PolicyType, RoleType, StatementType, TaskType, UserType } from "@/types/ecafe";
 import { PrismaClient } from '@prisma/client'
+import { js } from "./utils";
 
 /**
  * DB
  */
-export const initDB = async (_table: string, _callback: CallbackFunctionDefault) => {
-  const res = await fetch('http://localhost:3000/api/db?table='+_table,{
+export const initDB = async (_table: string, _callback: CallbackFunctionWithData) => {
+  await fetch('http://localhost:3000/api/db?table='+_table,{
     method: 'POST',
     body: JSON.stringify("initialise DB?"),
     headers: {
       'content-type': 'application/json'
     }
-  }).then((response: Response) => _callback());
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response))
+  .catch((error: any) => console.log("ERROR DB(initDB)", js(error)));
 }
 
-export const handleClearDB = async (startup: boolean, _callback: CallbackFunctionDefault) => {
-  await fetch("http://localhost:3000/api/db?startup="+startup,{
+export const handleClearDB = async (_startup: boolean, _callback: CallbackFunctionWithData) => {
+  await fetch("http://localhost:3000/api/db?startup="+_startup,{
       method: 'DELETE',
-  }).then((response: Response) => _callback());
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response))
+  .catch((error: any) => console.log("handleClearDB", `ERROR clear tables with startup included: ${_startup}`, js(error)));
 }
 
 

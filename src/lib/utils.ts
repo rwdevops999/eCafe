@@ -5,8 +5,9 @@ import crypto from 'crypto';
 
 import * as  fs from 'fs';
 import * as path from 'path';
-import { ApiResponseType, Country, Data, HistoryType, typeType } from "@/types/ecafe";
+import { Country, Data, HistoryType, typeType } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
+import { ApiResponseType, apiResponseType } from "@/types/db";
 
 
 
@@ -164,10 +165,6 @@ export const generateOTP = (): string => {
 
 export const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
-export const createApiReponse = (_status: number, _payload: any): ApiResponseType => {
-  return {status: _status, payload: _payload};
-}
-
 export const stringToBoolean = (str: string): boolean => {
   return (str.toLowerCase() === 'true');
 }
@@ -186,3 +183,19 @@ export const createHistoryType = (_type: typeType, _title: string, _description:
 export const js = (object: any): string {
   return JSON.stringify(object);
 }
+
+export const createApiResponse = (_status: number, _payload: any, info: string): apiResponseType => {
+  return {status: _status, payload: _payload};
+}
+
+// Database
+export const createEmptyApiReponse = (): ApiResponseType => {
+  return (
+    {
+      status: 200,
+      info: "",
+      payload: undefined
+    }
+  );
+
+} 
