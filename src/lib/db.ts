@@ -34,7 +34,7 @@ export const handleClearDB = async (_startup: boolean, _callback: CallbackFuncti
 const loadLanguages = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/languages")
     .then((response) => response.json())
-    .then((response) => _callback(response))
+    .then((response: ApiResponseType) => _callback(response))
     .catch((error: any) => console.log("loadLanguages", `ERROR loading the languages`, js(error)));
 }
 
@@ -48,12 +48,12 @@ export const handleLoadLanguages = async (_callback: CallbackFunctionWithData): 
 
 const loadCountries = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/db?table=country")
-    .then((response) => response.json())
-    .then((response) => _callback(response))
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
     .catch((error: any) => console.log("loadCountries", `ERROR loading the countries`, js(error)));
 }
 
-export const handleLoadCountries = async (_callback: CallbackFunctionWithData) => {
+export const handleLoadCountries = async (_callback: CallbackFunctionWithData): Promise<void> => {
     await loadCountries(_callback);
 }
 
@@ -64,51 +64,51 @@ export const handleLoadCountries = async (_callback: CallbackFunctionWithData) =
  */
 const loadServices = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
-    .then((response) => response.json())
-    .then((response) => {_callback(response)})
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response)})
     .catch((error: any) => console.log("loadServices", `ERROR loading the services`, js(error)));
 }
 
-export const handleLoadServices = async (_callback: CallbackFunctionWithData) => {
+export const handleLoadServices = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await loadServices(_callback);
 }
 
-const loadServiceByName = async (_service: string, _callback: CallbackFunctionWithData) => {
+const loadServiceByName = async (_service: string, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
-    .then((response) => response.json())
-    .then((response) => {_callback(response)})
+    .then((response: Response) => response.json())
+    .then((response: ResponseType) => {_callback(response)})
     .catch((error: any) => console.log("loadServiceByName", `ERROR loading the service`, js(error)));
 }
 
-export const handleLoadServiceByName = async (_service: string, _callback: CallbackFunctionWithData) => {
+export const handleLoadServiceByName = async (_service: string, _callback: CallbackFunctionWithData): Promise<void> => {
   await loadServiceByName(_service, _callback);
 }
 
 /**
  * STATEMENTS
  */
-const loadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionWithData) => {
+const loadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionWithData): Promise<void> => {
     await fetch("http://localhost:3000/api/iam/statements?serviceId=" + _serviceId + "&sid=" + _sid)
-      .then((response) => response.json())
-      .then((response) => {_callback(response);})
+      .then((response: Response) => response.json())
+      .then((response: ApiResponseType) => {_callback(response);})
       .catch((error: any) => console.log("loadStatements", `ERROR loading the statements`, js(error)));
 }
 
-export const handleLoadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionWithData) => {
+export const handleLoadStatements = async (_serviceId: number, _sid: string, _callback: CallbackFunctionWithData): Promise<void> => {
   await loadStatements(_serviceId, _sid, _callback);
 }
 
 
-export const handleDeleteStatement = async (id: number, _callback: CallbackFunctionWithData) => {
+export const handleDeleteStatement = async (id: number, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/iam/statements?statementId="+id,{
       method: 'DELETE',
   })
   .then((response: Response) => response.json())
-  .then((response) => _callback(response))
+  .then((response: ApiResponseType) => _callback(response))
   .catch((error: any) => console.log("deleteStatement", `ERROR deleting the statement`, js(error)));
 }
 
-export const handleCreateStatement = async (_statement: StatementType, _callback: CallbackFunctionWithData) => {
+export const handleCreateStatement = async (_statement: StatementType, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch('http://localhost:3000/api/iam/statements',
     {
       method: 'POST',
@@ -173,6 +173,11 @@ export const handleCreatePolicy = async (_policy: PolicyType, _callback: Callbac
     }).then((response) => _callback());
 }
 
+
+
+
+
+
 /**
  * ROLES
  */
@@ -204,6 +209,11 @@ export const handleCreateRole = async (_role: RoleType , _callback: CallbackFunc
       }
     }).then((response) => _callback());
 }
+
+
+
+
+
 
 /**
  * GROUPS
@@ -255,6 +265,12 @@ const updateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctio
 export const handleUpdateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionDefault) => {
   await updateGroup(_group, _callback);
 }
+
+
+
+
+
+
 
 /**
  * USERS
@@ -348,6 +364,12 @@ const unblockUser = async (_userId: number, _callback: CallbackFunctionDefault) 
 export const handleUnblockUser = async (_userId: number, _callback: CallbackFunctionDefault) => {
   await unblockUser(_userId, _callback);
 }
+
+
+
+
+
+
 
 // OTP
 export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
