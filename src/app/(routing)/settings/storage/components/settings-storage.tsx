@@ -72,8 +72,8 @@ const SettingsStorage = () => {
         }
     }
 
-    const handleLoadCountries = (_dummy: boolean): void => {
-        logger.debug("Storage", "handleLoadCountries");
+    const handleProvisionCountries = (_dummy: boolean): void => {
+        logger.debug("Storage", "handleProvisionCountries");
 
         initDB('country', countriesLoaded);
     }
@@ -135,7 +135,7 @@ const SettingsStorage = () => {
 
                         <div className="grid grid-cols-8 items-center space-x-2">
                             <div className="col-span-1">
-                                <EcafeButton caption='Load Countries' clickHandler={handleLoadCountries}/>
+                                <EcafeButton caption='Load Countries' clickHandler={handleProvisionCountries}/>
                             </div>
                             <div className="col-span-1">
                                 <HoverInfo title="Countries" message="Load the countries into DB." />

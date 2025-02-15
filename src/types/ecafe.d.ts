@@ -169,14 +169,6 @@ type ServiceType = {
   statements?: StatementType[],
 }  
 
-type CountryType = {
-  id: number,
-  name: string,
-  dialCode: string,
-  code: string,
-  addresses?: AddressType[]
-}
-
 type ExtendedUserType = {
   id?: number,
   name: string,
@@ -255,3 +247,14 @@ type HistoryType = {
 }
 
 type HistoryData = z.infer<typeof historyDataScheme>
+
+
+
+
+// FROM PRISMA
+export type CountryType = {
+  id: number,
+  name: string | null,
+  dialCode: string | null,
+  code: string | null,
+}

@@ -25,6 +25,7 @@ import { handleCreateUser, handleLoadCountries, handleUpdateUser } from "@/lib/d
 import { initMetaBase } from "@/data/meta-base";
 import { validateMappedData } from "@/lib/validate";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 type DependencyType = {
   initialised: boolean,
@@ -291,8 +292,10 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
   }
 
   const countries = useRef<CountryType[]>([])
-  const countriesLoadedCallback = (data: CountryType[]) => {
-    countries.current = data;
+  const countriesLoadedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+      countries.current = data.payload;
+    }
   }
 
   useEffect(() => {

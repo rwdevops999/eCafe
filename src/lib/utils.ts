@@ -184,8 +184,8 @@ export const js = (object: any): string {
   return JSON.stringify(object);
 }
 
-export const createApiResponse = (_status: number, _payload: any, info: string): apiResponseType => {
-  return {status: _status, payload: _payload};
+export const createApiResponse = (_status: number, _info: string, _payload: any): apiResponseType => {
+  return {status: _status, info: _info, payload: _payload};
 }
 
 // Database

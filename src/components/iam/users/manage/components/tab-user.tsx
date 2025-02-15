@@ -18,6 +18,7 @@ import { storeUserFormValues } from "../data/util";
 import AddressSection from "./address-section";
 import { handleLoadCountries } from "@/lib/db";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: boolean; setFormMethods(methods: UseFormReturn<any>): void;}) => {
     const {debug} = useDebug();
@@ -87,8 +88,10 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
   const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
 
   const countries = useRef<CountryType[]>([])
-  const countriesLoadedCallback = (data: CountryType[]) => {
-    countries.current = data;
+  const countriesLoadedCallback = (data: ApiResponseType): void => {
+    if (data.status === 200) {
+      countries.current = data.payload;
+    }
   }
 
   useEffect(() => {

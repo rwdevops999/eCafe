@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest } from "next/server";
-import { Country } from "@/types/ecafe";
-import { createEmptyApiReponse, js, loadCountriesFromFile } from "@/lib/utils";
+import { Country, CountryType } from "@/types/ecafe";
+import { createApiResponse, createEmptyApiReponse, js, loadCountriesFromFile } from "@/lib/utils";
 import { serviceMappings, ServiceMappingType } from "./setup/setup";
 import { allItems, workingItems } from "@/data/constants";
 import { ApiResponseType } from "@/types/db";
@@ -120,20 +120,22 @@ const getAllCountries = async () => {
   return Response.json(countries.sort((a, b) => a.name.localeCompare(b.name)));
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
 
-    if (table && table !== allItems) {
-      if (table === 'country') {
-        return getAllCountries();
-      }
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
+
+    if (table && table === 'country') {
+      apiResponse.info = "Payload: CountryType[]";
+
+      const countries: CountryType[] = await prisma.country.findMany({});
+      apiResponse.payload = countries;
+
+      return Response.json(apiResponse);
     }
     
-    return new Response("No Data", {
-      headers: { "content-type": "application/json" },
-      status: 204,
-   });
+    return new Response(createApiResponse(204, "NoData", undefined));
 }
 
 export async function DELETE(request: NextRequest) {

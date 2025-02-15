@@ -42,18 +42,31 @@ export const handleLoadLanguages = async (_callback: CallbackFunctionWithData): 
   await loadLanguages(_callback);
 }
 
+
+
+
 /**
  * COUNTRIES
  */
-const loadCountries = async (_callback: CallbackFunctionSubjectLoaded) => {
+
+const loadCountries = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/db?table=country")
     .then((response) => response.json())
-    .then((response) => _callback(response));
+    .then((response) => _callback(response))
+    .catch((error: any) => console.log("loadCountries", `ERROR loading the countries`, js(error)));
 }
 
-export const handleLoadCountries = async (_callback: CallbackFunctionSubjectLoaded) => {
+export const handleLoadCountries = async (_callback: CallbackFunctionWithData) => {
     await loadCountries(_callback);
 }
+
+
+
+
+
+
+
+
 
 /**
  * SERVICES

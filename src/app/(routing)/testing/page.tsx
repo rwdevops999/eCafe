@@ -1,7 +1,5 @@
 'use client'
 
-import TestStorage from "./storage";
-
 const Test = () => {
 
   const ftest = () => {
@@ -10,7 +8,7 @@ const Test = () => {
   ftest();
 
   const renderComponent = () => {
-    return (<TestStorage />);
+    return (<></>);
     };
 
   return (<>{renderComponent()}</>);
