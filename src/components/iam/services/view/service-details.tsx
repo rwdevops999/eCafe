@@ -11,12 +11,17 @@ import { Data, ServiceType } from "@/types/ecafe";
 import { mapServicesToData } from "@/lib/mapping";
 import { handleLoadServicesWithServiceName } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
   const [servicesData, setServicesData] = useState<Data[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
+  const {debug} = useDebug();
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const servicesLoadedCallback = (data: ServiceType[]) => {
+    logger.debug("ServiceDeaials", "Serives loaded", JSON.stringify(data));
     setServicesData(mapServicesToData(data));
     setLoader(false);
   }

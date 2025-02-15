@@ -14,11 +14,16 @@ import AlertMessage from "@/components/ecafe/alert-message";
 import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData } from "@/lib/mapping";
-import { isNumber } from "@/lib/utils";
-import { handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import { createHistoryType, isNumber } from "@/lib/utils";
+import { addHistory, handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
+import { useDebug } from "@/hooks/use-debug";
+import { ConsoleLogger } from "@/lib/console.logger";
 
 const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
+  const {debug} = useDebug();
+  const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
+
   const [loader, setLoader] = useState<boolean>(false);
   const [reload, setReload] = useState(0);
 
@@ -61,6 +66,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   }
 
   const statementsLoadedCallback = (data: StatementType[]) => {
+    logger.debug("StatementDetails", "Statements loaded", JSON.stringify(data));
     setStatements(data);
     setStatementData(mapStatementsToData(data, services.current));
     statementsLoaded.current = true;
@@ -116,6 +122,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
       const statement = statements.find(s => s.id === _statement.id);
       if (statement && statement.policies) {
+        logger.debug("StatementDetails", "Statement is in a policy", _statement.name);
         if (statement.policies.length > 0) {
           alert.open = true;
           alert.error = true;
@@ -129,6 +136,8 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
   /** for admin only later on */
   const handleDeleteManagedStatement = (statement: Data) => {
+    logger.debug("StatementDetails", `Forced deleting managed statement ${statement.name}`);
+    addHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
     handleDeleteStatement(statement.id, statementDeletedCallback);
     setAlert(undefined);
   }
@@ -136,6 +145,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   const handleAction = (action: string, statement: Data) => {
     if (action === action_delete) {
       if (statement.other?.managed) {
+        logger.debug("StatementDetails", `Deleting managed statement ${statement.name}?`);
         const alert = {
           open: true,
           error: true,
@@ -151,6 +161,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         if (alert.error) {
           setAlert(alert);
         } else {
+          addHistory(createHistoryType("info", "Statement delete", "Statement ${statement.name} is deleted", "Statement"));
           handleDeleteStatement(statement.id, statementDeletedCallback);
         }
       }
