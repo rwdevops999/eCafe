@@ -3,6 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { useSidebar } from "@/components/ui/sidebar";
 import { defaultLanguage } from "@/data/constants";
 import { handleLoadLanguages } from "@/lib/db";
+import { ApiResponseType } from "@/types/db";
 import { LanguageType } from "@/types/ecafe";
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -15,8 +16,10 @@ const ToolsLanguage = () => {
     const [languages, setLanguages] = useState<LanguageType[]>([]);
     const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage);
 
-    const languagesLoadedCallback = (data: LanguageType[]) => {
-        setLanguages(data);
+    const languagesLoadedCallback = (data: ApiResponseType): void => {
+        if (data.status === 200) {
+            setLanguages(data.payload as LanguageType[]);
+        }
     }
 
     useEffect(() => {

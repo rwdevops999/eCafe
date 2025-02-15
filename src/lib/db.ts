@@ -6,7 +6,7 @@ import { js } from "./utils";
 /**
  * DB
  */
-export const initDB = async (_table: string, _callback: CallbackFunctionWithData) => {
+export const initDB = async (_table: string, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch('http://localhost:3000/api/db?table='+_table,{
     method: 'POST',
     body: JSON.stringify("initialise DB?"),
@@ -19,7 +19,7 @@ export const initDB = async (_table: string, _callback: CallbackFunctionWithData
   .catch((error: any) => console.log("ERROR DB(initDB)", js(error)));
 }
 
-export const handleClearDB = async (_startup: boolean, _callback: CallbackFunctionWithData) => {
+export const handleClearDB = async (_startup: boolean, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/db?startup="+_startup,{
       method: 'DELETE',
   })
@@ -28,17 +28,17 @@ export const handleClearDB = async (_startup: boolean, _callback: CallbackFuncti
   .catch((error: any) => console.log("handleClearDB", `ERROR clear tables with startup included: ${_startup}`, js(error)));
 }
 
-
  /**
  * LANGUAGES
  */
-const loadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
+const loadLanguages = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/languages")
     .then((response) => response.json())
-    .then((response) => _callback(response));
+    .then((response) => _callback(response))
+    .catch((error: any) => console.log("loadLanguages", `ERROR loading the languages`, js(error)));
 }
 
-export const handleLoadLanguages = async (_callback: CallbackFunctionSubjectLoaded) => {
+export const handleLoadLanguages = async (_callback: CallbackFunctionWithData): Promise<void> => {
   await loadLanguages(_callback);
 }
 
