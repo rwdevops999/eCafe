@@ -1,11 +1,7 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
-function DashboardPage ({
-    className,
-    children,
-    ...props
-  }: HTMLAttributes<HTMLDivElement>) {
+const DashboardPage = ({className, children, ...props}: HTMLAttributes<HTMLDivElement>) => {
     return (
       <section
         className={cn(

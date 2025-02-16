@@ -1,10 +1,6 @@
 import { cn } from "@/lib/utils"
 
-function NavHeader({
-    className,
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLDivElement>) {
+const NavHeader = ({className, children, ...props}: React.HTMLAttributes<HTMLDivElement>) => {
     return (
       <section
         className={cn(
@@ -18,10 +14,7 @@ function NavHeader({
     )
 }
 
-function NavHeaderHeading({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement>) {
+const NavHeaderHeading = ({className, ...props}: React.HTMLAttributes<HTMLHeadingElement>) => {
     return (
       <h1
         className={cn(
@@ -33,10 +26,7 @@ function NavHeaderHeading({
     )
 }
   
-function NavHeaderDescription({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLParagraphElement>) {
+const NavHeaderDescription = ({className, ...props}: React.HTMLAttributes<HTMLParagraphElement>) => {
     return (
       <p
         className={cn(
@@ -48,10 +38,7 @@ function NavHeaderDescription({
     )
 }
   
-function NavHeaderActions({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLDivElement>) {
+const NavHeaderActions = ({className, ...props}: React.HTMLAttributes<HTMLDivElement>) => {
     return (
       <div
         className={cn(
