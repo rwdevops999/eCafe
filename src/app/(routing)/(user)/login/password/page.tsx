@@ -10,7 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { addHistory, createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
+import { createHistory, createTask, handleLoadUserById, handleUpdateUser } from "@/lib/db";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ExtendedUserType, NotificationButtonsType, TaskType, UserType } from "@/types/ecafe";
 import { useUser } from "@/hooks/use-user";
@@ -138,7 +138,7 @@ const LoginPassword = () => {
 
       if (user.password === getValues("password")) {
         logger.debug("LoadPassword", "Password correct => user is OK");
-        addHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
+        createHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
         login(user);
         redirect("/dashboard")
       } else {
@@ -166,7 +166,7 @@ const LoginPassword = () => {
         if (attemps >= MaxLoginAttemps) {
           _user.blocked = true;
           logger.debug("LoadPassword", "Too many login tries => block user", attemps);
-          addHistory(createHistoryType("action", "Invalid login", `${user.email} will be blocked (too many attemps)`, "Login[Password]"));
+          createHistory(createHistoryType("action", "Invalid login", `${user.email} will be blocked (too many attemps)`, "Login[Password]"));
           handleUpdateUser(_user, ()=>{});
 
           const task: TaskType = {
@@ -178,14 +178,14 @@ const LoginPassword = () => {
           }
           
           logger.debug("LoginPassword", "userLoadedCallback", "Create Task", JSON.stringify(task));
-          addHistory(createHistoryType("action", "Task created", `Unblock ${user.email}`, "Login[Password]"));
+          createHistory(createHistoryType("action", "Task created", `Unblock ${user.email}`, "Login[Password]"));
           createTask(task, () => {});
           
           handleAttempsExceeded();          
         } else {
           logger.debug("LoadPassword", "Login failed => updating attemps", attemps);
           handleUpdateUser(_user, ()=>{});
-          addHistory(createHistoryType("action", "User updated", `Attemps adjusted`, "Login[Password]"));
+          createHistory(createHistoryType("action", "User updated", `Attemps adjusted`, "Login[Password]"));
           handleInvalidPassword(user.attemps);
         }
       }

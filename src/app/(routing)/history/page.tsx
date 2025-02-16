@@ -13,6 +13,7 @@ import { HistoryData, HistoryType } from "@/types/ecafe";
 import { useEffect, useState } from "react";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
+import { ApiResponseType } from "@/types/db";
 
 const History = () => {
     const {debug} = useDebug();
@@ -22,14 +23,14 @@ const History = () => {
 
     const [mappedHistory, setMappedHistory] = useState<HistoryData[]>([]);
 
-    const historyLoadedCallback = (data: any): void => {
-        logger.debug("History", "historyLoadedCallback", JSON.stringify(data));
-        if (data.status === 200) {
-            const history: HistoryType[] = data.payload;
+    const historyLoadedCallback = (_data: ApiResponseType): void => {
+        logger.debug("History", "historyLoadedCallback", JSON.stringify(_data));
+        if (_data.status === 200) {
+            const history: HistoryType[] = _data.payload;
 
             setMappedHistory(mapHistoryToData(history));
         } else {
-            logger.debug("History", "tasksLoadedCallback", "Error", data.payload);
+            logger.debug("History", "tasksLoadedCallback", "Error", _data.payload);
         }
 
         setLoader(false);

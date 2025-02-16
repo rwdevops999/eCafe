@@ -7,12 +7,13 @@ import PageTitle from "@/components/ecafe/page-title";
 import { Separator } from "@/components/ui/separator";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { handleLoadTasks } from "@/lib/db";
+import { handleLoadAllTasks, handleLoadTasks } from "@/lib/db";
 import { mapTasksToData } from "@/lib/mapping";
 import { TaskData, TaskType } from "@/types/ecafe";
 import { useEffect, useState } from "react";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
+import { ApiResponseType } from "@/types/db";
 
 const Task = () => {
     const {debug} = useDebug();
@@ -22,14 +23,14 @@ const Task = () => {
 
     const [mappedTasks, setMappedTasks] = useState<TaskData[]>([]);
 
-    const tasksLoadedCallback = (data: any): void => {
-        logger.debug("Task", "tasksLoadedCallback", JSON.stringify(data));
-        if (data.status === 200) {
-        const tasks: TaskType[] = data.payload;
+    const tasksLoadedCallback = (_data: ApiResponseType): void => {
+        logger.debug("Task", "tasksLoadedCallback", JSON.stringify(_data));
+        if (_data.status === 200) {
+        const tasks: TaskType[] = _data.payload;
 
         setMappedTasks(mapTasksToData(tasks, 0));
         } else {
-        logger.debug("Task", "tasksLoadedCallback", "Error", data.payload);
+            logger.debug("Task", "tasksLoadedCallback", "Error", _data.payload);
         }
 
         setLoader(false);
@@ -38,7 +39,7 @@ const Task = () => {
     useEffect(() => {
         logger.debug("Task", "UserEffect[]");
         setLoader(true);
-        handleLoadTasks(tasksLoadedCallback);
+        handleLoadAllTasks(tasksLoadedCallback);
     }, []);
 
     const renderComponent = () => {

@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { months } from "@/data/constants";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { handleLoadTask } from "@/lib/db";
+import { handleLoadTask, handleLoadTaskById } from "@/lib/db";
 import { cn, padZero } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
 import { CheckedState } from "@radix-ui/react-checkbox";
@@ -18,6 +18,7 @@ import { CheckedState } from "@radix-ui/react-checkbox";
 import { CalendarDays, MailCheck, MailOpen } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { ActionExecutionType, ActionFunction, actionFunctions } from "../data/taskInfo";
+import { ApiResponseType } from "@/types/db";
 
 /**
  * Functions can't be stored in the database, so we need to store them in a .ts file
@@ -34,7 +35,7 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
 
   const taskToExecute = useRef<string|undefined>(undefined);
 
-  const taskLoadedCallback = (_response: any) => {
+  const taskLoadedCallback = (_response: ApiResponseType) => {
     // logger.debug("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
     console.log("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
 
@@ -57,7 +58,7 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
 
   useEffect(() => {
     logger.debug("Task", "UseEffect[taskId]", taskId);
-    handleLoadTask(taskId, taskLoadedCallback);
+    handleLoadTaskById(taskId, taskLoadedCallback);
   }, [taskId]);
 
   const renderCreationDateInfo = (dateValue: string|undefined): string => {

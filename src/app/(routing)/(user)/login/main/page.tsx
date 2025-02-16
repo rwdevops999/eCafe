@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { startTransition, useEffect, useRef, useState } from "react";
-import { addHistory, createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
+import { createHistory, createOTP, createTask, handleLoadUserByEmail } from "@/lib/db";
 import { EmailType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { useRouter } from "next/navigation";
 import { createHistoryType, generateOTP, js } from "@/lib/utils";
@@ -78,9 +78,11 @@ const LoginMain = () => {
         focusToEmailInput();
     }, [refocus]);
 
-    const taskCreatedCallback = () => {
-        logger.debug("LoginMain", "Task Created");
-        addHistory(createHistoryType("action", "Task created", `Task created to remove the OTP code`, "Login[Email]"));
+    const taskCreatedCallback = (_data: ApiResponseType) => {
+        if (_data.status === 200) {
+            logger.debug("LoginMain", "Task Created");
+            createHistory(createHistoryType("action", "Task created", `Task created to remove the OTP code`, "Login[Email]"));
+        }
     }
 
     const otpCreatedCallback = (_data: ApiResponseType) => {
@@ -88,41 +90,47 @@ const LoginMain = () => {
             const otp: OtpType = _data.payload;
 
             logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", js(otp));
-            addHistory(createHistoryType("action", "OTP Created", `OTP ${otp.OTP} created for ${otp.email}`, "Login[Email]"));
+            createHistory(createHistoryType("action", "OTP Created", `OTP ${otp.OTP} created for ${otp.email}`, "Login[Email]"));
 
             const task: TaskType = {
+                id: -1,
                 name: ACTION_REMOVE_OTP,
                 description: `Remove code for OTP ${otp.OTP}`,
                 subject: ACTION_TYPE_OTP,
                 subjectId: otp.id,
                 status: "open",
+                createDate: new Date(),
+                updateDate: new Date()
             }
 
             createTask(task, taskCreatedCallback);
 
-            logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
+            logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", otp.id);
             setDialogState(false);
             redirect("/login/OTP?otpId="+otp.id);
         }
     }
 
-    const sendEmailCallback = (data: any) => {
-        logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(data));
+    const sendEmailCallback = (_data: ApiResponseType) => {
+        logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(_data));
 
-        if (data.status === 200) {
-            const emailInfo: EmailType = data.payload;
+        if (_data.status === 200) {
+            const emailInfo: EmailType = _data.payload;
 
             const info: OtpType = {
+                id: -1,
                 userId: emailInfo.data,
                 OTP: emailInfo.OTPcode,
                 email: emailInfo.destination,
                 attemps: emailInfo.attemps,
+                createDate: new Date(),
+                updateDate: new Date(),
                 used: false
             }
 
             createOTP(info, otpCreatedCallback);
         } else {
-            logger.debug("LoginMain", "sendEmailCallback", "Send error", JSON.stringify(data.payload));
+            logger.debug("LoginMain", "sendEmailCallback", "Send error", JSON.stringify(_data.payload));
         }
     }
 
@@ -156,7 +164,7 @@ const LoginMain = () => {
         }
 
         logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
-        addHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
+        createHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
         handleSendEmail(emailInfo, sendEmailCallback);
     }
 
@@ -183,7 +191,7 @@ const LoginMain = () => {
             logger.debug("LoginMain", "userByEmailLoadedCallback(user)", "user is in DB", js(user));
 
             if (user.blocked) {
-                addHistory(createHistoryType("info", "Invalid login", `Blocked user ${_email} tried to log in.`, "Login[Email]"));
+                createHistory(createHistoryType("info", "Invalid login", `Blocked user ${_email} tried to log in.`, "Login[Email]"));
                 handleUserBlocked();
             } else if (user.passwordless) {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
@@ -195,7 +203,7 @@ const LoginMain = () => {
                 }
 
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
-                addHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
+                createHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
                 handleSendEmail(emailInfo, sendEmailCallback);
             } else {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "User wants to login with password => Redirect to LoginPassword", user.id);
@@ -208,9 +216,14 @@ const LoginMain = () => {
             dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry", rightButton: "Use OTP"};
         
             const otpData: OtpType = {
+                id: -1,
                 attemps: 0,
                 email: _email,
-                OTP: ""                 
+                OTP: "",
+                createDate: new Date(),
+                updateDate: new Date(),
+                userId: null,
+                used: false             
             }
         
             dialogDataRef.current = otpData;
@@ -221,7 +234,7 @@ const LoginMain = () => {
 
     const onSubmit = (data: FormSchemaType) => {
         logger.debug("LoginMain", "SUBMITTING");
-        addHistory(createHistoryType("info", "Login try", `${data.email} tries to login`, "Login[Email]"));
+        createHistory(createHistoryType("info", "Login try", `${data.email} tries to login`, "Login[Email]"));
         handleLoadUserByEmail(data.email, userByEmailLoadedCallback)
     }
 

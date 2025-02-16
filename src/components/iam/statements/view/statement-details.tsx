@@ -15,7 +15,7 @@ import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData, mapStatementToDataArray } from "@/lib/mapping";
 import { createHistoryType, isNumber, js } from "@/lib/utils";
-import { addHistory, handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import { createHistory, handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -158,7 +158,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   /** for admin only later on */
   const handleDeleteManagedStatement = (statement: Data) => {
     logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
-    addHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
+    createHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
     handleDeleteStatement(statement.id, statementDeletedCallback);
     setAlert(undefined);
   }
@@ -181,7 +181,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         if (alert.error) {
           setAlert(alert);
         } else {
-          addHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
+          createHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
           handleDeleteStatement(statement.id, statementDeletedCallback);
         }
       }

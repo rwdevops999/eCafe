@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { createApiReponse } from "@/lib/utils";
+import { createApiResponse } from "@/lib/utils";
 import { HistoryType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 import { title } from "process";
@@ -24,13 +24,13 @@ const createHistory = async (data: HistoryType) => {
 export async function POST(request: NextRequest) {
     const _data: HistoryType = await request.json();
 
-    const history = await createHistory(_data);
+    const history: HistoryType = await createHistory(_data);
 
-    return Response.json(createApiReponse(200, history));
+    return Response.json(createApiResponse(200, "Payload: HistoryType", history));
 }
 
 export async function GET(request: NextRequest) {
-    const history = await prisma.history.findMany();
+    const history: HistoryType[] = await prisma.history.findMany();
 
-    return Response.json(createApiReponse(200, history.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
+    return Response.json(createApiResponse(200, "Payload: HistoryType[]", history.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
 }

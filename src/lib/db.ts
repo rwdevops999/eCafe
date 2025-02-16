@@ -450,7 +450,33 @@ export const handleDeleteOtpByEmailAndDate = async (_email: string, _expireDate:
 
 
 // TASKS
-export const createTask = async (task: TaskType, _callback: CallbackFunctionDefault) => {
+const loadTasks = async (open: boolean, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch("http://localhost:3000/api/task?open="+open)
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("loadTasks", "ERROR loading tasks", js(error)));
+  }
+
+export const handleLoadAllTasks = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadTasks(false, _callback);
+}
+
+export const handleLoadOpenTasks = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadTasks(true, _callback);
+}
+
+const loadTaskById = async (_taskId: number, _callback: CallbackFunctionWithParam, additional: any): Promise<void> => {
+  await fetch("http://localhost:3000/api/task?taskId="+_taskId)
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response, additional))
+    .catch((error: any) => console.log("loadTaskById", "ERROR loading task by id", js(error)));
+}
+
+export const handleLoadTaskById = async (_taskId: number, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await loadTaskById(_taskId, _callback, additional);
+}
+
+export const createTask = async (task: TaskType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch('http://localhost:3000/api/task',
     {
       method: 'POST',
@@ -459,48 +485,25 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionDefa
         'content-type': 'application/json'
       }
     })
-    .then(response => response.json())
-    .then(response => _callback());
-}
-
-const loadTasks = async (open: boolean, _callback: CallbackFunctionSubjectLoaded) => {
-  await fetch("http://localhost:3000/api/task?open="+open)
-    .then((response) => response.json())
-    .then((response) => _callback(response));
-}
-
-export const handleLoadTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
-  await loadTasks(false, _callback);
-}
-
-export const handleLoadOpenTasks = async (_callback: CallbackFunctionSubjectLoaded) => {
-  await loadTasks(true, _callback);
-}
-
-const loadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded, additional: any) => {
-  await fetch("http://localhost:3000/api/task?taskId="+_taskId)
-    .then((response) => response.json())
-    .then((response) => _callback(response, additional));
-}
-
-export const handleLoadTask = async (_taskId: number, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  await loadTask(_taskId, _callback, additional);
-}
-
-const prisma = new PrismaClient()
-
-const tableNames = ['Action', 'Address', 'Country', 'Group','OTP', 'Policy', 'Role', 'Service', 'ServiceStatement', 'StatementAction', 'Task', 'User'];
-const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
-
-export const flushAll = async () => {
-  for (const tableName of tableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
-  for (const tableName of relationTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("createTask", "ERROR creating task", js(error)));
 }
 
 // HISTORY
-// Use 
-// createHistoryType to create an instance of HistoryType
-export const addHistory = async (_history: HistoryType, _callback?: CallbackFunctionDefault) => {
+// Use createHistoryType to create an instance of HistoryType
+const loadHistory = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch("http://localhost:3000/api/history")
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response)})
+    .catch((error: any) => console.log("loadHistory", "ERROR loading history", js(error)));
+}
+
+export const handleLoadHistory = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadHistory(_callback);
+}
+
+export const createHistory = async (_history: HistoryType, _callback?: CallbackFunctionWithParam): Promise<void> => {
   await fetch('http://localhost:3000/api/history',
     {
       method: 'POST',
@@ -508,18 +511,10 @@ export const addHistory = async (_history: HistoryType, _callback?: CallbackFunc
       headers: {
         'content-type': 'application/json'
         }
-    }).then(response => (_callback ? _callback() : () => {}));
+    })
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {(_callback ? _callback(response) : () => {}})
+    .catch((error: any) => console.log("createHistory", "ERROR creating history", js(error)));
 }
 
-const loadHistory = async (_callback: CallbackFunctionSubjectLoaded) => {
-  await fetch("http://localhost:3000/api/history")
-    .then((response) => response.json())
-    .then((response) => {
-      _callback(response);
-    });
-}
-
-export const handleLoadHistory = async (_callback: CallbackFunctionSubjectLoaded) => {
-  await loadHistory(_callback);
-}
 

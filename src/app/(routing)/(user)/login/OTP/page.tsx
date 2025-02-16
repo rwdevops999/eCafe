@@ -8,7 +8,7 @@ import { MaxLoginAttemps } from "@/data/constants";
 import { useDebug } from "@/hooks/use-debug";
 import { useUser } from "@/hooks/use-user";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { addHistory, createTask, handleLoadOTP, handleLoadUserById, handleUpdateOtp, handleUpdateUser } from "@/lib/db";
+import { createHistory, createTask, handleLoadOTP, handleLoadUserById, handleUpdateOtp, handleUpdateUser } from "@/lib/db";
 import { ExtendedUserType, NotificationButtonsType, OtpType, TaskType, UserType } from "@/types/ecafe";
 import { register } from "module";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -139,7 +139,7 @@ const LoginOTP = () => {
 
     if (data.status === 200) {
       logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
-      addHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
+      createHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
       login(data.payload);
       redirect("/dashboard")
     } else {
@@ -159,7 +159,7 @@ const LoginOTP = () => {
     }
     logger.debug("LoginOTP", "OTP login as guest", "set user", JSON.stringify(user));
 
-    addHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
+    createHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
     login(user);
     redirect("/dashboard")
   }
@@ -174,14 +174,14 @@ const LoginOTP = () => {
 
       if (otp.OTP !== getValues("otpcode")) {
         logger.debug("LoginOTP", "otpLoadedCallback", "OTP invalid");
-        addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
+        createHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
 
         otp.attemps++;
 
         handleUpdateOtp(otp, ()=>{});
 
         if (otp.attemps >= MaxLoginAttemps) {
-          addHistory(createHistoryType("info", "Invalid login", `${otp.email} attemps exceeded.`, "Login[OTP]"));
+          createHistory(createHistoryType("info", "Invalid login", `${otp.email} attemps exceeded.`, "Login[OTP]"));
 
           if (user.current) {
             const _user: ExtendedUserType = {
@@ -211,7 +211,7 @@ const LoginOTP = () => {
             }
                     
             logger.debug("LoginPassword", "userLoadedCallback", "Create Task", js(task));
-            addHistory(createHistoryType("action", "Task created", `Unblock ${user.current.email}`, "Login[Password]"));
+            createHistory(createHistoryType("action", "Task created", `Unblock ${user.current.email}`, "Login[Password]"));
             createTask(task, () => {});
           
             handleAccountBlocked();
@@ -221,12 +221,12 @@ const LoginOTP = () => {
         } else {
           logger.debug("LoginOTP", "otpLoadedCallback", "Update attemps");
 
-          addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
+          createHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
         if (otp.used) {
-          addHistory(createHistoryType("info", "Invalid login", `${otp.OTP} was already used for ${otp.email}.`, "Login[OTP]"));
+          createHistory(createHistoryType("info", "Invalid login", `${otp.OTP} was already used for ${otp.email}.`, "Login[OTP]"));
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
           dialogTitleRef.current = `OTP code invalid`;
           dialogMessageRef.current = "OTP code already used. Retry Login?";

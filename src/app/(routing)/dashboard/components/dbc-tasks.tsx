@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/datatable/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { handleLoadOpenTasks, handleLoadTasks } from "@/lib/db";
+import { handleLoadAllTasks, handleLoadOpenTasks, handleLoadTasks } from "@/lib/db";
 import { mapTasksToData } from "@/lib/mapping";
 import { cn } from "@/lib/utils";
 import { Data, TaskData, TaskType } from "@/types/ecafe";
@@ -12,6 +12,7 @@ import { useDebug } from "@/hooks/use-debug";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { ApiResponseType } from "@/types/db";
 
 const DbcTasks = ({className = ""}:{className?:string}) => {
   const {debug} = useDebug();
@@ -21,10 +22,10 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
   const [loader, setLoader] = useState<boolean>(false);
 
   const [tasksData, setTasksData] = useState<TaskData[]>([]);
-  const tasksLoadedCallback = (data: any) => {
-    logger.debug("DbcTask", "tasks loaded", JSON.stringify(data));
-    if (data.status === 200) {
-      const tasks: TaskType[] = data.payload;
+  const tasksLoadedCallback = (_data: ApiResponseType) => {
+    logger.debug("DbcTask", "tasks loaded", JSON.stringify(_data));
+    if (_data.status === 200) {
+      const tasks: TaskType[] = _data.payload;
       
       setTasksData(mapTasksToData(tasks, 5));
     }
@@ -33,7 +34,7 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
 
   const loadTasks = () => {
     setLoader(true);
-    handleLoadTasks(tasksLoadedCallback);
+    handleLoadAllTasks(tasksLoadedCallback);
   }
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
     if (checked) {
       handleLoadOpenTasks(tasksLoadedCallback);
     } else {
-      handleLoadTasks(tasksLoadedCallback);
+      handleLoadAllTasks(tasksLoadedCallback);
     }
   }
 

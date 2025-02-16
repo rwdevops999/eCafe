@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { createApiReponse, stringToBoolean } from "@/lib/utils";
+import { createApiResponse, stringToBoolean } from "@/lib/utils";
 import { TaskType } from "@/types/ecafe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,13 +26,9 @@ const createTask = async (data: TaskType) => {
 
     console.log("API CreateTask: ", JSON.stringify(_data));
     
-    const task = await createTask(_data);
+    const task: TaskType = await createTask(_data);
 
-    return new Response(JSON.stringify(task), {
-      headers: { "content-type": "application/json" },
-      status: 201,
-   });
-
+    return Response.json(createApiResponse(201, "Payload: TaskType", task));
 }
 
 export async function GET(request: NextRequest) {
@@ -40,10 +36,8 @@ export async function GET(request: NextRequest) {
   const open = searchParams.get('open');  // passed as ...?service=Stock => service = "Stock"
   const taskId = searchParams.get('taskId');  // passed as ...?service=Stock => service = "Stock"
 
-  let tasks: any[] = [];
-
   if (taskId) {
-    const task: any = await prisma.task.findFirst({
+    const task: TaskType | null = await prisma.task.findFirst({
       where: {
         id: parseInt(taskId)
       }
@@ -52,19 +46,21 @@ export async function GET(request: NextRequest) {
     if (task) {
       console.log("API Task = " + JSON.stringify(task));
 
-      return Response.json(createApiReponse(200, task));
+      return Response.json(createApiResponse(200, "Payload: TaskType", task));
     }
 
-    return Response.json(createApiReponse(404, "Task not found"));
+    return Response.json(createApiResponse(404, "Task not found"));
   }
   
+  let tasks: TaskType[] = [];
+
   if (open && stringToBoolean(open)) {
     tasks = await prisma.task.findMany({where: {status: "open"}});
   } else {
     tasks = await prisma.task.findMany();
   }
 
-  return Response.json(createApiReponse(200, tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
+  return Response.json(createApiResponse(200, "Payload: TaskType[]", tasks.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
 }
 
 export async function PUT(request: NextRequest) {

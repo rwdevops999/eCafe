@@ -4,7 +4,7 @@ import EcafeButton from '@/components/ecafe/ecafe-button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDebug } from '@/hooks/use-debug';
 import { ConsoleLogger } from '@/lib/console.logger';
-import { addHistory, initDB } from '@/lib/db';
+import { createHistory, initDB } from '@/lib/db';
 import { createHistoryType, js } from '@/lib/utils';
 import { History } from 'lucide-react';
 import React from 'react'
@@ -17,7 +17,7 @@ const SettingsHistory = () => {
 
     const historyCleared = (data: any) => {
         logger.debug("History", "handleClearHistory", js(data));
-        addHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
+        createHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
         toast.success("History cleared.")
     }
     

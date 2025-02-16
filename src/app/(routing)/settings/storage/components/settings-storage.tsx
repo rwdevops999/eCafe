@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { allItems, workingItems } from '@/data/constants';
 import { useDebug } from '@/hooks/use-debug';
 import { ConsoleLogger } from '@/lib/console.logger';
-import { addHistory, handleClearDB, initDB } from '@/lib/db';
+import { createHistory, handleClearDB, initDB } from '@/lib/db';
 import { Database, Info } from 'lucide-react';
 import React, { useRef, useState } from 'react'
 import { toast } from 'sonner';
@@ -29,7 +29,7 @@ const SettingsStorage = () => {
     const databaseCleared = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
             toast.success("Database cleared.")
-            addHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
         }
     }
 
@@ -42,7 +42,7 @@ const SettingsStorage = () => {
     const databaseInitialised = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
             toast.success("Database initialised.")
-            addHistory(createHistoryType("info", "Database initialised", "Database startup tables set up", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Database initialised", "Database startup tables set up", "Settings[Storage]"), () => {})
         }
     }
 
@@ -55,7 +55,7 @@ const SettingsStorage = () => {
     const dataCleared = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
             toast.success("Working data removed.")
-            addHistory(createHistoryType("info", "Data tables clear", "Database work tables are cleared", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Data tables clear", "Database work tables are cleared", "Settings[Storage]"), () => {})
         }
     }
 
@@ -68,7 +68,7 @@ const SettingsStorage = () => {
     const countriesLoaded = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
             toast.info("Countries loaded.")
-            addHistory(createHistoryType("info", "Country tables loaded", "Country table resetted", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Country tables loaded", "Country table resetted", "Settings[Storage]"), () => {})
         }
     }
 

@@ -1,7 +1,7 @@
+import { createApiResponse } from '@/lib/utils';
 import { EmailType } from '@/types/ecafe';
 import { NextRequest, NextResponse } from 'next/server';
 import * as nodemailer from 'nodemailer';
-import { createApiReponse } from '@/lib/utils';
 
 // import nodemailer from 'nodemailer';
 
@@ -30,9 +30,9 @@ export async function POST(req: NextRequest) {
         })
         console.log("email sent");
 
-    return NextResponse.json(createApiReponse(200, _data));
+        return Response.json(createApiResponse(200, "Payload: EmailType", _data));
       } catch (err) {
         console.log("email error", err);
-        return NextResponse.json(createApiReponse(500, err))
+        return Response.json(createApiResponse(500, "Error sending email"))
       }
     }

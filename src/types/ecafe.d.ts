@@ -99,29 +99,7 @@ type NotificationButtonsType = {
 }
 
 
-/**
- * name will be the action so the name and the actions in task are preferably the same
- */
-type TaskType = {
-  id?: number
-  name: string
-  description: string
-  subject: string
-  subjectId?: number
-  status: "open" | "completed"
-  createDate?: string
-}
-
 export type typeType = "info" | "action";
-
-type HistoryType = {
-  id?: number,
-  type: typeType,
-  title: string,
-  description: string,
-  originator: string,
-  createDate?: string
-}
 
 type HistoryData = z.infer<typeof historyDataScheme>
 
@@ -265,3 +243,25 @@ type OtpType = {
   createDate: Date
   updateDate: Date
 }
+
+type TaskType = {
+  id: number
+  name: string
+  description: string
+  subject: string
+  subjectId: number | null
+  status: string
+  createDate: Date
+  updateDate: Date
+}
+
+type HistoryType = {
+  id: number,
+  type: string,
+  title: string,
+  description: string,
+  originator: string,
+  createDate: Date
+  updateDate: Date
+}
+
