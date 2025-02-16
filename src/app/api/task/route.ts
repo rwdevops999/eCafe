@@ -33,9 +33,28 @@ const createTask = async (data: TaskType) => {
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
+  const test = searchParams.get('test');  // passed as ...?service=Stock => service = "Stock"
   const open = searchParams.get('open');  // passed as ...?service=Stock => service = "Stock"
   const taskId = searchParams.get('taskId');  // passed as ...?service=Stock => service = "Stock"
 
+  if (test) {
+    const tasks: TaskType[] = await prisma.task.findMany({
+      where: {
+        createDate: {
+          lt: new Date(Date.now() - 15 * 60 * 1000)
+        }
+      }
+    });
+
+    if (tasks) {
+      console.log("API Task = " + JSON.stringify(tasks));
+
+      return Response.json(createApiResponse(200, "Payload: TaskType[]", tasks));
+    }
+
+    return Response.json(createApiResponse(404, "Task not found"));
+  }
+  
   if (taskId) {
     const task: TaskType | null = await prisma.task.findFirst({
       where: {

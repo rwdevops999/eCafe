@@ -23,14 +23,14 @@ export default function RootLayout({
 }>) {
   const [open, setOpen] = useState<boolean>(true);
 
-  LogRocket.init('j9dl4b/ecafe', {
-    release: '0.8.0'
-  });
+  // LogRocket.init('j9dl4b/ecafe', {
+  //   release: '0.8.0'
+  // });
 
-  LogRocket.identify('999', {
-    name: 'rwdevops999',
-    email: 'rwdevops999@gmail.com',
-    });
+  // LogRocket.identify('999', {
+  //   name: 'rwdevops999',
+  //   email: 'rwdevops999@gmail.com',
+  //   });
 
   return (
     <html suppressHydrationWarning lang="en">

@@ -431,7 +431,7 @@ export const handleDeleteOtpById = async (_otpId: number, _callback: CallbackFun
   await deleteOtpById(_otpId, _callback);
 }
 
-export const deleteOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+export const deleteExpiredOtpsByEmail = async (_email: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
   await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`,{
       method: 'DELETE',
   })
@@ -440,8 +440,8 @@ export const deleteOtpByEmailAndDate = async (_email: string, _date: string, _ca
   .catch((error: any) => console.log("deleteOTPByEmailAndDate", "ERROR deleting OTP by email and date", js(error)));
 }
 
-export const handleDeleteOtpByEmailAndDate = async (_email: string, _expireDate: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
-  await deleteOtpByEmailAndDate(_email, _expireDate, _callback, additional);
+export const handleDeleteExpiredOtpsByEmail = async (_email: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await deleteExpiredOtpsByEmail(_email, _callback, additional);
 }
 
 
@@ -490,6 +490,7 @@ export const createTask = async (task: TaskType, _callback: CallbackFunctionWith
     .catch((error: any) => console.log("createTask", "ERROR creating task", js(error)));
 }
 
+
 // HISTORY
 // Use createHistoryType to create an instance of HistoryType
 const loadHistory = async (_callback: CallbackFunctionWithParam): Promise<void> => {
@@ -513,7 +514,7 @@ export const createHistory = async (_history: HistoryType, _callback?: CallbackF
         }
     })
     .then((response: Response) => response.json())
-    .then((response: ApiResponseType) => {(_callback ? _callback(response) : () => {}})
+    .then((response: ApiResponseType) => _callback ? _callback(response) : () => {})
     .catch((error: any) => console.log("createHistory", "ERROR creating history", js(error)));
 }
 

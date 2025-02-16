@@ -1,4 +1,4 @@
-import { handleDeletefromOtpByEmailAndDate, handleDeleteOtpByEmailAndDate, handleDeleteOtpById, handleLoadOTP, handleUnblockUser } from "@/lib/db";
+import { handleDeleteExpiredOtpsByEmail, handleDeletefromOtpByEmailAndDate, handleDeleteOtpByEmailAndDate, handleDeleteOtpById, handleLoadOTP, handleUnblockUser } from "@/lib/db";
 import { ApiResponseType } from "@/types/db";
 import { OtpType } from "@/types/ecafe";
 
@@ -75,7 +75,7 @@ const otpLoadedCallback = (_data: any, _info: ActionExecutionType) => {
 
         if (_info.related) {
             console.log("TaskInfo", "optLoadedCallback", "RELATED");
-            handleDeleteOtpByEmailAndDate(otp.email, convertToLocalTime(new Date()), otpDeletedCallbackWithData, _info);
+            handleDeleteExpiredOtpsByEmail(otp.email, otpDeletedCallbackWithData, _info);
         } else {
             console.log("TaskInfo", "optLoadedCallback", "NOT RELATED");
             handleDeleteOtpById(otp.id!, otpDeletedCallback);
