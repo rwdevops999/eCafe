@@ -24,7 +24,8 @@ const data: SidebarType = {
 data.Header = {
     name: `ecafé v_${packageJson.version}`,
     logo: Coffee,
-    url: '/dashboard'
+    url: '/navpage'
+    // url: '/dashboard'
 };
 
 data.User = {

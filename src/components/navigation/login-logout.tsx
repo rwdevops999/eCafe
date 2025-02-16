@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { useDebug } from "@/hooks/use-debug";
 import ProgressLink from "../ecafe/progress-link";
+import { cn } from "@/lib/utils";
 
-const LoginLogout = () => {
+const LoginLogout = ({className}:{className?:string}) => {
     const {isLoggedIn, logout} = useUser();
     const router = useRouter();
     const {debug} = useDebug();
@@ -40,7 +41,7 @@ const LoginLogout = () => {
             </>
         }
             {!isLoggedIn() && 
-                    <ProgressLink href="/login/main" className="flex items-center">
+                    <ProgressLink href="/login/main" className={cn("flex items-center", className)}>
                         <LogIn size={18} className="mr-2"/>
                         Log In
                     </ProgressLink>
