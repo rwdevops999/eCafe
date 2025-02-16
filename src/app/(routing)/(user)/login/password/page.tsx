@@ -20,6 +20,7 @@ import { useDebug } from "@/hooks/use-debug";
 import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
 import { createHistoryType, js } from "@/lib/utils";
 import { useProgressBar } from "@/hooks/use-progress-bar";
+import { ApiResponseType } from "@/types/db";
 
 const LoginPassword = () => {
   const searchParams = useSearchParams();
@@ -105,7 +106,7 @@ const LoginPassword = () => {
 
   const user = useRef<UserType|undefined>(undefined);
 
-  const userLoadedOnEntryCallback = (data: any) => {
+  const userLoadedOnEntryCallback = (data: ApiResponseType) => {
     if (data.status === 200) {
       logger.debug("LoginPassword", "User loaded on entry", userId);
       user.current = data.payload; 

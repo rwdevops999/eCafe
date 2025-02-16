@@ -200,7 +200,7 @@ export const js = (object: any): string => {
  * 
  * @returns ApiReponseType
  */
-export const createApiResponse = (_status: number, _info: string, _payload: any): ApiResponseType => {
+export const createApiResponse = (_status: number, _info: string, _payload?: any): ApiResponseType => {
   return {status: _status, info: _info, payload: _payload};
 }
 

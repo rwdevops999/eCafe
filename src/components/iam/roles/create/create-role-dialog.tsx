@@ -100,9 +100,11 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     }
   }
 
-  const roleCreatedCallback = () => {
-    if (setReload) {
-      setReload((x: any) => x+1);
+  const roleCreatedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      if (setReload) {
+        setReload((x: any) => x+1);
+      }
     }
   }
 

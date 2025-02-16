@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
-import { createApiReponse, decrypt, encrypt } from "@/lib/utils";
-import { ExtendedUserType } from "@/types/ecafe";
+import { createApiResponse, decrypt, encrypt } from "@/lib/utils";
+import { ExtendedUserType, UserType } from "@/types/ecafe";
+import { create } from "domain";
 import { NextRequest, NextResponse } from "next/server";
 
 const provisionUserForCreate = (data: ExtendedUserType) => {
@@ -64,7 +65,7 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
         county: data.address?.county,
         country: {
           connect: {
-            id: data.address!.country.id
+            id: (data.address && data.address.country ? data.address.country.id : 0)
           }
         }
       }
@@ -84,58 +85,14 @@ const  provisionUserForUpdate = (data: ExtendedUserType) => {
   });
 }
 
-const  provisionUserForUpdate2 = (data: ExtendedUserType) => {
-  return ({
-      id: data.id,
-      name: data.name,
-      firstname: data.firstname,
-      phone: (data.phone ? data.phone : ""),
-      email: data.email,
-      password: data.passwordless ? "" : encrypt(data.password!),
-      passwordless: data.passwordless,
-      attemps: data.attemps,
-      blocked: data.blocked,
-      address: {
-        update: {
-          street: (data.address ? data.address.street : ""),
-          number: (data.address ? data.address.number : ""),
-          box: (data.address ? data.address.box : ""),
-          city: (data.address ? data.address.city : ""),
-          postalcode: (data.address ? data.address.postalcode : ""),
-          county: (data.address ? data.address.county : ""),
-          country: {
-            connect: {
-              id: (data.address ? data.address.country.id : null)
-            }
-          },
-        }
-      },
-      // roles: {
-      //   disconnect: data.roles?.removed,
-      //   connect: data.roles?.selected
-      // },
-      // policies: {
-      //   disconnect: data.policies?.removed,
-      //   connect: data.policies?.selected
-      // },
-      // groups: {
-      //   disconnect: data.groups?.removed,
-      //   connect: data.groups?.selected
-      // }
-    });
-}
-
 export async function POST(req: NextRequest) {
   const data: ExtendedUserType = await req.json();
 
   const user: any = provisionUserForCreate(data);
 
-  const createdUser = await prisma.user.create({data: user});
+  const createdUser: UserType = await prisma.user.create({data: user});
 
-  return new Response(JSON.stringify(createdUser), {
-      headers: { "content-type": "application/json" },
-      status: 201,
-    });
+  return Response.json(createApiResponse(201, "Payload: UserType", createdUser));
 }
 
 const findAllUsers = async () => {
@@ -217,7 +174,7 @@ export async function GET(request: NextRequest) {
     const _id: string|null = searchParams.get('id');  // passed as ...?service=Stock => service = "Stock"
 
     if (_email) {
-      const user = await prisma.user.findFirst({
+      const user: UserType|null = await prisma.user.findFirst({
         where: {
           email: _email
         },
@@ -237,12 +194,12 @@ export async function GET(request: NextRequest) {
           console.log("password for " + user.name + " is " + user.password);
         }
     
-        return Response.json(createApiReponse(200, user));
+        return Response.json(createApiResponse(200, "Payload: UserType", user));
       }
     }
 
     if (_id) {
-      const user = await prisma.user.findFirst({
+      const user: UserType|null = await prisma.user.findFirst({
         where: {
           id: parseInt(_id)
         },
@@ -262,17 +219,15 @@ export async function GET(request: NextRequest) {
           console.log("password for " + user.name + " is " + user.password);
         }
 
-        console.log("API LOAD BY ID" + JSON.stringify(user) );
-
-        return Response.json(createApiReponse(200, user));
+        return Response.json(createApiResponse(200, "Payload: UserType", user));
       }
 
-      return Response.json(createApiReponse(404, "user not found"));
+      return Response.json(createApiResponse(404, "user not found"));
     }
 
-    const users = await findAllUsers();
+    const users: UserType[] = await findAllUsers();
 
-    return Response.json(users);
+    return Response.json(createApiResponse(200, "Payload: UserType[]", users))
 }
 
 const deleteUserById = async (userId: number) => {
@@ -306,18 +261,12 @@ export async function DELETE(request: NextRequest) {
 
   if  (userId) {
     await deleteAddressByUserId(parseInt(userId));
-    const user = await deleteUserById(parseInt(userId));
+    const user: UserType = await deleteUserById(parseInt(userId));
 
-    return new Response(JSON.stringify(`deleted ${user}`), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-   });
+    return Response.json(createApiResponse(200, "Payload: UserType", user));
   }
 
-  return new Response(JSON.stringify(`user not deleted`), {
-      headers: { "content-type": "application/json" },
-      status: 400,
-   });
+  return Response.json(createApiResponse(400, "User not deleted without id"));
 }
 
 export async function PUT(req: NextRequest) {
@@ -329,18 +278,18 @@ export async function PUT(req: NextRequest) {
 
     console.log("[API] UPDATE USER", JSON.stringify(data));
   
-    const updatedUser = await prisma.user.update({
+    const updatedUser: UserType = await prisma.user.update({
         where: {
         id: data.id
       },
       data: provisionUserForUpdate(data) as any
     });
 
-    return NextResponse.json(updatedUser);
+    return Response.json(createApiResponse(200, "Payload: UserType", updatedUser));
   }
 
   // UNBLOCK USER
-  const updatedUser = await prisma.user.update({
+  const updatedUser: UserType = await prisma.user.update({
     where: {
       id: parseInt(userId)
     },
@@ -350,5 +299,5 @@ export async function PUT(req: NextRequest) {
     }
   });
 
-  return NextResponse.json(updatedUser);
+  return Response.json(createApiResponse(200, "Payload: UserType", updatedUser));
 }

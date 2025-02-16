@@ -1,4 +1,4 @@
-import { handleDeletefromOtpByEmailAndDate, handleDeleteFromOtpById, handleLoadOTP, handleLoadTask, handleUnblockUser, handleUpdateUser } from "@/lib/db";
+import { handleDeletefromOtpByEmailAndDate, handleDeleteFromOtpById, handleLoadOTP, handleUnblockUser } from "@/lib/db";
 import { OtpType } from "@/types/ecafe";
 
 export const ACTION_TYPE_OTP="OTP"

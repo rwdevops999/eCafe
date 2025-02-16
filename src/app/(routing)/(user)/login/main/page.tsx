@@ -17,6 +17,7 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import { useDebug } from "@/hooks/use-debug";
 import { ACTION_REMOVE_OTP, ACTION_TYPE_OTP } from "@/app/(routing)/task/[id]/data/taskInfo";
 import { useProgressBar } from "@/hooks/use-progress-bar";
+import { ApiResponseType } from "@/types/db";
  
 const LoginMain = () => {
     const {push} = useRouter();
@@ -170,7 +171,7 @@ const LoginMain = () => {
         setDialogState(true);
     }
 
-    const userByEmailLoadedCallback = (_data: any, _email: string) => {
+    const userByEmailLoadedCallback = (_data: ApiResponseType, _email: string) => {
         logger.debug("LoginMain", "userByEmailLoadedCallback(data, email)", "user loaded using the email?", js(_data), _email);
 
         if (_data.status === 200) {
@@ -186,7 +187,7 @@ const LoginMain = () => {
                     destination:user.email,
                     OTPcode: generateOTP(),
                     attemps: 0,
-                    data: _data.userId
+                    data: user.id
                 }
 
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));

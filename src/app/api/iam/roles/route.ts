@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+import { createEmptyApiReponse } from "@/lib/utils";
+import { ApiResponseType } from "@/types/db";
 import { RoleType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -24,11 +26,14 @@ const findAllRoles = async () => {
 }
 
 export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams
+    const roles: RoleType[] = await findAllRoles();
 
-    const roles = await findAllRoles();
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return Response.json(roles);
+    apiResponse.info = "Payload: RoleType[]";
+    apiResponse.payload = roles;
+
+    return Response.json(apiResponse);
 }
 
 const createRole = async (data: RoleType) => {
@@ -50,15 +55,18 @@ const createRole = async (data: RoleType) => {
   return role;
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
     const _data: RoleType = await req.json();
 
-    const role = await createRole(_data);
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return new Response(JSON.stringify(role), {
-      headers: { "content-type": "application/json" },
-      status: 201,
-   });
+    const role: RoleType = await createRole(_data);
+
+    apiResponse.status = 201;
+    apiResponse.info = "Payload: RoleType";
+    apiResponse.payload = role;
+
+    return Response.json(apiResponse);
 }
 
 const deleteRoleById = async (roleId: number) => {
@@ -75,21 +83,23 @@ const deleteRoleById = async (roleId: number) => {
   return role;
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(request: NextRequest): Promise<Response> {
   const urlParams = request.nextUrl.searchParams
   const roleId = urlParams.get('roleId');
 
-  if  (roleId) {
-    const role = await deleteRoleById(parseInt(roleId));
+  let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return new Response(JSON.stringify(`deleted ${role}`), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-   });
+  if  (roleId) {
+    const role: RoleType = await deleteRoleById(parseInt(roleId));
+
+    apiResponse.info = "Payload: RoleType";
+    apiResponse.payload = role;
+  
+    return Response.json(apiResponse);
   }
 
-  return new Response(JSON.stringify(`not deleted: policy id undefined`), {
-      headers: { "content-type": "application/json" },
-      status: 400,
-   });
+  apiResponse.status = 400;
+  apiResponse.info = "Not deleted: role id is not defined";
+
+  return Response.json(apiResponse);
 }

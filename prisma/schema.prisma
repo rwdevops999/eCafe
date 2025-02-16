@@ -70,9 +70,9 @@ model Policy {
 
 model Role {
   id Int @id @default(autoincrement())
-  name String?
-  description String?
-  managed Boolean? @default(false)
+  name String
+  description String
+  managed Boolean @default(false)
   createDate DateTime @default(now())
   updateDate DateTime @updatedAt
   policies Policy[]
@@ -99,9 +99,11 @@ model Address {
   box String
   city String
   postalcode String
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
   county String
-  country Country @relation(fields: [countryId], references: [id])
-  countryId Int
+  country Country? @relation(fields: [countryId], references: [id])
+  countryId Int?
   user User? @relation(fields: [userId], references: [id])
   userId Int? @unique
 }
@@ -113,7 +115,8 @@ model OTP {
   used Boolean? @default(false)
   attemps Int @default(0)
   userId Int?
-  createDate DateTime? @default(now())
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
 }
 
 model User {
@@ -125,7 +128,8 @@ model User {
   password String
   passwordless Boolean
   attemps Int @default(0)
-  createDate DateTime? @default(now())
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
   blocked Boolean @default(false)
   address Address?
   roles Role[]
@@ -137,6 +141,8 @@ model Group {
   id Int @id @default(autoincrement())
   name String
   description String
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
   roles Role[]
   policies Policy[]
   users User[]
@@ -149,7 +155,8 @@ model Task {
   status String @default("open")
   subject String
   subjectId Int?
-  createDate DateTime? @default(now())
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
 }
 
 model History {
@@ -157,6 +164,7 @@ model History {
   title String
   description String
   originator String
-  createDate DateTime? @default(now())
+  createDate DateTime @default(now())
+  updateDate DateTime @updatedAt
   type String @default("info")
 }

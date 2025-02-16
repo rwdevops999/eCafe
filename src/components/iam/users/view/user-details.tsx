@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/datatable/data-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import { cloneObject } from "@/lib/utils";
+import { cloneObject, js } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
@@ -17,6 +17,7 @@ import { mapUsersToData } from "@/lib/mapping";
 import { handleDeleteUser, handleLoadUsers } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     const {debug} = useDebug();
@@ -42,15 +43,20 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     metaUserDetails.current.currentSubject = _user;
   }
 
-  const usersLoadedCallback = (_users: UserType[]) => {
-    logger.debug("UserDetails", "usersLoadedCallback", JSON.stringify(_users));
+  const usersLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      const users: UserType[] = _data.payload;
+      logger.debug("UserDetails", "usersLoadedCallback", js(users));
 
-    usersRef.current = _users
+      usersRef.current = users;
 
-    setSelectedUser(undefined);
+      setSelectedUser(undefined);
 
-    usersDataRef.current = mapUsersToData(_users);
-    setRerender((x:any) => x+1);
+      usersDataRef.current = mapUsersToData(users);
+      
+      setRerender((x:any) => x+1);
+    }
+
     setLoader(false)
   }
 
@@ -80,10 +86,12 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
     handleLoadUsers(usersLoadedCallback);
   }, [reloadState, setReloadState]);
 
-  const userDeletedCallback = () => {
-    setSelectedUser(undefined);
-    setLoader(true);
-    handleLoadUsers(usersLoadedCallback);
+  const userDeletedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      setSelectedUser(undefined);
+      setLoader(true);
+      handleLoadUsers(usersLoadedCallback);
+    }
   }
 
   const handleAction = (_action: string, _user: Data) => {

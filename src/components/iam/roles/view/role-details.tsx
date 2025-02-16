@@ -17,6 +17,8 @@ import { ConsoleLogger } from "@/lib/console.logger";
 import AlertMessage from "@/components/ecafe/alert-message";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
+import { js } from "@/lib/utils";
 
 const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const {debug} = useDebug();
@@ -32,12 +34,17 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
     const [rolesData, setRolesData] = useState<Data[]>([]);
     const rolesLoaded = useRef<boolean>(false);
 
-    const rolesLoadedCallback = (data: RoleType[]) => {
-        logger.debug(" RoleDetails", "rolesLadedCallback", JSON.stringify(data));
+    const rolesLoadedCallback = (data: ApiResponseType) => {
+        if (data.status === 200) {
+            logger.debug(" RoleDetails", "rolesLadedCallback", js(data));
 
-        setRoles(data);
-        setRolesData(mapRolesToData(data));
-        rolesLoaded.current = true;
+            const roles: RoleType[] = data.payload;
+
+            setRoles(roles);
+            setRolesData(mapRolesToData(roles));
+            rolesLoaded.current = true;
+        }
+
         setLoader(false);
     }
 
@@ -55,8 +62,10 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
         setAlert(undefined);
     }
   
-    const roleDeletedCallback = () => {
-        setReload((x:any) => x+1);
+    const roleDeletedCallback = (_data: ApiResponseType) => {
+        if (_data.payload === 200) {
+            setReload((x:any) => x+1);
+        }
     }
 
     const roleUsed = (_role: Data): AlertType => {

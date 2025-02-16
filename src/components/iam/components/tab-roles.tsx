@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from "react";
-import { cloneObject } from "@/lib/utils";
+import { cloneObject, js } from "@/lib/utils";
 import TabItems from "./tab-items";
 import { dependency_roles } from "@/data/constants";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -10,6 +10,7 @@ import { handleLoadRoles } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const {debug} = useDebug();
@@ -21,20 +22,22 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   const [metaOfTabRoles, setMetaOfTabRoles] = useState<MetaBase>();
   const actionButtons = useRef<ButtonConfig>({})
 
-  const rolesLoadedCallback = (_data: RoleType[]) => {
-    logger.debug("TabRoles", "rolesLoadedCallback", JSON.stringify(_data));
+  const rolesLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      logger.debug("TabRoles", "rolesLoadedCallback", js(_data));
 
-    allRoles.current = _data;
+      allRoles.current = _data.payload;
 
-    actionButtons.current = defineActionButtons(_meta.currentSubject as UserType|GroupType);
+      actionButtons.current = defineActionButtons(_meta.currentSubject as UserType|GroupType);
 
-    const newMeta: MetaBase = cloneObject(_meta);
-    newMeta.subject.name = "Roles";
-    newMeta.subject.dependency = dependency_roles;
+      const newMeta: MetaBase = cloneObject(_meta);
+      newMeta.subject.name = "Roles";
+      newMeta.subject.dependency = dependency_roles;
 
-    newMeta.subject.getAllDependencies = getAllRoles;
+      newMeta.subject.getAllDependencies = getAllRoles;
 
-    setMetaOfTabRoles(newMeta);
+      setMetaOfTabRoles(newMeta);
+    }
   }
 
   const getAllRoles = (): RoleType[] => {

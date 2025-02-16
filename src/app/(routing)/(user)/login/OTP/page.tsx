@@ -20,6 +20,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { createHistoryType, js } from "@/lib/utils";
 import { useProgressBar } from "@/hooks/use-progress-bar";
 import { ACTION_TYPE_USER, ACTION_UNBLOCK_USER } from "@/app/(routing)/task/[id]/data/taskInfo";
+import { ApiResponseType } from "@/types/db";
 
 
 const LoginOTP = () => {
@@ -104,7 +105,7 @@ const LoginOTP = () => {
     }
   }
 
-  const userLoadedOnEntryCallback = (data: any) => {
+  const userLoadedOnEntryCallback = (data: ApiResponseType) => {
     if (data.status === 200) {
       user.current = data.payload; 
       logger.debug("LoginPassword", "User loaded on entry", data.payload.id);

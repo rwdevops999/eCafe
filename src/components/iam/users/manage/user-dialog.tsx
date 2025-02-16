@@ -415,11 +415,13 @@ const UserDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _se
     return user;
   }
 
-  const userUpsetCallback = () => {
-    clearDependencies();
-    metaOfUserDialogState.control.handleDialogState(false);
-    logger.debug("UserDetails", "CALL RELOAD");
-    _setReload((x: any) => x+1);
+  const userUpsetCallback = (_data: ApiResponseType) => {
+    if (_data.status === 201) {
+      clearDependencies();
+      metaOfUserDialogState.control.handleDialogState(false);
+      logger.debug("UserDetails", "CALL RELOAD");
+      _setReload((x: any) => x+1);
+    }
   }
 
   const onSubmitForm = (data: any) => {

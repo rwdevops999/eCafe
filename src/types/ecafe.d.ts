@@ -3,7 +3,7 @@ import { dataScheme, historyDataScheme, taskDataScheme } from "@/data/schemes";
 import { apiResponseType } from "./db";
 
 type CallbackFunctionNoParam = () => void;
-type CallbackFunctionWithData = (data: apiResponseType, additional?: any) => void;
+type CallbackFunctionWithParam = (data: apiResponseType, additional?: any) => void;
 
 
 
@@ -25,20 +25,6 @@ type StatementActionType = {
   updateDate?: Date,
   statement?: StatementType,
   actionId?: number
-}
-
-type AddressType = {
-  id: number,
-  street: string,
-  number: string,
-  box: string,
-  city: string,
-  postalcode: string,
-  county: string,
-  countryId?: number,
-  country: CountryType,
-  userId?: number
-  user?: UserType    
 }
 
 type Country = {
@@ -99,64 +85,10 @@ type ButtonConfig = {
   cancelButton?: boolean
 }
 
-type UserType = {
-  id?: number,
-  name: string,
-  firstname: string,
-  phone: string,
-  email: string,
-  password: string,
-  passwordless?: boolean
-  attemps: number,
-  blocked: boolean,
-  createDate?: Date,
-  address?: AddressType,
-  roles?: RoleType[],
-  policies?: PolicyType[],
-  groups?: GroupType[]
-}
-
 type CombinedType = NewRoleType|NewPolicyType|NewGroupType;
 
 type Data = z.infer<typeof dataScheme>
 type TaskData = z.infer<typeof taskDataScheme>
-
-type RoleType = {
-  id: number,
-  name: string,
-  description: string,
-  managed: boolean
-  createDate?: Date,
-  updateDate?: Date,
-  policies?: PolicyType[],
-  groups?: GroupType[],
-  users?: UserType[]
-}
-
-type ExtendedUserType = {
-  id?: number,
-  name: string,
-  firstname: string,
-  phone: string,
-  email: string,
-  password: string,
-  passwordless?: boolean
-  attemps?: number,
-  blocked?: boolean,
-  address?: AddressType,
-  roles?: {
-      selected?: any[],
-      removed?: any[]
-  },
-  policies?: {
-      selected?: any[],
-      removed?: any[],
-  },
-  groups?: {
-      selected?: any[],
-      removed?: any[],
-  }
-}
 
 type LanguageType = z.infer<typeof languageScheme>
 
@@ -221,6 +153,7 @@ export type CountryType = {
   name: string | null,
   dialCode: string | null,
   code: string | null,
+  addresses?: AddressType[]
 }
 
 type ServiceType = {
@@ -257,5 +190,76 @@ type PolicyType = {
   roles?: RoleType[],
   groups?: GroupType[],
   users?: UserType[],
+}
+
+type RoleType = {
+  id: number,
+  name: string,
+  description: string,
+  managed: boolean
+  createDate: Date,
+  updateDate: Date,
+  policies?: PolicyType[],
+  groups?: GroupType[],
+  users?: UserType[]
+}
+
+type UserType = {
+  id: number,
+  name: string,
+  firstname: string,
+  phone: string,
+  email: string,
+  password: string,
+  passwordless?: boolean
+  attemps: number,
+  blocked: boolean,
+  createDate: Date,
+  updateDate: Date,
+  address?: AddressType | null,
+  roles?: RoleType[],
+  policies?: PolicyType[],
+  groups?: GroupType[]
+}
+
+type ExtendedUserType = {
+  id?: number,
+  name: string,
+  firstname: string,
+  phone: string,
+  email: string,
+  password: string,
+  passwordless?: boolean
+  attemps?: number,
+  blocked?: boolean,
+  address?: AddressType,
+  roles?: {
+      selected?: any[],
+      removed?: any[]
+  },
+  policies?: {
+      selected?: any[],
+      removed?: any[],
+  },
+  groups?: {
+      selected?: any[],
+      removed?: any[],
+  }
+}
+
+type AddressType = {
+  id: number,
+  street: string,
+  number: string,
+  box: string,
+  city: string,
+  postalcode: string,
+  county: string,
+  createDate: Date,
+  updateDate: Date,
+  countryId?: number | null,
+  country?: CountryType | null,
+  userId?: number | null,
+  user?: UserType | null    
 }
 
