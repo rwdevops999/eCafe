@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import { hideLoaderToast, showLoaderToast } from "@/lib/utils";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -12,18 +13,12 @@ const Test = () => {
     ftest();
   }, [])
 
-  let toastId: number | string = 0;
-  
   const showToast = () => {
-      toastId = toast.loading('Loading…', {
-        style: {
-          background: 'rgb(100,200,300)',
-        },
-      });
+    showLoaderToast("Test Load...");
   }
 
   const hideToast = () => {
-    toast.dismiss(toastId);
+    hideLoaderToast();
   }
 
   const renderComponent = () => {

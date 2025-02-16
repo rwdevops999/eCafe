@@ -8,6 +8,7 @@ import * as path from 'path';
 import { Country, Data, HistoryType, typeType } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
 import { ApiResponseType } from "@/types/db";
+import { toast } from "sonner";
 
 
 
@@ -217,5 +218,16 @@ export const createEmptyApiReponse = (): ApiResponseType => {
       payload: undefined
     }
   );
-
 } 
+
+export const showLoaderToast = (title: string) => {
+  toast.loading(title, {
+    style: {
+      background: 'rgb(100,200,300)',
+    },
+  });
+} 
+
+export const hideLoaderToast = () => {
+  toast.dismiss();
+}
