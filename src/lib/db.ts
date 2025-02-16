@@ -432,7 +432,7 @@ export const handleDeleteOtpById = async (_otpId: number, _callback: CallbackFun
 }
 
 export const deleteExpiredOtpsByEmail = async (_email: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
-  await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`,{
+  await fetch(`http://localhost:3000/api/otp?email=${_email}`,{
       method: 'DELETE',
   })
   .then((response: Response) => response.json())
