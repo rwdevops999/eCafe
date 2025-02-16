@@ -1,4 +1,4 @@
-import { Data, GroupType, HistoryData, HistoryType, ServiceType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
+import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 import { padZero } from "./utils";
 
@@ -235,6 +235,25 @@ export const mapPoliciesToData = (policies: any[] | undefined): Data[] => {
         }
       }
     })
+  }
+
+  return result;
+};
+
+export const mapPolicyToData = (policy: PolicyType | undefined): Data[] => {
+  let result: Data[] = [];
+
+  if (policy) {
+
+    result.push({
+        id: policy.id,
+        name: policy.name!,
+        description: policy.description!,
+        children: mapStatementsToData(policy.statements),
+        other: {
+          managed: policy.managed
+        }
+      });
   }
 
   return result;

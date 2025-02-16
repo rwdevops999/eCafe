@@ -1,6 +1,6 @@
 'use client'
 
-import { cloneObject } from "@/lib/utils";
+import { cloneObject, js } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { dependency_policies } from "@/data/constants";
 import TabItems from "./tab-items";
@@ -10,6 +10,7 @@ import { handleLoadPolicies } from "@/lib/db";
 import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const debug: boolean = false;
 
@@ -23,10 +24,11 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
   const [metaOfTabPolicies, setMetaOfTabPolicies] = useState<MetaBase>();
   const actionButtons = useRef<ButtonConfig>({})
  
-   const policiesLoadedCallback = (_data: RoleType[]) => {
-     logger.debug("TabPolicies", "policiesLoadedCallback", JSON.stringify(_data));
+  const policiesLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+       logger.debug("TabPolicies", "policiesLoadedCallback", js(_data));
  
-     allPolicies.current = _data;
+     allPolicies.current = _data.payload;
  
      actionButtons.current = defineActionButtons(_meta.currentSubject as UserType|GroupType);
  
@@ -37,7 +39,8 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
      newMeta.subject.getAllDependencies = getAllPolicies;
  
      setMetaOfTabPolicies(newMeta);
-   }
+    }
+  }
  
    const getAllPolicies = (): PolicyType[] => {
      logger.debug("TabPolicies", "getAllPolicies", JSON.stringify(allPolicies.current));

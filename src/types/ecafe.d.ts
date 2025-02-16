@@ -121,19 +121,6 @@ type CombinedType = NewRoleType|NewPolicyType|NewGroupType;
 type Data = z.infer<typeof dataScheme>
 type TaskData = z.infer<typeof taskDataScheme>
 
-type PolicyType = {
-  id: number,
-  name: string,
-  description: string,
-  managed: boolean,
-  createDate?: Date,
-  updateDate?: Date,
-  statements?: StatementType[],
-  roles?: RoleType[],
-  groups?: GroupType[],
-  users?: UserType[],
-}
-
 type RoleType = {
   id: number,
   name: string,
@@ -258,3 +245,17 @@ type StatementType = {
   actions?: StatementActionType[],
   policies?: PolicyType[]
 }   
+
+type PolicyType = {
+  id: number,
+  name: string,
+  description: string,
+  managed: boolean,
+  createDate: Date,
+  updateDate: Date,
+  statements?: StatementType[],
+  roles?: RoleType[],
+  groups?: GroupType[],
+  users?: UserType[],
+}
+

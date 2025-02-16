@@ -167,9 +167,11 @@ const PolicyCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; se
     }
   }
 
-  const policyCreatedCallback = () => {
-    if (setReload) {
-      setReload((x: any) => x+1);
+  const policyCreatedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 201) {
+      if (setReload) {
+        setReload((x: any) => x+1);
+      }
     }
   }
 

@@ -122,47 +122,41 @@ export const handleCreateStatement = async (_statement: StatementType, _callback
     .catch((error: any) => console.log("createStatement", "ERROR creating the statement", js(error)));
 }        
 
-
-
-
-
-
-#######
-
 /**
  * POLICIES
  */
-const loadPolicies = async (_callback: CallbackFunctionSubjectLoaded) => {
+const loadPolicies = async (_callback: CallbackFunctionWithData): Promise<void> => {
     await fetch("http://localhost:3000/api/iam/policies")
-      .then((response) => response.json())
-      .then((response) => {
-        _callback(response);
-      });
-}
+      .then((response: Response) => response.json())
+      .then((response: ApiResponseType) => {_callback(response)})
+      .catch((error: any) => console.log("loadPolicies", "ERROR loading the policies", js(error)));
+    }
 
-export const handleLoadPolicies = async (_callback: CallbackFunctionSubjectLoaded) => {
+export const handleLoadPolicies = async (_callback: CallbackFunctionWithData) => {
   await loadPolicies(_callback);
 }
 
-const loadPoliciesWithName = async (_policy: string, _callback: CallbackFunctionSubjectLoaded) => {
+const loadPolicyByName = async (_policy: string, _callback: CallbackFunctionWithData): Promise<void> => {
   await fetch("http://localhost:3000/api/iam/policies?policy=" + _policy)
-    .then((response) => response.json())
-    .then((response) => {
-        _callback(response);
-    });
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response)})
+    .catch((error: any) => console.log("loadPolicyByName", "ERROR loading the policy by name", js(error)));
+  }
+
+export const handleLoadPolicyByName = async (_policy: string, _callback: CallbackFunctionWithData): Promise<void> => {
+    await loadPolicyByName(_policy, _callback);
 }
 
-export const handleLoadPoliciesWithPolicyName = async (_policy: string, _callback: CallbackFunctionSubjectLoaded) => {
-    await loadPoliciesWithName(_policy, _callback);
-}
-
-export const handleDeletePolicy = async (id: number, _callback: CallbackFunctionDefault) => {
+export const handleDeletePolicy = async (id: number, _callback: CallbackFunctionWithData): Promise<void> => {
   const res = await fetch("http://localhost:3000/api/iam/policies?policyId="+id,{
       method: 'DELETE',
-  }).then((response: Response) => _callback());
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response))
+  .catch((error: any) => console.log("handleDeletePolicy", "ERROR deleting the policy", js(error)));
 }
 
-export const handleCreatePolicy = async (_policy: PolicyType, _callback: CallbackFunctionDefault) => {
+export const handleCreatePolicy = async (_policy: PolicyType, _callback: CallbackFunctionWithData) => {
   await fetch('http://localhost:3000/api/iam/policies',
     {
       method: 'POST',
@@ -170,8 +164,11 @@ export const handleCreatePolicy = async (_policy: PolicyType, _callback: Callbac
       headers: {
         'content-type': 'application/json'
       }
-    }).then((response) => _callback());
-}
+    })
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("handleCreatePolicy", "ERROR creating the policy", js(error)));
+  }
 
 
 

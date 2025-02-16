@@ -24,6 +24,7 @@ import { handleCreateRole, handleLoadPolicies } from "@/lib/db";
 import { validateMappedData } from "@/lib/validate";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { Separator } from "@/components/ui/separator";
+import { ApiResponseType } from "@/types/db";
 
 const FormSchema = z.object({
   name: z.string().min(3).max(25),
@@ -51,10 +52,14 @@ const RoleCreateDialog = ({_enabled = true, setReload}:{_enabled?: boolean; setR
     setOpen(state);
   }
 
-  const policiesLoadedCallback = (policies: PolicyType[]) => {
-    setPolicies(policies);
-    const mappedPolicies: Data[] = mapPoliciesToData(policies);
-    setPolicyData(mappedPolicies);
+  const policiesLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      const policies: PolicyType[] = _data.payload;
+      
+      setPolicies(policies);
+      const mappedPolicies: Data[] = mapPoliciesToData(policies);
+      setPolicyData(mappedPolicies);
+    }
     setLoader(false);
   }
 

@@ -12,11 +12,13 @@ import AlertMessage from "@/components/ecafe/alert-message";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, PolicyType } from "@/types/ecafe";
-import { mapPoliciesToData } from "@/lib/mapping";
-import { handleDeletePolicy, handleLoadPoliciesWithPolicyName } from "@/lib/db";
+import { mapPoliciesToData, mapPolicyToData } from "@/lib/mapping";
+import { handleDeletePolicy, handleLoadPolicyByName } from "@/lib/db";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
+import { js } from "@/lib/utils";
 
  const PolicyDetails = ({_policy}:{_policy?: string | undefined;}  ) => {
     const {debug} = useDebug();
@@ -26,23 +28,29 @@ import { useDebug } from "@/hooks/use-debug";
     const [loader, setLoader] = useState<boolean>(false);
 
     const [selectedPolicy, setSelectedPolicy] = useState<string>(allItems)
-    const [policies, setPolicies] = useState<PolicyType[]>([]);
-    const [policiesData, setPoliciesData] = useState<Data[]>([]);
+    const [policy, setPolicy] = useState<PolicyType>();
+    const [policyData, setPolicyData] = useState<Data[]>([]);
 
     const policiesLoaded = useRef<boolean>(false);
 
     const [alert, setAlert] = useState<AlertType>();
     const [reload, setReload] = useState(0);
     
-    const policiesLoadedCallback = (data: PolicyType[]) => {
-        logger.debug("PolicyDetails", "policiesLoadedCallback", JSON.stringify(data));
-        
-        setPolicies(data);
+    const policyLoadedCallback = (data: ApiResponseType) => {
+        if (data.status === 200) {
+            logger.debug("PolicyDetails", "policyLoadedCallback", js(data));
+            
+            const policy: PolicyType = data.payload;
 
-        let mappedPolicies: Data[] = mapPoliciesToData(data);
+            setPolicy(policy);
 
-        setPoliciesData(mappedPolicies);
-        policiesLoaded.current = true;
+            let mappedPolicy: Data[] = mapPolicyToData(policy);
+
+            setPolicyData(mappedPolicy);
+
+            policiesLoaded.current = true;
+        }
+
         setLoader(false);
     }
 
@@ -51,21 +59,23 @@ import { useDebug } from "@/hooks/use-debug";
           setSelectedPolicy(_policy);
 
           setLoader(true);
-          handleLoadPoliciesWithPolicyName(_policy, policiesLoadedCallback);
+          handleLoadPolicyByName(_policy, policyLoadedCallback);
         }
     }, []);
 
     useEffect(() => {
         setLoader(true);
-        handleLoadPoliciesWithPolicyName(selectedPolicy, policiesLoadedCallback);
+        handleLoadPolicyByName(selectedPolicy, policyLoadedCallback);
     }, [reload, setReload]);
 
     const handleRemoveAlert = () => {
         setAlert(undefined);
     }
   
-    const policyDeletedCallback = () => {
-        setReload((x:any) => x+1);
+    const policyDeletedCallback = (_data: ApiResponseType) => {
+        if (_data.status === 200) {
+            setReload((x:any) => x+1);
+        }
     }
 
     const policyInRole = (_policy: Data): AlertType => {
@@ -77,7 +87,6 @@ import { useDebug } from "@/hooks/use-debug";
             child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
         };
 
-        const policy = policies.find(p => p.id === _policy.id);
         if (policy && policy.roles) {
             if (policy.roles.length > 0) {
                 alert.open = true;
@@ -141,9 +150,9 @@ import { useDebug } from "@/hooks/use-debug";
                     </div>
                 }   
     
-                {policiesData &&
+                {policyData &&
                     <div className="block space-y-5">
-                        <DataTable data={policiesData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
+                        <DataTable data={policyData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar}/>
                     </div>
                 }
             </div>

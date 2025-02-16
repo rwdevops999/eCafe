@@ -1,9 +1,11 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
+import { createEmptyApiReponse } from "@/lib/utils";
+import { ApiResponseType } from "@/types/db";
 import { PolicyType, StatementType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
-const findAllPolicies = async () => {
+const findAllPolicies = async (): => {
   const policies = await prisma.policy.findMany(
     {
       include: {
@@ -18,11 +20,11 @@ const findAllPolicies = async () => {
   return policies;
 }
 
-const findPolicyById = async (_id: number) => {
+const findPolicyByName = async (_name: string) => {
   const policy = await prisma.policy.findFirst(
     {
       where: {
-        id: _id
+        name: _name
       },
       include: {
         statements: {
@@ -32,24 +34,32 @@ const findPolicyById = async (_id: number) => {
         },
       }});
 
-  return [policy];
+  return policy;
 }
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    const policyId = searchParams.get('policy');  // passed as ...?service=Stock => service = "Stock"
+    const policyName = searchParams.get('policy');  // passed as ...?service=Stock => service = "Stock"
 
-    if (policyId && policyId !== allItems) {
-      const policy = await findPolicyById(parseInt(policyId));      
-      return Response.json(policy);
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
+
+    if (policyName && policyName !== allItems) {
+      const policy = await findPolicyByName(policyName);
+
+      apiResponse.info = "Payload: PolicyType";
+      apiResponse.payload = policy;
+  
+      return Response.json(apiResponse);
     }
     
-    const policies = await findAllPolicies();
+    const policies: PolicyType[] = await findAllPolicies();
+    apiResponse.info = "Payload: PolicyType[]";
+    apiResponse.payload = policies;
 
-    return Response.json(policies);
+    return Response.json(apiResponse);
 }
 
-const createPolicy = async (data: PolicyType) => {
+const createPolicy = async (data: PolicyType): Promise<PolicyType> => {
   let policy: any;
 
    await prisma.policy.create({
@@ -71,16 +81,18 @@ const createPolicy = async (data: PolicyType) => {
 export async function POST(req: NextRequest) {
     const _data: PolicyType = await req.json();
 
-    const policy = await createPolicy(_data);
+    let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return new Response(JSON.stringify(policy), {
-      headers: { "content-type": "application/json" },
-      status: 201,
-   });
+    const policy: PolicyType = await createPolicy(_data);
 
+    apiResponse.info = "Payload: PolicyType"
+    apiResponse.payload = policy;
+    apiResponse.status = 201;
+
+    return Response.json(apiResponse);
 }
 
-const deletePolicyById = async (policyId: number) => {
+const deletePolicyById = async (policyId: number): Promise<PolicyType> => {
   let policy: any;
 
   await prisma.policy.delete(
@@ -98,17 +110,18 @@ export async function DELETE(request: NextRequest) {
   const urlParams = request.nextUrl.searchParams
   const policyId = urlParams.get('policyId');
 
-  if  (policyId) {
-    const policy = await deletePolicyById(parseInt(policyId));
+  let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    return new Response(JSON.stringify(`deleted ${policy}`), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-   });
+  if  (policyId) {
+    const policy: PolicyType = await deletePolicyById(parseInt(policyId));
+
+    apiResponse.info = "Payload: PolicyType";
+    apiResponse.payload = policy;
+
+    return Response.json(apiResponse);
   }
 
-  return new Response(JSON.stringify(`not deleted: policy id undefined`), {
-      headers: { "content-type": "application/json" },
-      status: 400,
-   });
+  apiResponse.status = 400;
+
+  return Response.json(apiResponse);
 }
