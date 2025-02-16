@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import { ExtendedGroupType } from "@/types/ecafe";
+import { createApiResponse } from "@/lib/utils";
+import { ExtendedGroupType, GroupType } from "@/types/ecafe";
 import { NextRequest, NextResponse } from "next/server";
 
 const  setGroupForCreate = (data: ExtendedGroupType) => {
@@ -46,12 +47,9 @@ export async function POST(req: NextRequest) {
 
   const group: any = setGroupForCreate(data);
 
-  const createdGroup = await prisma.group.create({data: group});
+  const createdGroup: GroupType = await prisma.group.create({data: group});
 
-  return new Response(JSON.stringify(createdGroup), {
-      headers: { "content-type": "application/json" },
-      status: 201,
-   });
+  return Response.json(createApiResponse(201, "Payload: GroupType", createdGroup));
 }
 
 const findAllGroups = async () => {
@@ -69,30 +67,28 @@ const findAllGroups = async () => {
 }
 
 export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams
+    const groups: GroupType[] = await findAllGroups();
 
-    const groups = await findAllGroups();
+    // const _groups: ExtendedGroupType[] = groups.map((_group) => {
+    //   let group: any = {
+    //     id: _group.id,
+    //     name: _group.name,
+    //     description: _group.description,
+    //     roles: {
+    //       original: _group.roles,
+    //     },
+    //     policies: {
+    //       original: _group.policies
+    //     },
+    //     users: {
+    //       original: _group.users,
+    //     }
+    //   };
 
-    const _groups: ExtendedGroupType[] = groups.map((_group) => {
-      let group: any = {
-        id: _group.id,
-        name: _group.name,
-        description: _group.description,
-        roles: {
-          original: _group.roles,
-        },
-        policies: {
-          original: _group.policies
-        },
-        users: {
-          original: _group.users,
-        }
-      };
+    //   return group;
+    // });
 
-      return group;
-    });
-
-    return Response.json(_groups);
+    return Response.json(createApiResponse(200, "Payload: GroupType", groups));
   }
 
   const deleteGroup = async (groupId: number) => {
@@ -114,29 +110,23 @@ export async function GET(request: NextRequest) {
   const groupId = urlParams.get('groupId');
 
   if  (groupId) {
-    const group = await deleteGroup(parseInt(groupId));
+    const group: GroupType = await deleteGroup(parseInt(groupId));
 
-    return new Response(JSON.stringify(`deleted ${group}`), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-   });
+    return Response.json(createApiResponse(200, "Payload: GroupType", group));
   }
 
-  return new Response(JSON.stringify(`not deleted: policy id undefined`), {
-      headers: { "content-type": "application/json" },
-      status: 400,
-   });
+  return Response.json(createApiResponse(400, "Group not deleted because id is undefined"));
 }
 
 export async function PUT(req: NextRequest) {
   const data: ExtendedGroupType = await req.json();
 
-  const  updatedGroup = await prisma.group.update({
+  const  updatedGroup: GroupType = await prisma.group.update({
     where: {
       id: data.id
     },
     data: setGroupForUpdate(data) as any
   });
 
-  return NextResponse.json(updatedGroup);
+  return Response.json(createApiResponse(200, "Payload: GroupType", updatedGroup));
 }

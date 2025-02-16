@@ -10,13 +10,14 @@ import { DataTable } from "@/components/datatable/data-table";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import GroupDialog from "../manage/group-dialog";
-import { cloneObject } from "@/lib/utils";
+import { cloneObject, js } from "@/lib/utils";
 import { Data, GroupType } from "@/types/ecafe";
 import { initGroupMeta, Meta } from "../meta/meta";
 import { mapGroupsToData } from "@/lib/mapping";
 import { handleDeleteGroup, handleLoadGroups } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => {
   const {debug} = useDebug();
@@ -42,15 +43,20 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     metaGroupDetails.current.currentSubject = _group;
   }
 
-  const groupsLoadedCallback = (_groups: GroupType[]) => {
-    logger.debug("GroupDetails", "groupsLoadedCallback", JSON.stringify(_groups));
+  const groupsLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      const groups: GroupType[] = _data.payload;
 
-    groupsRef.current = _groups
+      logger.debug("GroupDetails", "groupsLoadedCallback", js(groups));
 
-    setSelectedGroup(undefined);
+      groupsRef.current = groups
 
-    groupsDataRef.current = mapGroupsToData(_groups);
-    setRerender((x:any) => x+1);
+      setSelectedGroup(undefined);
+
+      groupsDataRef.current = mapGroupsToData(groups);
+      setRerender((x:any) => x+1);
+    }
+
     setLoader(false);
   }
 
@@ -80,13 +86,13 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
     handleLoadGroups(groupsLoadedCallback);
   }, [reloadState, setReloadState]);
 
-  const groupDeletedCallback = () => {
-    setSelectedGroup(undefined);
-    setLoader(true);
-    handleLoadGroups(groupsLoadedCallback);
+  const groupDeletedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      setSelectedGroup(undefined);
+      setLoader(true);
+      handleLoadGroups(groupsLoadedCallback);
+    }
   }
-
-  // const [reload, setReload] = useState<number>(0);
 
   const handleAction = (_action: string, _group: Data) => {
     logger.debug("GroupDetails", "handleAction", _action);

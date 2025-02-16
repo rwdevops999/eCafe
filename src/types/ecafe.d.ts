@@ -34,15 +34,6 @@ type Country = {
 }
 
 /******* NEW */
-type GroupType = {
-  id?: number,
-  name: string,
-  description: string,
-  roles?: RoleType[],
-  policies?: PolicyType[],
-  users?: UserType[],
-}
-
 type ExtendedGroupType = {
   id?: number,
   name: string,
@@ -261,5 +252,16 @@ type AddressType = {
   country?: CountryType | null,
   userId?: number | null,
   user?: UserType | null    
+}
+
+type GroupType = {
+  id: number,
+  name: string,
+  description: string,
+  createDate: Date,
+  updateDate: Date,
+  roles?: RoleType[],
+  policies?: PolicyType[],
+  users?: UserType[],
 }
 

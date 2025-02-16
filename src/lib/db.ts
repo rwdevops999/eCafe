@@ -314,36 +314,30 @@ export const handleUnblockUser = async (_userId: number, _callback: CallbackFunc
   await unblockUser(_userId, _callback);
 }
 
-
-
-
-
-
-
-
-
 /**
  * GROUPS
  */
-const loadGroups = async (_callback: CallbackFunctionSubjectLoaded) => {
+const loadGroups = async (_callback: CallbackFunctionWithParam): Promise<void> => {
     await fetch("http://localhost:3000/api/iam/groups")
-      .then((response) => response.json())
-      .then((response) => {
-        _callback(response);
-      });
-}
+      .then((response: Response) => response.json())
+      .then((response: ApiResponseType) => {_callback(response)})
+      .catch((error: any) => console.log("loadGroups", "ERROR loading groups", js(error)));
+    }
 
-export const handleLoadGroups = async (_callback: CallbackFunctionSubjectLoaded) => {
+export const handleLoadGroups = async (_callback: CallbackFunctionWithParam): Promise<void> => {
     await loadGroups(_callback);
 }
 
-export const handleDeleteGroup = async (id: number, callback: CallbackFunctionDefault) => {
+export const handleDeleteGroup = async (id: number, callback: CallbackFunctionWithParam): Promise<void> => {
   const res = await fetch("http://localhost:3000/api/iam/groups?groupId="+id,{
     method: 'DELETE',
-  }).then((response: Response) => callback());
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => callback(response))
+  .catch((error: any) => console.log("handleDeleteGroup", "ERROR deleting group", js(error)));
 }
 
-const createGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionDefault) => {
+const createGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch('http://localhost:3000/api/iam/groups',
     {
       method: 'POST',
@@ -351,14 +345,17 @@ const createGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctio
       headers: {
         'content-type': 'application/json'
       }
-    }).then(response => _callback());
-}
+    })
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("createGroup", "ERROR creating group", js(error)));
+  }
 
-export const handleCreateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionDefault) => {
+export const handleCreateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await createGroup(_group, _callback);
 }
 
-const updateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionDefault) => {
+const updateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch('http://localhost:3000/api/iam/groups',
     {
       method: 'PUT',
@@ -366,10 +363,13 @@ const updateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctio
       headers: {
         'content-type': 'application/json'
       }
-    }).then(response => _callback());
+    })
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("updateGroup", "ERROR updating group", js(error)));
 }
 
-export const handleUpdateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionDefault) => {
+export const handleUpdateGroup = async (_group: ExtendedGroupType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await updateGroup(_group, _callback);
 }
 

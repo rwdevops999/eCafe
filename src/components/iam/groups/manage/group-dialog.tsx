@@ -26,6 +26,7 @@ import { handleCreateGroup, handleUpdateGroup } from "@/lib/db";
 import { initMetaBase } from "@/data/meta-base";
 import { useDebug } from "@/hooks/use-debug";
 import { validateMappedData } from "@/lib/validate";
+import { ApiResponseType } from "@/types/db";
 
 type DependencyType = {
   initialised: boolean,
@@ -381,11 +382,13 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     return group;
   }
 
-  const groupUpsetCallback = () => {
-    clearDependencies();
-    metaOfGroupDialogState.control.handleDialogState(false);
-    logger.debug("GroupDetails", "CALL RELOAD");
-    _setReload((x: any) => x+1);
+  const groupUpsetCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200 || _data.status === 201) {
+      clearDependencies();
+      metaOfGroupDialogState.control.handleDialogState(false);
+      logger.debug("GroupDetails", "CALL RELOAD");
+      _setReload((x: any) => x+1);
+    }
   }
 
   const onSubmitForm = (data: any) => {

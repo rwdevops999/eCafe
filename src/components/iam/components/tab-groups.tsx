@@ -11,6 +11,7 @@ import { MetaBase } from "@/data/meta-base";
 import { defineActionButtons } from "../lib/util";
 import { Meta } from "../users/meta/meta";
 import { useDebug } from "@/hooks/use-debug";
+import { ApiResponseType } from "@/types/db";
 
 const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const {debug} = useDebug();
@@ -22,20 +23,22 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   const [metaOfTabGroups, setMetaOfTabGroups] = useState<MetaBase>();
   const actionButtons = useRef<ButtonConfig>({})
 
-  const groupsLoadedCallback = (_data: GroupType[]) => {
-    logger.debug("TabGroups", "groupsLoadedCallback", JSON.stringify(_data));
-   
-    allGroups.current = _data;
-   
-    actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
-   
-    const newMeta: MetaBase = cloneObject(_meta);
-    newMeta.subject.name = "Groups";
-    newMeta.subject.dependency = dependency_groups;
-   
-    newMeta.subject.getAllDependencies = getAllGroups;
-   
-    setMetaOfTabGroups(newMeta);
+  const groupsLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      logger.debug("TabGroups", "groupsLoadedCallback", JSON.stringify(_data));
+    
+      allGroups.current = _data.payload;
+    
+      actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
+    
+      const newMeta: MetaBase = cloneObject(_meta);
+      newMeta.subject.name = "Groups";
+      newMeta.subject.dependency = dependency_groups;
+    
+      newMeta.subject.getAllDependencies = getAllGroups;
+    
+      setMetaOfTabGroups(newMeta);
+    }
   }
   
    const getAllGroups = (): GroupType[] => {
