@@ -14,7 +14,10 @@ const permanentTables = ['History']
 const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_PolicyToRole','_PolicyToServiceStatement', '_PolicyToUser', '_RoleToUser'];
 
 const flushStartup = async () => {
-  for (const tableName of startupTableNames) await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  for (const tableName of startupTableNames) {
+    console.log(`[API] Clear ${tableName}`);
+    await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
+  }
 }
 
 const flushData = async () => {
@@ -31,11 +34,11 @@ const flushTable = async (tableName : string) => {
 
 export const flushAll = async (initStartup: boolean) => {
   if (initStartup) {
-    flushStartup();
+    await flushStartup();
   }
 
-  flushData();
-  flushRelations();
+  await flushData();
+  await flushRelations();
 }
 
 const provisionServiceActions = (_service: ServiceMappingType) => {
@@ -70,48 +73,67 @@ const provisionServices = (_services: ServiceMappingType[]) => {
   })
 }
 
-const provisionCountries = (filename: string) => {
+const provisionCountries = async (filename: string) => {
   const countries: Country[] = loadCountriesFromFile(filename);
 
-  countries.map(async (_country: Country) => {
-    let country: Prisma.CountryCreateInput;
+  const dbCountries: CountryType[] = countries.map((_country: Country) => {
+    let country: CountryType;
     country = {
+      id: undefined,
       name: _country.name,
       dialCode: _country.dial_code,
       code: _country.code
     }
 
-    await prisma.country.create({data: country});
+    return country;
   })
+
+  await prisma.country.createMany({data: dbCountries});
 }
 
 export async function POST(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
-  
+
+    console.log("[API] POST");
+
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    if (table === allItems) {
-      flushAll(true);
+    if (table === 'Services') {
+      console.log("[API] loading Services");
       provisionServices(serviceMappings);
+      const includeCountries = searchParams.get('countries');  // passed as ...?service=Stock => service = "Stock"
+      console.log("[API] include countries = " + includeCountries);
+      if (includeCountries?.toLowerCase() === 'true') {
+        await provisionCountries('./public/country/country-codes.json');
+      }
+
+      apiResponse.info = "flushed startup tables and provisioned services. No payload";
+    }
+
+    if (table === allItems) {
+      console.log("[API] Clear DB");
+      await flushAll(true);
+      // provisionServices(serviceMappings);
       apiResponse.info = "flushed all tables and provisioned services. No payload";
     }
 
     if (table === workingItems) {
+      console.log("[API] Clear Working Items");
       flushAll(false);
       apiResponse.info = "flushed all working tables (like User, Role, ...). No payload";
     }
 
     if (table === 'country') {
+      console.log("[API] Clear Country");
       flushTable('Country');
       provisionCountries('./public/country/country-codes.json');
       apiResponse.info = "flushed COUNTRY table and provisioned it. No payload";
     }
 
-    return new Response(js(apiResponse), {
-        headers: { "content-type": "application/json" },
-        status: apiResponse.status,
-     });
+    console.log("[API] RESPONSE = " + js(apiResponse));
+
+    return Response.json(apiResponse);
 }
 
 const getAllCountries = async () => {
@@ -134,7 +156,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
       return Response.json(apiResponse);
     }
-    
+
     return Response.json(createApiResponse(204, "NoData", undefined));
 }
 

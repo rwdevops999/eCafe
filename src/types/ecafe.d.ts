@@ -108,7 +108,7 @@ type HistoryData = z.infer<typeof historyDataScheme>
 
 // FROM PRISMA
 export type CountryType = {
-  id: number,
+  id: number | undefined,
   name: string | null,
   dialCode: string | null,
   code: string | null,

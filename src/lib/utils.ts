@@ -163,7 +163,7 @@ export const generateOTP = (): string => {
     return (OTP);
 }
 
-export const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
+export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const stringToBoolean = (str: string): boolean => {
   return (str.toLowerCase() === 'true');

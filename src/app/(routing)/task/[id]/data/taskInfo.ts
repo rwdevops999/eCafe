@@ -1,4 +1,4 @@
-import { handleDeleteExpiredOtpsByEmail, handleDeletefromOtpByEmailAndDate, handleDeleteOtpByEmailAndDate, handleDeleteOtpById, handleLoadOTP, handleUnblockUser } from "@/lib/db";
+import { handleDeleteExpiredOtpsByEmail, handleDeleteOtpById, handleLoadOTP, handleUnblockUser } from "@/lib/db";
 import { ApiResponseType } from "@/types/db";
 import { OtpType } from "@/types/ecafe";
 

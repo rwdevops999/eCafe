@@ -45,14 +45,14 @@ export async function GET(request: NextRequest) {
   const otpId = searchParams.get('otpId');
 
   if (otpId) {
-    const otp = await findOtpById(parseInt(otpId));
+    const otp: OtpType | null = await findOtpById(parseInt(otpId));
 
     if (otp) {
-      return Response.json(createApiReponse(200, otp));
+      return Response.json(createApiResponse(200, "Payload: OtpType", otp));
     }
   }
 
-  return new Response(JSON.stringify(createApiReponse(404, "otp not found")), {
+  return new Response(JSON.stringify(createApiResponse(404, "otp not found")), {
     headers: { "content-type": "application/json" },
  });
 }
@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest) {
     }
   });
 
-  return Response.json(createApiReponse(200, "Payload: OtpType", updatedOtp));
+  return Response.json(createApiResponse(200, "Payload: OtpType", updatedOtp));
 }
 
 export async function DELETE(request: NextRequest) {

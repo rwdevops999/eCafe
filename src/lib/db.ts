@@ -19,6 +19,19 @@ export const initDB = async (_table: string, _callback: CallbackFunctionWithPara
   .catch((error: any) => console.log("ERROR DB(initDB)", js(error)));
 }
 
+export const handleLoadServicesDB = async (_includeCountries: boolean, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch('http://localhost:3000/api/db?table=Services&countries='+_includeCountries,{
+    method: 'POST',
+    body: JSON.stringify("initialise DB?"),
+    headers: {
+      'content-type': 'application/json'
+    }
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response))
+  .catch((error: any) => console.log("ERROR DB(handleLoadServicesDB)", js(error)));
+}
+
 export const handleClearDB = async (_startup: boolean, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch("http://localhost:3000/api/db?startup="+_startup,{
       method: 'DELETE',
@@ -56,8 +69,6 @@ const loadCountries = async (_callback: CallbackFunctionWithParam): Promise<void
 export const handleLoadCountries = async (_callback: CallbackFunctionWithParam): Promise<void> => {
     await loadCountries(_callback);
 }
-
-
 
 /**
  * SERVICES
