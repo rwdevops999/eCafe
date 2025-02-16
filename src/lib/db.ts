@@ -373,20 +373,19 @@ export const handleUpdateGroup = async (_group: ExtendedGroupType, _callback: Ca
   await updateGroup(_group, _callback);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 // OTP
-export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjectLoaded) => {
+const loadOTP = async (_otpId: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await fetch("http://localhost:3000/api/otp?otpId=" + _otpId)
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response, additional)})
+    .catch((error: any) => console.log("LOADOTP", "ERROR LOADING OTP", js(error)));
+}
+
+export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionWithParam, additional?: any) => {
+  await loadOTP(_otpId, _callback, additional);
+}
+
+export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionWithParam): Promise<void> => {
   console.log("OTP in DB.ts", JSON.stringify(_otp));
   await fetch('http://localhost:3000/api/otp',
     {
@@ -396,23 +395,12 @@ export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionSubjec
         'content-type': 'application/json'
       }
     })
-    .then(response => response.json())
-    .then(response => _callback(response));
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("createOTP", "ERROR creating OTP", js(error)));
 }
 
-const loadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  await fetch("http://localhost:3000/api/otp?otpId=" + _otpId)
-    .then((response) => response.json())
-    .then((response) => {
-      _callback(response, additional);
-    });
-}
-
-export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  await loadOTP(_otpId, _callback, additional);
-}
-
-const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
+const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch('http://localhost:3000/api/otp',
     {
       method: 'PUT',
@@ -420,34 +408,46 @@ const updateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
       headers: {
         'content-type': 'application/json'
       }
-    }).then(response => _callback());
+    })
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => _callback(response))
+    .catch((error: any) => console.log("updateOTP", "ERROR updating OTP", js(error)));
 }
 
-export const handleUpdateOtp = async (_otp: OtpType, _callback: CallbackFunctionDefault) => {
+export const handleUpdateOtp = async (_otp: OtpType, _callback: CallbackFunctionWithParam): Promise<void> => {
   await updateOtp(_otp, _callback);
 }
 
-export const deleteFromOtpById = async (_otpId: number, _callback: CallbackFunctionDefault) => {
+export const deleteOtpById = async (_otpId: number, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch("http://localhost:3000/api/otp?otpId="+_otpId,{
       method: 'DELETE',
-  }).then((response: Response) => _callback());
+  })
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response))
+  .catch((error: any) => console.log("deleteOTPById", "ERROR deleting OTP by id", js(error)));
 }
 
-export const handleDeleteFromOtpById = (_otpId: number, _callback: CallbackFunctionDefault) => {
-  deleteFromOtpById(_otpId, _callback);
+export const handleDeleteOtpById = async (_otpId: number, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await deleteOtpById(_otpId, _callback);
 }
 
-export const deleteFromOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
+export const deleteOtpByEmailAndDate = async (_email: string, _date: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
   await fetch(`http://localhost:3000/api/otp?email=${_email}&expdate=${_date}`,{
       method: 'DELETE',
   })
-  .then(response => response.json())
-  .then(response => _callback(response, additional));
+  .then((response: Response) => response.json())
+  .then((response: ApiResponseType) => _callback(response, additional))
+  .catch((error: any) => console.log("deleteOTPByEmailAndDate", "ERROR deleting OTP by email and date", js(error)));
 }
 
-export const handleDeletefromOtpByEmailAndDate = (_email: string, _expireDate: string, _callback: CallbackFunctionSubjectLoaded, additional?: any) => {
-  deleteFromOtpByEmailAndDate(_email, _expireDate, _callback, additional);
+export const handleDeleteOtpByEmailAndDate = async (_email: string, _expireDate: string, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await deleteOtpByEmailAndDate(_email, _expireDate, _callback, additional);
 }
+
+
+
+
+
 
 // TASKS
 export const createTask = async (task: TaskType, _callback: CallbackFunctionDefault) => {

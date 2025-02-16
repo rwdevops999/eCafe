@@ -112,9 +112,9 @@ const LoginOTP = () => {
     }
   }
 
-  const otpLoadedOnEntryCallback = (data: any) => {
-    if (data.status === 200) {
-      const otpData: OtpType = data.payload;
+  const otpLoadedOnEntryCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      const otpData: OtpType = _data.payload;
       logger.debug("LoginPassword", "Otp loaded on entry", otpData.id);
 
       otp.current = otpData;
@@ -164,24 +164,24 @@ const LoginOTP = () => {
     redirect("/dashboard")
   }
 
-  const otpLoadedCallback = (data: any) => {
-    logger.debug("LoginOTP", "otpLoadedCallback", JSON.stringify(data));
-    if (data.status === 200) {
-      const otp: any = data.payload;
+  const otpLoadedCallback = (_data: ApiResponseType) => {
+    logger.debug("LoginOTP", "otpLoadedCallback", js(_data));
+    if (_data.status === 200) {
+      const otp: OtpType = _data.payload;
 
-      logger.debug("LoginOTP", "otpLoadedCallback", "entered value = ", JSON.stringify(getValues("otpcode")));
-      logger.debug("LoginOTP", "otpLoadedCallback", "stored OTP = ", JSON.stringify(otp));
+      logger.debug("LoginOTP", "otpLoadedCallback", "entered value = ", js(getValues("otpcode")));
+      logger.debug("LoginOTP", "otpLoadedCallback", "stored OTP = ", js(otp));
 
       if (otp.OTP !== getValues("otpcode")) {
         logger.debug("LoginOTP", "otpLoadedCallback", "OTP invalid");
-        addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${data.OTP}.`, "Login[OTP]"));
+        addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
 
         otp.attemps++;
 
         handleUpdateOtp(otp, ()=>{});
 
         if (otp.attemps >= MaxLoginAttemps) {
-          addHistory(createHistoryType("info", "Invalid login", `${data.email} attemps exceeded.`, "Login[OTP]"));
+          addHistory(createHistoryType("info", "Invalid login", `${otp.email} attemps exceeded.`, "Login[OTP]"));
 
           if (user.current) {
             const _user: ExtendedUserType = {
@@ -221,12 +221,12 @@ const LoginOTP = () => {
         } else {
           logger.debug("LoginOTP", "otpLoadedCallback", "Update attemps");
 
-          addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${data.OTP}.`, "Login[OTP]"));
+          addHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
         if (otp.used) {
-          addHistory(createHistoryType("info", "Invalid login", `${data.OTP} was already used for ${data.email}.`, "Login[OTP]"));
+          addHistory(createHistoryType("info", "Invalid login", `${otp.OTP} was already used for ${otp.email}.`, "Login[OTP]"));
           logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
           dialogTitleRef.current = `OTP code invalid`;
           dialogMessageRef.current = "OTP code already used. Retry Login?";

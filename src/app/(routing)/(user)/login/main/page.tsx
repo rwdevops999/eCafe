@@ -48,7 +48,7 @@ const LoginMain = () => {
 
     const progress = useProgressBar();
 
-    const progressPush = (href: string) => {
+    const redirect = (href: string) => {
        progress.start(); // show the indicator
    
        startTransition(() => {
@@ -83,23 +83,27 @@ const LoginMain = () => {
         addHistory(createHistoryType("action", "Task created", `Task created to remove the OTP code`, "Login[Email]"));
     }
 
-    const otpCreatedCallback = (data: any) => {
-        logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", js(data));
-        addHistory(createHistoryType("action", "OTP Created", `OTP ${data.OTP} created for ${data.email}`, "Login[Email]"));
+    const otpCreatedCallback = (_data: ApiResponseType) => {
+        if (_data.status === 201) {
+            const otp: OtpType = _data.payload;
 
-        const task: TaskType = {
-            name: ACTION_REMOVE_OTP,
-            description: `Remove code for OTP ${data.OTP}`,
-            subject: ACTION_TYPE_OTP,
-            subjectId: data.id,
-            status: "open",
+            logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", js(otp));
+            addHistory(createHistoryType("action", "OTP Created", `OTP ${otp.OTP} created for ${otp.email}`, "Login[Email]"));
+
+            const task: TaskType = {
+                name: ACTION_REMOVE_OTP,
+                description: `Remove code for OTP ${otp.OTP}`,
+                subject: ACTION_TYPE_OTP,
+                subjectId: otp.id,
+                status: "open",
+            }
+
+            createTask(task, taskCreatedCallback);
+
+            logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
+            setDialogState(false);
+            redirect("/login/OTP?otpId="+otp.id);
         }
-
-        createTask(task, taskCreatedCallback);
-
-        logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", data.id);
-        setDialogState(false);
-        progressPush("/login/OTP?otpId="+data.id);
     }
 
     const sendEmailCallback = (data: any) => {
@@ -127,7 +131,7 @@ const LoginMain = () => {
         setDialogState(false);
         setValue("email", "");
         setRefocus((old: boolean) => !old);
-        progressPush("/login/main");
+        redirect("/login/main");
     }
 
     const sendByEmail = (_emailInfo: EmailType) => {
@@ -138,7 +142,7 @@ const LoginMain = () => {
         logger.debug("LoginMain", "Close Dialog and redirect to URL", url);
 
         setDialogState(false);
-        progressPush(url);
+        redirect(url);
     }
 
     const handleOTP = (name: string, data: OtpType) => {
@@ -195,7 +199,7 @@ const LoginMain = () => {
                 handleSendEmail(emailInfo, sendEmailCallback);
             } else {
                 logger.debug("LoginMain", "userByEmailLoadedCallback", "User wants to login with password => Redirect to LoginPassword", user.id);
-                progressPush("/login/password?userId="+user.id);
+                redirect("/login/password?userId="+user.id);
             }
         } else {
             logger.debug("LoginMain", "userByEmailLoadedCallback", "User not in DB treat as guest => Show notification");

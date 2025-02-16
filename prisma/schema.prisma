@@ -111,8 +111,8 @@ model Address {
 model OTP {
   id Int @id @default(autoincrement())
   OTP String
-  email String?
-  used Boolean? @default(false)
+  email String
+  used Boolean @default(false)
   attemps Int @default(0)
   userId Int?
   createDate DateTime @default(now())

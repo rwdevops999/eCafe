@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { createApiReponse } from "@/lib/utils";
+import { createApiResponse } from "@/lib/utils";
 import { EmailType, OtpType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -25,12 +25,9 @@ export async function POST(request: NextRequest) {
 
     console.log("[API] OTP Creation", JSON.stringify(_data));
     
-    const otp = await createOtp(_data);
-  
-    return new Response(JSON.stringify(otp), {
-      headers: { "content-type": "application/json" },
-      status: 200,
-    });
+    const otp: OtpType = await createOtp(_data);
+
+    return Response.json(createApiResponse(201, "Payload: OtpType", otp));
 }
 
 const findOtpById = async (_id: number) => {
@@ -63,7 +60,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(req: NextRequest) {
   const data: OtpType = await req.json();
 
-  const  updatedOtp = await prisma.oTP.update({
+  const  updatedOtp: OtpType = await prisma.oTP.update({
     where: {
       id: data.id
     },
@@ -73,7 +70,7 @@ export async function PUT(req: NextRequest) {
     }
   });
 
-  return Response.json(createApiReponse(200, updatedOtp));
+  return Response.json(createApiReponse(200, "Payload: OtpType", updatedOtp));
 }
 
 export async function DELETE(request: NextRequest) {
@@ -81,13 +78,13 @@ export async function DELETE(request: NextRequest) {
   const otpId = urlParams.get('otpId');
 
   if (otpId) {
-    const otp = await prisma.oTP.delete({
+    const otp: OtpType = await prisma.oTP.delete({
       where: {
         id: parseInt(otpId)
       }
     });
 
-    return Response.json(createApiReponse(410, otp));
+    return Response.json(createApiResponse(410, "Payload: OtpType", otp));
   }
 
   const _email = urlParams.get('email');
@@ -113,8 +110,8 @@ export async function DELETE(request: NextRequest) {
       }
     })
 
-    return Response.json(createApiReponse(410, otps));
+    return Response.json(createApiResponse(410, "Payload: {count: number)", otps));
   }
 
-  return Response.json(createApiReponse(400, "Invalid Parameters"));
+  return Response.json(createApiResponse(400, "Invalid Parameters"));
 }
