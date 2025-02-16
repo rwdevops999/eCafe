@@ -18,7 +18,7 @@ const SettingsHistory = () => {
     const historyCleared = (data: any) => {
         logger.debug("History", "handleClearHistory", js(data));
         createHistory(createHistoryType("info", "History Cleared", "Cleared the old history data", "Settings[History]"), () => {})
-        toast.success("History cleared.")
+        toast.success("History cleared.", {duration: 1000})
     }
     
     const handleClearHistory = (_dummy: boolean): void => {
