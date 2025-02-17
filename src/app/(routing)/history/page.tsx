@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { columns } from "./table/colums";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { ApiResponseType } from "@/types/db";
-import { js } from "@/lib/utils";
+import { js, showToast } from "@/lib/utils";
 import { toast } from "sonner";
 
 const History = () => {
@@ -25,8 +25,6 @@ const History = () => {
 
     const [mappedHistory, setMappedHistory] = useState<HistoryData[]>([]);
 
-    let toastId: number|string = 0;
-
     const historyLoadedCallback = (_data: ApiResponseType): void => {
         logger.debug("History", "historyLoadedCallback", js(_data));
         if (_data.status === 200) {
@@ -34,10 +32,7 @@ const History = () => {
             const history: HistoryType[] = _data.payload;
 
             setMappedHistory(mapHistoryToData(history));
-            if (toastId == 0) {
-                toastId = toast.info("History loaded", {duration: 1500});
-            }
-
+            showToast("info", "History loaded");
         } else {
              logger.debug("History", "tasksLoadedCallback", "Error", _data.payload);
         }

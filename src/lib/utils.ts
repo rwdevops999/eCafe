@@ -236,3 +236,34 @@ export const hideLoaderToast = () => {
 export const convertDatabseDateToString = (date: Date|undefined): string => {
   return (date ? moment(date).format('DD-MMM-YYYY HH:mm:ss') : "");
 }
+
+interface IToast {
+  [index: string]: (message: string) => string|number;
+}
+
+let toasts = {} as IToast;
+
+toasts["description"] = toast.message;
+toasts["success"] = toast.success;
+toasts["info"] = toast.info;
+toasts["warning"] = toast.warning;
+toasts["error"] = toast.error;
+
+let toastId: number | string = 0;
+export const showToast = (type: string, message: string = "", duration: number = 1500) => {
+  if (toastId === 0) {
+    const myPromise = new Promise<{ name: string }>((resolve) => {
+        toastId = toasts[type](message);
+
+      setTimeout(() => {
+        resolve({ name: 'close toast' });
+      }, duration);
+    });
+  
+    myPromise
+    .then((value) => {
+      toast.dismiss(toastId);
+      toastId = 0;
+    });
+  }
+}

@@ -9,12 +9,13 @@ import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Data, ServiceType } from "@/types/ecafe";
 import { mapServicesToData, mapServiceToDataArray } from "@/lib/mapping";
-import { handleLoadServiceByName } from "@/lib/db";
+import { handleLoadServiceByName, handleLoadServices } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
-import { js } from "@/lib/utils";
+import { js, showToast } from "@/lib/utils";
+import { allItems } from "@/data/constants";
 
 const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
   const [servicesData, setServicesData] = useState<Data[]>([]);
@@ -22,25 +23,46 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  const servicesLoadedCallback = (data: ApiResponseType): void => {
+  const serviceLoadedCallback = (data: ApiResponseType): void => {
     if (data.status === 200) {
         let service: ServiceType = data.payload;
 
         logger.debug("ServiceDetails", "Service loaded", js(service));
+        logger.debug("ServiceDetails", "Mapped Service", js(mapServiceToDataArray(service)));
+
         setServicesData(mapServiceToDataArray(service));
+        showToast("info", "Service loaded")
       }
 
       setLoader(false);
   }
-    
+
+  const servicesLoadedCallback = (data: ApiResponseType): void => {
+    if (data.status === 200) {
+      let services: ServiceType[] = data.payload;
+
+      logger.debug("ServiceDetails", "Services loaded", js(services));
+      logger.debug("ServiceDetails", "Mapped Services", js(mapServicesToData(services)));
+      setServicesData(mapServicesToData(services));
+      showToast("info", "Services loaded")
+    }
+
+    setLoader(false);
+  }
+
   useEffect(() => {
     setLoader(true);
-    handleLoadServiceByName(selectedService!, servicesLoadedCallback);
+    if (selectedService !== allItems) {
+      handleLoadServiceByName(selectedService!, serviceLoadedCallback);
+    } else {
+      handleLoadServices(servicesLoadedCallback)
+    }
   }, []);
 
   const handleChangeService = (_service: string) =>  {
+    logger.debug("ServiceDetails", "handleChangeService", _service);
     setLoader(true);
-    handleLoadServiceByName(_service!, servicesLoadedCallback);
+    handleLoadServiceByName(_service!, serviceLoadedCallback);
   }
 
   const renderComponent = () => {

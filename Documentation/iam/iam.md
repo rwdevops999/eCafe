@@ -3,11 +3,11 @@
 ## Services
 
 ### overview
-1. [ ] a list of services is shown
-2. [ ] we need to see which actions are attached to each service
-3. [ ] we can select a certain service to see its details only
-4. [ ] the service view is informational only
-5. [ ] services can be filtered
+1. [x] a list of services is shown
+2. [x] we need to see which actions are attached to each service
+3. [x] we can select a certain service to see its details only
+4. [x] the service view is informational only
+5. [x] services can be filtered
 
 ## Statements  
 

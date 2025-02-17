@@ -1,6 +1,6 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
-import { createApiResponse, createEmptyApiReponse } from "@/lib/utils";
+import { createApiResponse, createEmptyApiReponse, js } from "@/lib/utils";
 import { ServiceType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
     const paramService = searchParams.get('service');
     const paramDepth = searchParams.get('depth');
     
+    console.log("[API] SERVICE", paramService, paramDepth);
     const apiResponse = createEmptyApiReponse();
 
     let depth = -1;
@@ -58,12 +59,16 @@ export async function GET(request: NextRequest) {
 
     if (paramService) {
         if  (paramService !== allItems) {
+            console.log("[API] SERVICE", "Load service", paramService);
             const service: ServiceType|null = await findServiceByName(paramService, depth);
+            console.log("[API] SERVICE", "Loaded service", js(service));
+
             if (service) {
+                console.log("[API] SERVICE", "SEND service To APP", js(service));
                 apiResponse.info = "Payload: ServiceType";
                 apiResponse.payload = service;
 
-                return Response.json(service);
+                return Response.json(apiResponse);
             }
 
             apiResponse.info = "Service not found";

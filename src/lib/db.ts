@@ -74,7 +74,7 @@ export const handleLoadCountries = async (_callback: CallbackFunctionWithParam):
  * SERVICES
  */
 const loadServices = async (_callback: CallbackFunctionWithParam): Promise<void> => {
-  await fetch("http://localhost:3000/api/iam/services?service=*&depth=0")
+  await fetch("http://localhost:3000/api/iam/services?service=*&depth=1")
     .then((response: Response) => response.json())
     .then((response: ApiResponseType) => {_callback(response)})
     .catch((error: any) => console.log("loadServices", `ERROR loading the services`, js(error)));
