@@ -101,12 +101,21 @@ export async function POST(request: NextRequest) {
 
     if (table === 'Services') {
       console.log("[API] loading Services");
+      await flushStartup();
       provisionServices(serviceMappings);
       const includeCountries = searchParams.get('countries');  // passed as ...?service=Stock => service = "Stock"
       console.log("[API] include countries = " + includeCountries);
       if (includeCountries?.toLowerCase() === 'true') {
         await provisionCountries('./public/country/country-codes.json');
       }
+
+      apiResponse.info = "flushed startup tables and provisioned services. No payload";
+    }
+
+    if (table === 'History') {
+      console.log("[API] clearing History");
+
+      flushTable('History');
 
       apiResponse.info = "flushed startup tables and provisioned services. No payload";
     }
@@ -149,9 +158,9 @@ export async function GET(request: NextRequest): Promise<Response> {
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
     if (table && table === 'country') {
-      apiResponse.info = "Payload: CountryType[]";
+      const countries: CountryType[] = await prisma.country.findMany();
 
-      const countries: CountryType[] = await prisma.country.findMany({});
+      apiResponse.info = "Payload: CountryType[]";
       apiResponse.payload = countries;
 
       return Response.json(apiResponse);

@@ -13,7 +13,7 @@ import { Database } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner';
 import HoverInfo from './hover-info';
-import { createHistoryType, wait } from '@/lib/utils';
+import { createHistoryType, js, wait } from '@/lib/utils';
 import { ApiResponseType } from '@/types/db';
 import { Separator } from '@/components/ui/separator';
 import { CountryType, ServiceType } from '@/types/ecafe';
@@ -31,7 +31,7 @@ const SettingsStorage = () => {
         if (_response.status === 200) {
             logger.debug("Settings", _response.info);
             toast.success("Database cleared.", {duration: 1000})
-            createHistory(createHistoryType("info", "Database cleared", "Database cleared", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Clear", "Database fully cleared", "Settings[Storage]"), () => {})
 
             setNumServices(0);
             setNumCountries(0);
@@ -49,7 +49,7 @@ const SettingsStorage = () => {
         if (_response.status === 200) {
             logger.debug("Settings", _response.info);
             toast.success("Working data removed.", {duration: 1000})
-            createHistory(createHistoryType("info", "Data tables clear", "Database work tables are cleared", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Clear", "Work tables cleared", "Settings[Storage]"), () => {})
         }
     }
 
@@ -60,8 +60,10 @@ const SettingsStorage = () => {
     }
 
     const countriesLoadedCallback = (_data: ApiResponseType) => {
+        console.log("countriesLoadedCallback", js(_data))
         if (_data.status === 200) {
             const countries: CountryType[] = _data.payload;
+            console.log("SIZE COUNTRIES", countries.length);
 
             setNumCountries(countries.length);
         }
@@ -70,12 +72,13 @@ const SettingsStorage = () => {
     const countriesLoaded = async (_response: ApiResponseType): Promise<void> => {
         if (_response.status === 200) {
             toast.info("Countries loaded.", {duration: 1000})
-            createHistory(createHistoryType("info", "Country tables loaded", "Country table resetted", "Settings[Storage]"), () => {})
+            createHistory(createHistoryType("info", "Provisioning", "Loaded countries table", "Settings[Storage]"), () => {})
+            await wait(500);
             handleLoadCountries(countriesLoadedCallback);
         }
     }
 
-    const servicesLoadedCallback = async (_data: ApiResponseType): Promise<void> => {
+    const servicesLoadedForCountCallback = async (_data: ApiResponseType): Promise<void> => {
         if (_data.status === 200) {
             const services: ServiceType[] = _data.payload;
 
@@ -84,13 +87,19 @@ const SettingsStorage = () => {
         }
     }
 
-    const servicesLoaded = async (_response: ApiResponseType): Promise<void> => {
+    const servicesLoaded = async (_response: ApiResponseType, _includeCountries: boolean): Promise<void> => {
         if (_response.status === 200) {
             logger.debug("Settings", _response.info);
-            toast.info(`Services loaded.`, {duration: 1000});
-            createHistory(createHistoryType("info", "Service tables loaded", "Loaded all startup tables", "Settings[Storage]"), () => {})
+            if (_includeCountries) {
+                toast.info(`Services and countries loaded.`, {duration: 1000});
+                createHistory(createHistoryType("info", "Provisioning", "Loaded all startup tables (and countries)", "Settings[Storage]"), () => {})
+                } else {
+                toast.info(`Services loaded.`, {duration: 1000});
+                createHistory(createHistoryType("info", "Provisioning", "Loaded all startup tables", "Settings[Storage]"), () => {})
+            }
+
             await wait(500);
-            handleLoadServices(servicesLoadedCallback)
+            handleLoadServices(servicesLoadedForCountCallback)
         }
     }
 
@@ -107,7 +116,7 @@ const SettingsStorage = () => {
     }
 
     useEffect(() => {
-        handleLoadServices(servicesLoadedCallback);
+        handleLoadServices(servicesLoadedForCountCallback);
     }, []);
 
     const renderComponent = () => {

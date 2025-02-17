@@ -1,6 +1,7 @@
 import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
-import { padZero } from "./utils";
+import { convertDatabseDateToString, padZero } from "./utils";
+import moment from "moment";
 
 /* ============ NEW VERSION ================= */
 const prettify = (path: any[]): string => {
@@ -381,7 +382,7 @@ export const mapHistoryToData = (history: HistoryType[]|undefined): HistoryData[
         type: historyEntry.type,
         description: historyEntry.description,
         originator: historyEntry.originator,
-        date: historyEntry.createDate??"",
+        date: convertDatabseDateToString(historyEntry.createDate),
         children: []
       }
 

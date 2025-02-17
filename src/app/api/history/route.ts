@@ -32,5 +32,5 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
     const history: HistoryType[] = await prisma.history.findMany();
 
-    return Response.json(createApiResponse(200, "Payload: HistoryType[]", history.sort((a, b) => a.createDate!.getTime() - b.createDate!.getTime())));
+    return Response.json(createApiResponse(200, "Payload: HistoryType[]", history.sort((a, b) => b.createDate!.getTime() - a.createDate!.getTime())));
 }

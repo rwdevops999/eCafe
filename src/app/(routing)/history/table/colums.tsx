@@ -7,34 +7,17 @@ import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { ReactNode } from "react";
 
-const renderNormal = (str: string): ReactNode => {
-    return (
-        <div className="-p-2 flex items-center h-[10px]">
-            {str}
-        </div>
-    );
-};
-
-const renderLink = (id: number, str: string): ReactNode => {
-    return (
-        <div className="-p-2 flex items-center h-[10px] underline text-blue-400">
-            {/* <Link href={`/task/${id}`}>{str}</Link> */}
-            <ProgressLink href={`/task/${id}`}>{str}</ProgressLink>
-        </div>
-    );
-};
-
 export const columns: ColumnDef<HistoryData>[] = [
     {
         accessorKey: 'title',
 
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Entry" />
+            <DataTableColumnHeader column={column} title="Entry"/>
         ),
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center ml-4 h-[10px]">
+                <div className="flex items-center h-[10px] ml-4">
                     {getValue<string>()}
                 </div>
             )
@@ -46,13 +29,13 @@ export const columns: ColumnDef<HistoryData>[] = [
         accessorKey: 'type',
 
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Type" />
+            <DataTableColumnHeader column={column} title="Type" className="-ml-4"/>
         ),
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center ml-2 h-[10px]">
-                    <Badge className={`ml-2 w-[35%] border border-foreground/30 ${row.original.type === 'info' ? 'text-blue-500' : 'text-red-500'}`} variant="outline">
+                <div className="flex items-center h-[10px]">
+                    <Badge className={`border border-foreground/30 ${row.original.type === 'info' ? 'text-blue-500' : 'text-red-500'}`} variant="outline">
                         {getValue<string>()}
                     </Badge>
                 </div>
@@ -69,12 +52,14 @@ export const columns: ColumnDef<HistoryData>[] = [
         accessorKey: 'description',
 
         header: ({ column }) => (
-            <>Description</>
+            <div className="">
+                <>Description</>
+            </div>
         ),
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center h-[10px]">
+                <div className="flex items-center h-[10px]">
                     {getValue<string>()}
                 </div>
             )
@@ -86,12 +71,12 @@ export const columns: ColumnDef<HistoryData>[] = [
         accessorKey: 'originator',
 
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Originator" />
+            <DataTableColumnHeader column={column} title="Originator" className="-ml-4"/>
         ),
 
         cell: ({ row, getValue }) => {
             return(
-                <div className="-p-2 flex items-center ml-5 h-[10px]">
+                <div className="flex items-center h-[10px]">
                     {getValue<string>()}
                 </div>
             )
@@ -103,15 +88,15 @@ export const columns: ColumnDef<HistoryData>[] = [
         accessorKey: 'date',
 
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Created" />
+            <DataTableColumnHeader column={column} title="Created" className="-ml-4"/>
         ),
 
         cell: ({ row, getValue }) => {
             const date: string = getValue<string>();
 
             return(
-                <div className="-p-2 flex items-center ml-5 h-[10px]">
-                    {date.replace('T', ' ').slice(0, date.length - 5)}
+                <div className="flex items-center h-[10px]">
+                    {getValue<string>()}
                 </div>
             )
         },

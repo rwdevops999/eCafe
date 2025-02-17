@@ -28,7 +28,7 @@ export const handleLoadServicesDB = async (_includeCountries: boolean, _callback
     }
   })
   .then((response: Response) => response.json())
-  .then((response: ApiResponseType) => _callback(response))
+  .then((response: ApiResponseType) => _callback(response, _includeCountries))
   .catch((error: any) => console.log("ERROR DB(handleLoadServicesDB)", js(error)));
 }
 

@@ -55,7 +55,7 @@ export default function RootLayout({
                   </div>
                   <div className="w-svw h-svw rounded-lg" id="XXX1">
                       {children}
-                      <Toaster richColors position="top-center"/>
+                      <Toaster richColors position="top-center" expand={true}/>
                   </div>
                   </ProgressBar>
                   </Theme>

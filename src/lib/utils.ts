@@ -9,6 +9,7 @@ import { Country, Data, HistoryType, typeType } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
 import { ApiResponseType } from "@/types/db";
 import { toast } from "sonner";
+import moment from "moment";
 
 
 
@@ -230,4 +231,8 @@ export const showLoaderToast = (title: string) => {
 
 export const hideLoaderToast = () => {
   toast.dismiss();
+}
+
+export const convertDatabseDateToString = (date: Date|undefined): string => {
+  return (date ? moment(date).format('DD-MMM-YYYY HH:mm:ss') : "");
 }
