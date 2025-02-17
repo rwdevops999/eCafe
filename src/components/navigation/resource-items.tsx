@@ -32,7 +32,7 @@ const ResourceItems = ({resource}:{resource: SidebarResourceType}) => {
                     {resource.children.map((child) => (
                         <DropdownMenuItem key={child.tkey}>
                         <div className="flex m-1 space-x-1 text-sm hover:bg-muted">
-                            <Menubutton icon={<child.icon size={18}/>} name={isClient ? t(child.tkey) : child.tkey} url={child.url} />
+                            <Menubutton icon={<child.icon width={16} height={16} className="mr-2"/>} name={isClient ? t(child.tkey) : child.tkey} url={child.url} />
                             {/* <child.icon size={18}/>
                             <Link href={child.url}>
                                 <span className="capitalize">{isClient ? t(child.tkey) : child.tkey}</span>
