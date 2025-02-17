@@ -5,7 +5,7 @@ const DashboardPage = ({className, children, ...props}: HTMLAttributes<HTMLDivEl
     return (
       <section
         className={cn(
-          "-ml-2 mt-2 absolute w-[99%] h-[100%] rounded-lg border bg-background shadow-inner shadow-slate-400/30",
+          "-ml-2 mt-2 absolute w-[99%] h-[95%] rounded-lg border bg-background shadow-md shadow-slate-400/30",
           className
         )}
         {...props}

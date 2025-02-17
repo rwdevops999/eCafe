@@ -4,8 +4,9 @@ import { Bell } from "lucide-react";
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation";
 import ProgressLink from "../ecafe/progress-link";
+import { cn } from "@/lib/utils";
 
-const Notification = () => {
+const Notification = ({className}:{className?: string}) => {
     const router = useRouter();
     
     const showNotifications = () => {
@@ -13,7 +14,7 @@ const Notification = () => {
     };
 
     return (
-        <ProgressLink href="/notifications" className="flex items-center">
+        <ProgressLink href="/notifications" className={cn("flex items-center", className)}>
             <Bell size={18} className="mr-2"/>
             Notification
         </ProgressLink>

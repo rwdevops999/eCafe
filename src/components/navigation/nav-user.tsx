@@ -45,21 +45,21 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
             >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-foreground/10">
-                    <UserInfo user={user} />
+                    <UserInfo user={user} className="-ml-2"/>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="mb-1">
-                    <div className="ml-1 flex items-center cursor-pointer space-x-2">
-                      <Profile />
+                    <div className="flex items-center cursor-pointer space-x-2">
+                      <Profile className="-ml-1"/>
                       {/* <Briefcase size={18}/>
                       <Link href="/profile" className="capitalize">{isClient ? t('profile') : 'profile'}</Link> */}
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="mb-1">
-                    <div className="ml-1 flex space-x-2 items-center cursor-pointer">
-                      <Notification />
+                    <div className="flex space-x-2 items-center cursor-pointer">
+                      <Notification className="-ml-1"/>
                       {/* <Bell size={18}/>
                       <Link href="/user/notifications" className="capitalize">{isClient ? t('notifications') : 'notifications'}</Link> */}
                     </div>
@@ -68,7 +68,7 @@ const NavUser = ({user}:{user:SidebarUserType}) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogin}>
                   <div className="flex space-x-2 items-center cursor-pointer">
-                    <LoginLogout />
+                    <LoginLogout className="-ml-1"/>
                   </div>
                 </DropdownMenuItem>
             </DropdownMenuContent>

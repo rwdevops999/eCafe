@@ -5,8 +5,9 @@ import { Button } from "../ui/button"
 import { useRouter } from "next/navigation";
 import ProgressLink from "../ecafe/progress-link";
 import { useSidebar } from "../ui/sidebar";
+import { cn } from "@/lib/utils";
 
-const Profile = () => {
+const Profile = ({className}:{className?: string}) => {
     const router = useRouter();
 
     const showProfile = () => {
@@ -14,7 +15,7 @@ const Profile = () => {
     };
 
     return (
-        <ProgressLink href="/profile" className="flex items-center">
+        <ProgressLink href="/profile" className={cn("flex items-center", className)}>
             <Briefcase size={18} className="mr-2"/>
             Profile
         </ProgressLink>

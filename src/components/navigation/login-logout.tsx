@@ -34,7 +34,7 @@ const LoginLogout = ({className}:{className?:string}) => {
                 <>
                     <div className="-ml-4 flex items-center">
                         <Button variant="ghost" onClick={doLogout} className="h-4 ml-1">
-                            <LogOut size={18} className="mr-2"/>
+                            <LogOut width={16} height={16} className="mr-2"/>
                             Log Out
                         </Button>
                     </div>
@@ -42,7 +42,7 @@ const LoginLogout = ({className}:{className?:string}) => {
         }
             {!isLoggedIn() && 
                     <ProgressLink href="/login/main" className={cn("flex items-center", className)}>
-                        <LogIn size={18} className="mr-2"/>
+                        <LogIn width={16} height={16} className="mr-2"/>
                         Log In
                     </ProgressLink>
             //   {/* <div className="-ml-4 flex items-center">
