@@ -84,15 +84,15 @@ export const handleLoadServices = async (_callback: CallbackFunctionWithParam): 
   await loadServices(_callback);
 }
 
-const loadServiceByName = async (_service: string, _callback: CallbackFunctionWithParam): Promise<void> => {
+const loadServiceByIdentifier = async (_service: string|number, _callback: CallbackFunctionWithParam): Promise<void> => {
   await fetch(`http://localhost:3000/api/iam/services?service=${_service}&depth=1`)
     .then((response: Response) => response.json())
     .then((response: ResponseType) => {_callback(response)})
     .catch((error: any) => console.log("loadServiceByName", `ERROR loading the service`, js(error)));
 }
 
-export const handleLoadServiceByName = async (_service: string, _callback: CallbackFunctionWithParam): Promise<void> => {
-  await loadServiceByName(_service, _callback);
+export const handleLoadServiceByIdentifier = async (_service: string|number, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadServiceByIdentifier(_service, _callback);
 }
 
 /**

@@ -12,20 +12,20 @@
 ## Statements  
 
 ### overview
-1. [ ] a list of statements is shown
-2. [ ] for each statement we can view whict actions are linked to it
+1. [x] a list of statements is shown
+2. [x] for each statement we can view which actions are linked to it
 3. [ ] clicking on an action shows the services screen with the service selected
-4. [ ] statements can be show depending on theit action (allowed or denied)
-5. [ ] statements can be filtered
-6. [ ] there should be an indication that the statement is managed
-7. [ ] managed services can't be deleted
+4. [x] statements can be shown depending on their action (allowed or denied)
+5. [x] statements can be filtered
+6. [x] there should be an indication that the statement is managed
+7. [x] managed services can't be deleted
 8. [ ] statements attached to policies can't be deleted (until the policy is deleted)
 
 ### creation
-1. [ ] the statement name and sid are mandatory
-2. [ ] a statement can be managed
-3. [ ] a statement can be an allow or a deny statement
-4. [ ] a statement can contain at least one service action
+1. [x] the statement name (sid) and the description are mandatory
+2. [x] a statement can be managed
+3. [x] a statement can be an allow or a deny statement
+4. [x] a statement can contain at least one service action
 
 ### update
 1. [ ] the statement name and sid are mandatory

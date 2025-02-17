@@ -75,9 +75,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const statements = await findAllStatements();
+    console.log("[API] STATEMENTS", "loading all statements");
 
-    return Response.json(statements);
+    const statements: StatementType[] = await findAllStatements();
+
+    apiResponse.info = "Payload: StatementType[]";
+    apiResponse.payload = statements;
+
+    return Response.json(apiResponse);
   }
 
 const provisionStatementActions = (statement: StatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {

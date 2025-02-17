@@ -1,6 +1,6 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
-import { createApiResponse, createEmptyApiReponse, js } from "@/lib/utils";
+import { createApiResponse, createEmptyApiReponse, isNumber, js } from "@/lib/utils";
 import { ServiceType } from "@/types/ecafe";
 import { NextRequest } from "next/server";
 
@@ -22,6 +22,19 @@ const findServiceByName = async (_service: string, depth: number) => {
     const service = await prisma.service.findFirst({
         where: { 
             name: _service 
+        },
+        include: includes
+    });
+
+    return service;
+}
+
+const findServiceById = async (_serviceId: number, depth: number) => {
+    let includes = determineIncludes(depth);
+
+    const service = await prisma.service.findFirst({
+        where: { 
+            id: _serviceId
         },
         include: includes
     });
@@ -59,8 +72,17 @@ export async function GET(request: NextRequest) {
 
     if (paramService) {
         if  (paramService !== allItems) {
-            console.log("[API] SERVICE", "Load service", paramService);
-            const service: ServiceType|null = await findServiceByName(paramService, depth);
+            let service: ServiceType|null = null;
+
+            if (isNumber(paramService)) {
+                console.log("[API] SERVICE", "Load service by Id", parseInt(paramService));
+                service = await findServiceById(parseInt(paramService), depth);
+
+            } else {
+                console.log("[API] SERVICE", "Load service", paramService);
+                service = await findServiceByName(paramService, depth);
+            }
+
             console.log("[API] SERVICE", "Loaded service", js(service));
 
             if (service) {

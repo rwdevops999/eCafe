@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Data } from "@/types/ecafe";
+import { js } from "@/lib/utils";
+import ProgressLink from "@/components/ecafe/progress-link";
 
 export const columns: ColumnDef<Data>[] = [
     {
@@ -26,13 +28,18 @@ export const columns: ColumnDef<Data>[] = [
                                 {row.getIsExpanded() ? '📭' : '📬'}
                             </Button>
                         ) : ('⚙️')}&nbsp;
-                            {row.original.name}
                             {row.depth == 1 ? (
-                                <Badge 
-                                    className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`}
-                                    variant="outline">
-                                        {row.original.other?.access}
-                                </Badge>) : null}&nbsp;
+                                <>
+                                    <ProgressLink className="text-blue-400 underline" href={`http://localhost:3000/iam/services/service=${row.original.other?.serviceId}`}>
+                                        {row.original.name}
+                                    </ProgressLink>
+                                    <Badge 
+                                            className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`}
+                                            variant="outline">
+                                                {row.original.other?.access}
+                                    </Badge>
+                                </>
+                            ) : row.original.name}&nbsp;
                             {row.original.other?.managed ? 'Ⓜ️' : ''}
                     </div>
                 </div>
@@ -40,7 +47,8 @@ export const columns: ColumnDef<Data>[] = [
         },
 
         filterFn: (row, id, value) => {
-            return row.original.name.includes(value);
+            console.log("FILTER", value, js(row));
+            return (value.includes(row.original.other?.access) || row.original.name.includes(value));
         },
 
         footer: props => props.column.id,

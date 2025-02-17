@@ -3,21 +3,21 @@
 import { DataTable } from "@/components/datatable/data-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import PageTitle from "@/components/ecafe/page-title";
-import ServiceSelect from "@/components/ecafe/service-select";
 import { useEffect, useState } from "react";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Data, ServiceType } from "@/types/ecafe";
 import { mapServicesToData, mapServiceToDataArray } from "@/lib/mapping";
-import { handleLoadServiceByName, handleLoadServices } from "@/lib/db";
+import { handleLoadServiceByIdentifier, handleLoadServices } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
-import { js, showToast } from "@/lib/utils";
+import { isNumber, js, showToast } from "@/lib/utils";
 import { allItems } from "@/data/constants";
+import ServiceSelect from "@/components/ecafe/service-select";
 
-const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;}  ) => {
+const ServiceDetails = ({selectedService}:{selectedService: string | number;}  ) => {
   const [servicesData, setServicesData] = useState<Data[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
   const {debug} = useDebug();
@@ -53,7 +53,7 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
   useEffect(() => {
     setLoader(true);
     if (selectedService !== allItems) {
-      handleLoadServiceByName(selectedService!, serviceLoadedCallback);
+      handleLoadServiceByIdentifier(selectedService, serviceLoadedCallback);
     } else {
       handleLoadServices(servicesLoadedCallback)
     }
@@ -63,7 +63,7 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
     logger.debug("ServiceDetails", "handleChangeService", _service);
     setLoader(true);
     if (_service !== allItems) {
-      handleLoadServiceByName(_service, serviceLoadedCallback);
+      handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
     } else {
       handleLoadServices(servicesLoadedCallback)
     }
@@ -80,9 +80,11 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
         </div>
 
         <div className="block space-y-5">
+          {! isNumber(selectedService) &&
           <div className="ml-5">
             <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
           </div>
+          }
           {!loader && <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>}
         </div>
       </div>

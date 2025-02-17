@@ -33,7 +33,6 @@ export const columns: ColumnDef<TaskData>[] = [
         cell: ({ row, getValue }) => {
             const isOpen: boolean = row.original.status === "open";
 
-
             return(
                 (isOpen ? renderLink(row.original.id, getValue<string>()) : renderNormal(getValue<string>()))
             )

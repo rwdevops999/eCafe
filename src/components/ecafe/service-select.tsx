@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from "@/lib/utils";
+import { cn, isNumber, js } from "@/lib/utils";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useRef, useState } from "react";
@@ -20,18 +20,49 @@ import { ApiResponseType } from "@/types/db";
  * @param service: the default selected service
  */
 
-const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
-  const serviceToDisplay = useRef<string>(defaultService === allItems ? 'All' : defaultService);
+const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string|number; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
+  const serviceToDisplay = useRef<string>("");
+
+  console.log("Service Select: ", defaultService);
 
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
-  const servicesLoadedCallback = (data: ApiResponseType): void => {
-    if (data.status === 200) {
-      if (defaultService === allItems || forceAll) {
-        setServices(["All", ...data.payload.map((service: ServiceType) => service.name)]);
+  const servicesLoadedCallback = (_data: ApiResponseType): void => {
+    if (_data.status === 200) {
+
+      const services: ServiceType[] = _data.payload;
+  console.log("ServiceSelect", "servicesLoadedCallback", js(services));
+
+      if (isNumber(defaultService)) {
+        const value: string = defaultService as string;
+
+        const serviceId: number = parseInt(value);
+        console.log("ServiceSelect", "servicesLoadedCallback", "IsNumber", serviceId);
+        const service: ServiceType|undefined = services.find((service) => service.id === serviceId);
+
+        if (service) {
+          console.log("ServiceSelect", "servicesLoadedCallback", "Service of Number", service.name);
+          serviceToDisplay.current = service.name;
+          console.log("ServiceSelect", "servicesLoadedCallback", "Service To Display", service.name);
+
+          if (forceAll) {
+            setServices(["All", ...services.map((service: ServiceType) => service.name)]);
+          } else {
+            setServices(services.map((service: ServiceType) => service.name));
+          }
+        }
       } else {
-        setServices(data.payload.map((service: ServiceType) => service.name));
+        let service: string = "";
+  
+        service = (defaultService === allItems ? 'All' : defaultService) as string;
+        serviceToDisplay.current = service;
+
+        if (defaultService === allItems || forceAll) {
+          setServices(["All", ...services.map((service: ServiceType) => service.name)]);
+        } else {
+          setServices(services.map((service: ServiceType) => service.name));
+        }
       }
     }
   }
@@ -41,57 +72,59 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
   }, []);
 
   useEffect(() => {
-    serviceToDisplay.current = (defaultService === allItems ? 'All' : defaultService);
-
     handleLoadServices(servicesLoadedCallback); 
   }, [defaultService]);
 
-  return (
-    <div className="flex -ml-3 items-center z-10">
-      <Label className="mr-1">{label}</Label>
-      <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-                variant="outline"
-                size="sm"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[200px] justify-between"
-              >
-                {services.find((s) => s === serviceToDisplay.current)}
-                <ChevronsUpDown className="opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0 z-10">
-            <Command>
-              <CommandInput placeholder="Search service..." />
-              <CommandList>
-                <CommandEmpty>No service found.</CommandEmpty>
-                <CommandGroup>
-                  {services.map((service) => (
-                    <CommandItem
-                      key={service}
-                      value={service}
-                      onSelect={(currentValue) => {
-                        serviceToDisplay.current = currentValue;
-                        setOpen(false);
-                        (handleChangeService ? handleChangeService(currentValue === 'All' ? allItems : currentValue) : null)
-                      }}
-                    >
-                      {service}
-                      <Check
+  const renderComponent = () => {
+    return (
+      <div className="flex -ml-3 items-center z-10">
+        <Label className="mr-1">{label}</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                  variant="outline"
+                  size="sm"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-[200px] justify-between"
+                >
+                  {services.find((s) => s === serviceToDisplay.current)}
+                  <ChevronsUpDown className="opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0 z-10">
+              <Command>
+                <CommandInput placeholder="Search service..." />
+                <CommandList>
+                  <CommandEmpty>No service found.</CommandEmpty>
+                  <CommandGroup>
+                    {services.map((service) => (
+                      <CommandItem
                         key={service}
-                        className={cn("ml-auto", serviceToDisplay.current === service ? "opacity-100" : "opacity-0")}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-  )
+                        value={service}
+                        onSelect={(currentValue) => {
+                          serviceToDisplay.current = currentValue;
+                          setOpen(false);
+                          (handleChangeService ? handleChangeService(currentValue === 'All' ? allItems : currentValue) : null)
+                        }}
+                      >
+                        {service}
+                        <Check
+                          key={service}
+                          className={cn("ml-auto", serviceToDisplay.current === service ? "opacity-100" : "opacity-0")}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+      )
+    }
+
+    return (<>{renderComponent()}</>)
 }
 
 export default ServiceSelect;

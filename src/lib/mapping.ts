@@ -1,4 +1,4 @@
-import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
+import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementActionType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 import { convertDatabseDateToString, padZero } from "./utils";
 import moment from "moment";
@@ -41,17 +41,18 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
     return result;
   }
 
-  const mapActionsToData = (actions: any[], permission: string): Data[] => {
+  const mapActionsToData = (_actions: StatementActionType[], _permission: string, _serviceId: number): Data[] => {
     let result: Data[] = [];
 
-    result = actions.map((action) => {
+    result = _actions.map((_action) => {
       return {
-        id: action.id,
-        name: action.name,
+        id: _action.id,
+        name: _action.name,
         description: "",
         children: [],
         other: {
-          access: permission,
+          access: _permission,
+          serviceId: _serviceId
         }
       }
     })
@@ -186,7 +187,7 @@ export const mapStatementsToData = (statements: any[] | undefined, services?: an
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions, statement.permission),
+        children: mapActionsToData(statement.actions, statement.permission, statement.serviceId),
         other: {
           serviceId: statement.serviceId,
           serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
@@ -208,7 +209,7 @@ export const mapStatementToDataArray = (statement: StatementType | undefined, se
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions, statement.permission),
+        children: mapActionsToData(statement.actions!, statement.permission, statement.serviceId),
         other: {
           serviceId: statement.serviceId,
           serviceName: (services ? getServiceName(statement.serviceId, services) : ""),

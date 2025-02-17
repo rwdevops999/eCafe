@@ -21,7 +21,7 @@ import { Row } from "@tanstack/react-table"
 import { Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
-import { handleCreateStatement, handleLoadServiceByName } from "@/lib/db";
+import { handleCreateStatement, handleLoadServiceByIdentifier } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -85,7 +85,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const resetAll = () => {
     access.current = defaultAccess;
     reset();
-    handleLoadServiceByName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
@@ -94,7 +94,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }, [open]);
 
   useEffect(() => {
-    handleLoadServiceByName(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, []);
 
@@ -178,7 +178,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   const handleChangeService = (_service: string) => {
     logger.debug("CreateStatementDialog", `service changed`, _service);
     setSelectedService(_service);
-    handleLoadServiceByName(_service, servicesLoadedCallback);
+    handleLoadServiceByIdentifier(_service, servicesLoadedCallback);
   }
 
   const renderDialog = () => {
