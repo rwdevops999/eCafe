@@ -97,8 +97,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return statementsLoaded.current;
   }
 
-  // const [alert, setAlert] = useState<AlertType>();
-
+  const [alert, setAlert] = useState<AlertType>();
 
   const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
     let serviceId: number = 0;
@@ -196,14 +195,16 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     }
   }, [reload]);
 
-  // const handleChangeService = (_service: string) => {
-  //   logger.debug("StatementDetails", "Service changed", _service);
-  //   setLoader(true);
-  //   const serviceId: number = prepareStatementsLoad(_service, '*');
-  //   handleLoadStatements(serviceId, '*', statementsLoadedCallback);
-  //   setSelectedService(_service);
-  //   serviceName.current = _service === allItems ? 'All' : _service;
-  // }
+  const handleChangeService = (_service: string) => {
+    logger.debug("StatementDetails", "Service changed", _service);
+    setLoader(true);
+    const serviceId: number = prepareStatementsLoad(_service, '*');
+    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
+
+    setSelectedServiceIdentifier(_service);
+
+    setSelectedServiceName(_service === allItems ? 'All' : _service);
+  }
 
   // const statementDeletedCallback = (data: ApiResponseType) => {
   //   if (data.status === 200) {
@@ -237,49 +238,48 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
   // }
 
   // /** for admin only later on */
-  // const handleDeleteManagedStatement = (statement: Data) => {
-  //   logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
-  //   createHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
-  //   handleDeleteStatement(statement.id, statementDeletedCallback);
-  //   setAlert(undefined);
-  // }
+  const handleDeleteManagedStatement = (statement: Data) => {
+    // logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
+    // createHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
+    // handleDeleteStatement(statement.id, statementDeletedCallback);
+    setAlert(undefined);
+  }
 
-  // const handleAction = (action: string, statement: Data) => {
-  //   if (action === action_delete) {
-  //     if (statement.other?.managed) {
-  //       const alert = {
-  //         open: true,
-  //         error: true,
-  //         title: "Unable to delete statement.",
-  //         message: "Managed statements can not be deleted.",
-  //         // child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
-  //         child: <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedStatement(statement)}>delete anyway</Button>
-  //       };
+  const handleAction = (action: string, statement: Data) => {
+    if (action === action_delete) {
+      if (statement.other?.managed) {
+        const alert = {
+          open: true,
+          error: true,
+          title: "Unable to delete statement.",
+          message: "Managed statements can not be deleted.",
+          child: (<div className="flex space-x-1">
+                  <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedStatement(statement)}>delete anyway</Button>
+                  <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>OK</Button>
+                  </div>)
+        };
 
-  //       setAlert(alert);
-  //     } else {
-  //       let alert = statementInPolicy(statement);
-  //       if (alert.error) {
-  //         setAlert(alert);
-  //       } else {
-  //         createHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
-  //         handleDeleteStatement(statement.id, statementDeletedCallback);
-  //       }
-  //     }
-  //   }
-  // }
+        setAlert(alert);
+      } else {
+        // let alert = statementInPolicy(statement);
+        // if (alert.error) {
+        //   setAlert(alert);
+        // } else {
+        //   createHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
+        //   handleDeleteStatement(statement.id, statementDeletedCallback);
+        // }
+      }
+    }
+  }
 
-  // const meta: TableMeta<Data[]> = {
-  //   handleAction: handleAction,
-  // };
   const meta: TableMeta<Data[]> = {
-    handleAction: () => {},
+    handleAction: handleAction,
   };
 
   const renderComponent = () => {
-    // if (alert && alert.open) {
-    //     return (<AlertMessage alert={alert}></AlertMessage>)
-    // }
+    if (alert && alert.open) {
+        return (<AlertMessage alert={alert}></AlertMessage>)
+    }
 
     logger.debug("StatementDetails", "RENDER");
 
@@ -293,7 +293,7 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         </div>
           {!loader && 
             <div className="flex items-center justify-between p-5">
-              {/* <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/> */}
+              <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/>
               <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} /> 
             </div>
           }
