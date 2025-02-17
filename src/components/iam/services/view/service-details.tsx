@@ -62,7 +62,12 @@ const ServiceDetails = ({selectedService}:{selectedService?: string | undefined;
   const handleChangeService = (_service: string) =>  {
     logger.debug("ServiceDetails", "handleChangeService", _service);
     setLoader(true);
-    handleLoadServiceByName(_service!, serviceLoadedCallback);
+    if (_service !== allItems) {
+      handleLoadServiceByName(_service, serviceLoadedCallback);
+    } else {
+      handleLoadServices(servicesLoadedCallback)
+    }
+    selectedService
   }
 
   const renderComponent = () => {
