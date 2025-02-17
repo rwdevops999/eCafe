@@ -14,7 +14,7 @@ import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
 import { isNumber, js, showToast } from "@/lib/utils";
-import { allItems } from "@/data/constants";
+import { allItems, defaultService } from "@/data/constants";
 import ServiceSelect from "@/components/ecafe/service-select";
 
 const ServiceDetails = ({selectedService}:{selectedService: string | number;}  ) => {
@@ -85,7 +85,7 @@ const ServiceDetails = ({selectedService}:{selectedService: string | number;}  )
             <ServiceSelect defaultService={selectedService!} handleChangeService={handleChangeService}/>
           </div>
           }
-          {!loader && <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar}/>}
+          {!loader && <DataTable data={servicesData} columns={columns} Toolbar={DataTableToolbar} expandAll={isNumber(selectedService)}/>}
         </div>
       </div>
     );
