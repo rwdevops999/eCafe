@@ -15,7 +15,6 @@ const relationTableNames = ['_GroupToPolicy', '_GroupToRole', '_GroupToUser', '_
 
 const flushStartup = async () => {
   for (const tableName of startupTableNames) {
-    console.log(`[API] Clear ${tableName}`);
     await prisma.$queryRawUnsafe(`Truncate "${tableName}" restart identity cascade;`);
   }
 }
@@ -95,16 +94,12 @@ export async function POST(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const table = searchParams.get('table');  // passed as ...?service=Stock => service = "Stock"
 
-    console.log("[API] POST");
-
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
     if (table === 'Services') {
-      console.log("[API] loading Services");
       await flushStartup();
       provisionServices(serviceMappings);
       const includeCountries = searchParams.get('countries');  // passed as ...?service=Stock => service = "Stock"
-      console.log("[API] include countries = " + includeCountries);
       if (includeCountries?.toLowerCase() === 'true') {
         await provisionCountries('./public/country/country-codes.json');
       }
@@ -113,7 +108,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (table === 'History') {
-      console.log("[API] clearing History");
 
       flushTable('History');
 
@@ -121,26 +115,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (table === allItems) {
-      console.log("[API] Clear DB");
       await flushAll(true);
       // provisionServices(serviceMappings);
       apiResponse.info = "flushed all tables and provisioned services. No payload";
     }
 
     if (table === workingItems) {
-      console.log("[API] Clear Working Items");
       flushAll(false);
       apiResponse.info = "flushed all working tables (like User, Role, ...). No payload";
     }
 
     if (table === 'country') {
-      console.log("[API] Clear Country");
       flushTable('Country');
       provisionCountries('./public/country/country-codes.json');
       apiResponse.info = "flushed COUNTRY table and provisioned it. No payload";
     }
-
-    console.log("[API] RESPONSE = " + js(apiResponse));
 
     return Response.json(apiResponse);
 }

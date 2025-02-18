@@ -44,17 +44,13 @@ export const columns: ColumnDef<Data>[] = [
         },
 
         filterFn: (row, id, value) => {
-            console.log("FILTER", value, js(row));
             let included: boolean = true;
-            console.log("FILTER", "INCLUDED1", included);
 
             if (row) {
                 included = row.original.name.includes(value);
-                console.log("FILTER", "INCLUDED2", included);
 
                 if (row.original.other && row.original.other.parent) {
                     included = included || row.original.other.parent.includes(value);
-                    console.log("FILTER", "INCLUDED3", included);
                 }
             }
 

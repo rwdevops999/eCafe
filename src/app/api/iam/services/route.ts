@@ -74,18 +74,13 @@ export async function GET(request: NextRequest) {
             let service: ServiceType|null = null;
 
             if (isNumber(paramService)) {
-                console.log("[API] SERVICE", "Load service by Id", parseInt(paramService));
                 service = await findServiceById(parseInt(paramService), depth);
 
             } else {
-                console.log("[API] SERVICE", "Load service", paramService);
                 service = await findServiceByName(paramService, depth);
             }
 
-            console.log("[API] SERVICE", "Loaded service", js(service));
-
             if (service) {
-                console.log("[API] SERVICE", "SEND service To APP", js(service));
                 apiResponse.info = "Payload: ServiceType";
                 apiResponse.payload = service;
 

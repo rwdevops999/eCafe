@@ -16,7 +16,6 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
 
   const handleDelete = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    console.log("HANDLE DELETE");
     const statement: Data = row.original as Data;
     const meta = table.options.meta;
     (meta && meta.handleAction ? meta.handleAction(action_delete, statement) : () => {});
@@ -25,7 +24,6 @@ export function DataTableRowActions<TData>({
   }
 
   const handleUpdate = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    console.log("HANDLE UPDATE");
     const statement: Data = row.original as Data;
     const meta = table.options.meta;
     (meta && meta.handleAction ? meta.handleAction(action_update, statement) : () => {});

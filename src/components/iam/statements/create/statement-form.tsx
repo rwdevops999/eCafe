@@ -27,8 +27,6 @@ const StatementForm = (props: FormProps) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("SF", "IN", js(props.statement));
-
   const formMethods = useForm({
     defaultValues: useMemo(() => {
       logger.debug("SF", "statement has changed");
@@ -39,26 +37,21 @@ const StatementForm = (props: FormProps) => {
   const {reset, handleSubmit, register, formState: {errors}, setValue} = formMethods;
 
   useEffect(() => {
-    console.log("SF", "useEffect[props.statement]", "Reset", js(props.statement));
     reset(props.statement);
 
   }, [props.statement]);
 
   const changeAccessValue = (value: string) => {
-    logger.debug("StatementForm", "Access value changed", value);
     setValue("access", value);
   }
 
   const changeManaged = (checked: CheckedState) => {
     if (typeof checked === 'boolean') {
-      logger.debug("StatementForm", "managed changed", checked);
       setValue("managed", checked);
     }
   }
 
   const handleChangeService = (_service: string) => {
-    logger.debug("StatementForm", "handleChangeService", _service);
-
     props.serviceChangeFn(_service);
     // let _entity: StatementEntity = cloneObject(props.statement);
 
@@ -68,13 +61,10 @@ const StatementForm = (props: FormProps) => {
   }
 
   const onSubmit: SubmitHandler<StatementEntity> = (formData: StatementEntity) => {
-    logger.debug("CreateStatementDialog", "Submit(formData)", js(formData));
-    console.log("SF", "Submit");
     props.submitFn(formData);
   }
 
   const renderComponent = () => {
-    console.log("SF", "RENDER");
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="form">
         <div className="flex justify-between">

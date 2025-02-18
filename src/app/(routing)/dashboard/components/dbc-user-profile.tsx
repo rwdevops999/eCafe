@@ -14,7 +14,6 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
   if (typeof user?.createDate === 'string') {
     let d: Date = new Date(user?.createDate);
     
-    console.log("DBC USER PROFILE", d.toDateString());
     user.createDate = d;
   }
 
@@ -123,8 +122,6 @@ const DbcUserProfile = ({className=""}:{className?:string}) => {
 
     return null;
   }
-
-  console.log("RENDER USER PROFILE");
 
   return (
     <>

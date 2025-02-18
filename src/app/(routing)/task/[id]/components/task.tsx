@@ -37,7 +37,6 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
 
   const taskLoadedCallback = (_response: ApiResponseType) => {
     // logger.debug("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
-    console.log("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
 
     if (_response.status === 200) {
       const task: TaskType = _response.payload;

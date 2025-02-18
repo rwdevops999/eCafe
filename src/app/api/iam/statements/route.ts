@@ -57,7 +57,6 @@ export async function GET(request: NextRequest) {
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
     if (_serviceId) {
-      console.log("[API] STATEMENTS", "loading statements with service id", _serviceId);
       const statements: StatementType[] = await prisma.serviceStatement.findMany({
         where: {
           serviceId: parseInt(_serviceId!)
@@ -73,14 +72,11 @@ export async function GET(request: NextRequest) {
       return Response.json(apiResponse);
     }
     
-    console.log("[API] STATEMENTS", "loading all statements");
     const statements: StatementType[] = await prisma.serviceStatement.findMany({
       include: {
         actions: true
       }
     });
-
-    console.log("[API] STATEMENTS", "loaded all statements", js(statements));
 
     apiResponse.info = "Payload: StatementType[]";
     apiResponse.payload = statements;

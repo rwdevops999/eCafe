@@ -55,8 +55,6 @@ const StatementCreateDialog = (
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("SCD", "IN", openDialog, statementId);
-  
   const loadedServices = useRef<ServiceType[]>([]);
   const setLoadedServices = (services: ServiceType[]): void => {
     loadedServices.current = services;
@@ -111,7 +109,6 @@ const StatementCreateDialog = (
   }
 
   const resetAll = () => {
-    console.log("CSD", "RESET ALL");
     access.current = defaultAccess;
 
     setActiveStatement({
@@ -159,37 +156,25 @@ const StatementCreateDialog = (
   }
 
   const getStatementActionsId = (): number[] => {
-    console.log("CSD", "XXXXX");
-    console.log("CSD", "getStatementActionsId", js(selectedStatement));
     let actionIds: number[] = [];
     if (selectedStatement && selectedStatement.actions) {
       actionIds = selectedStatement.actions.map((action: StatementActionType) => action.actionId??0)
     }
 
-    console.log("CSD", "getStatementActionsId", "ACTIONS ID", js(actionIds));
-
     return actionIds;
   }
 
   useEffect(() => {
-    console.log("SCD", "useEffect[openDialog]");
     if (openDialog) {
       resetAll();
 
-      logger.debug("SCD", "UseEffect[openDialog]", statementId);
-
       if (statementId) {
-        logger.debug("SCD", "LoadStatementById", statementId);
         handleLoadStatementById(statementId, statementLoadedCallback);
       }
-
-      console.log("SCD", "useEffect[openDialog]", "Resetting");
     }
   }, [openDialog]);
 
   useEffect(() => {
-    logger.debug("SCD", "UseEffect[_service]");
-
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, [_service]);
 
@@ -224,20 +209,13 @@ const StatementCreateDialog = (
   }
 
   const statementCreatedCallback = (data: ApiResponseType) => {
-    console.log("STATEMENT CREATED CALLBACK");
     if (data.status === 201) {
-      console.log("STATEMENT CREATED");
       createHistory(createHistoryType("info", "Create", `Sattement created`, "Statement Details"));
-      // setReload((x: any) => x+1);
-      console.log("DO RELOAD");
       setReload((x: any) => x+1);
     }
   };
 
   const onSubmit = (entity: StatementEntity) => {
-    console.log("CSD", "SUBMIT(entity)", JSON.stringify(entity));
-    console.log("CSD", "SUBMIT(selectedActions)", JSON.stringify(selectedActions));
-
     // const statement: StatementType|undefined = provisionStatement(entity);
 
     // if  (statement) {
@@ -271,18 +249,11 @@ const StatementCreateDialog = (
   }
 
   const handleCreateButton = (value: boolean) => {
-    console.log("CDS", "handle create");
-
-    console.log("CDS", "set defaults");
     setStatementId(undefined);
-
-    console.log("CDS", "open dialog");
     setDialogState(true);
   }
 
   const renderDialog = () => {
-    console.log("CSD: RENDER");
-
     if (selectedService) {
         return (
           <Dialog open={openDialog}>

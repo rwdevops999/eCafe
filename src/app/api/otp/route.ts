@@ -23,8 +23,6 @@ const createOtp = async (data: OtpType) => {
 export async function POST(request: NextRequest) {
     const _data: OtpType = await request.json();
 
-    console.log("[API] OTP Creation", JSON.stringify(_data));
-    
     const otp: OtpType = await createOtp(_data);
 
     return Response.json(createApiResponse(201, "Payload: OtpType", otp));
@@ -90,7 +88,6 @@ export async function DELETE(request: NextRequest) {
   const _email = urlParams.get('email');
  
   if (_email) {
-    console.log("[API] DELETING Expired OTPs by email", _email);
 
     const otps = await prisma.oTP.deleteMany({
       where: {

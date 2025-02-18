@@ -15,8 +15,6 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const paramService = searchParams.get('id');
 
-    console.log("[API] load statement by id", paramService);
-
     let _id: number = -1;
 
     let apiResponse: ApiResponseType = createEmptyApiReponse();

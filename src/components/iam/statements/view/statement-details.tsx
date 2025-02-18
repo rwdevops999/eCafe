@@ -26,8 +26,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("SD IN");
-
   const loadedStatements = useRef<StatementType[]>([]);
   const setLoadedStatements = (_statements: StatementType[]): void => {
     loadedStatements.current = _statements;
@@ -70,8 +68,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
   const selectedStatementId = useRef<number|undefined>(undefined);
   const setSelectedStatementId = (_statementId : number|undefined): void => {
-    console.log("SD", "setSelectedStatementId", _statementId);
-
     selectedStatementId.current = _statementId;
   }
 
@@ -81,8 +77,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
   const servicesLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
-      logger.debug("StatementDetails", "Services loaded", JSON.stringify(_data));
-
       setLoadedServices(_data.payload);
     }
   }
@@ -210,9 +204,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleAction = (action: string, statement: Data) => {
-    console.log("StatementDetails", "handleAction", action);
     if (action === action_delete) {
-      console.log("StatementDetails", "Delete?", js(statement));
       if (statement.other?.managed) {
         const alert = {
           open: true,
@@ -236,10 +228,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
         }
       }
     } else {
-      console.log(`UPDATE ${statement.id}`);
       setSelectedStatementId(statement.id);
 
-      console.log("OPEN DIALOG");
       setOpenDialog(true);
     }
   }
@@ -249,19 +239,15 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   };
 
   const handleDialogState = (state: boolean): void => {
-    console.log("SD", "handleDialogState", state);
     setOpenDialog(state);
   }
 
   const handleTableAction = () => {
-    console.log("SD", "handleTableAction");
     setSelectedStatementId(5);
     handleDialogState(true);
   }
 
   const renderComponent = () => {
-    console.log("SD RENDER", openDialog);
-
     if (alert && alert.open) {
         return (<AlertMessage alert={alert}></AlertMessage>)
     }

@@ -23,8 +23,6 @@ const Statement = async ({ params }: { params: { details: string } }) => {
           statementId = undefined;
         }
       }
-
-      console.log("SELECTED statementId = ", statementId);
     }
 
     getURLDetails(details);

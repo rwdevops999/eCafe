@@ -156,12 +156,9 @@ const findAllUsers = async () => {
     }
   );
 
-  console.log("Decrypt passwords");
   users.forEach(user => {
     if (!user.passwordless) {
-      console.log("Decrypt password for " + user.name);
       user.password = decrypt(user.password);
-      console.log("password for " + user.name + " is " + user.password);
     }
   });
 
@@ -189,9 +186,7 @@ export async function GET(request: NextRequest) {
 
       if (user) {
         if (!user.passwordless) {
-          console.log("Decrypt password for " + user.name);
           user.password = decrypt(user.password);
-          console.log("password for " + user.name + " is " + user.password);
         }
     
         return Response.json(createApiResponse(200, "Payload: UserType", user));
@@ -214,9 +209,7 @@ export async function GET(request: NextRequest) {
 
       if (user) {
         if (!user.passwordless) {
-          console.log("Decrypt password for " + user.name);
           user.password = decrypt(user.password);
-          console.log("password for " + user.name + " is " + user.password);
         }
 
         return Response.json(createApiResponse(200, "Payload: UserType", user));
@@ -276,8 +269,6 @@ export async function PUT(req: NextRequest) {
   if (! userId) {
     const data: ExtendedUserType = await req.json();
 
-    console.log("[API] UPDATE USER", JSON.stringify(data));
-  
     const updatedUser: UserType = await prisma.user.update({
         where: {
         id: data.id

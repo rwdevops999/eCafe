@@ -24,8 +24,6 @@ const createTask = async (data: TaskType) => {
   export async function POST(req: NextRequest) {
     const _data: TaskType = await req.json();
 
-    console.log("API CreateTask: ", JSON.stringify(_data));
-    
     const task: TaskType = await createTask(_data);
 
     return Response.json(createApiResponse(201, "Payload: TaskType", task));
@@ -47,8 +45,6 @@ export async function GET(request: NextRequest) {
     });
 
     if (tasks) {
-      console.log("API Task = " + JSON.stringify(tasks));
-
       return Response.json(createApiResponse(200, "Payload: TaskType[]", tasks));
     }
 
@@ -63,8 +59,6 @@ export async function GET(request: NextRequest) {
     });
 
     if (task) {
-      console.log("API Task = " + JSON.stringify(task));
-
       return Response.json(createApiResponse(200, "Payload: TaskType", task));
     }
 
@@ -87,9 +81,6 @@ const searchParams = request.nextUrl.searchParams
 
 const _taskId = searchParams.get('taskId');  // passed as ...?service=Stock => service = "Stock"
 const _status = searchParams.get('status');  // passed as ...?service=Stock => service = "Stock"
-
-  console.log("[API] Task Id: " + _taskId);
-  console.log("[API] Status: " + _status);
 
   if (_taskId && _status) {
     const updatedTask = await prisma.task.update({
