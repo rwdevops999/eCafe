@@ -323,10 +323,6 @@ const AppSidebar = () => {
         avatar: user ? `https://ui-avatars.com/api/?name=${user.firstname} ${user.name}&size=24&background=00FF00&color=FF0000&rounded=true` : ''
     };
 
-    const handleClickie = () => {
-        console.log("Clickie");
-    }
-
     const renderComponent = () => {
         logger.debug("SideBar", "RENDER");
         

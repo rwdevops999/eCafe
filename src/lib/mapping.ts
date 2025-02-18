@@ -312,10 +312,7 @@ export const mapServiceToDataArray = (_service: ServiceType): Data[] => {
 export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
   let result: Data[] = [];
   
-  console.log("XXX1", js(services));
-  
   result = services.flatMap(service => {
-    console.log("XXX1 => SERVICE", js(service));
     if (service.actions) {
       return (service.actions?.map(action => {
         let data: Data = {
@@ -325,16 +322,13 @@ export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
               children: []
         }
 
-        console.log("XXX2");
         return data;
       }));
     }
 
-    console.log("XXX3");
     return [];
   });
 
-  console.log("XXX4");
   return result;
 }
 

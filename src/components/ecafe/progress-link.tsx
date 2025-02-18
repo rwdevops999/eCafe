@@ -16,7 +16,6 @@ const ProgressLink = ({ href, children, className, ...rest }:{href: string, chil
     }
 
     e.preventDefault();
-    console.log("NAV", href);
     progress.start(); // show the indicator
 
     startTransition(() => {

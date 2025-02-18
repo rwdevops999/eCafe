@@ -92,8 +92,6 @@ const loadServiceByIdentifier = async (_service: string|number, _callback: Callb
 }
 
 export const handleLoadServiceByIdentifier = async (_service: string|number, _callback: CallbackFunctionWithParam): Promise<void> => {
-  console.log("handleLoadServiceByIdentifier", _service);
-  
   await loadServiceByIdentifier(_service, _callback);
 }
 
@@ -420,7 +418,6 @@ export const handleLoadOTP = async (_otpId: string, _callback: CallbackFunctionW
 }
 
 export const createOTP = async (_otp: OtpType, _callback: CallbackFunctionWithParam): Promise<void> => {
-  console.log("OTP in DB.ts", JSON.stringify(_otp));
   await fetch('http://localhost:3000/api/otp',
     {
       method: 'POST',

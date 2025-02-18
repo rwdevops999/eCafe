@@ -23,8 +23,6 @@ import { ApiResponseType } from "@/types/db";
 const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string|number; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
   const serviceToDisplay = useRef<string>("");
 
-  console.log("Service Select: ", defaultService);
-
   const [services, setServices] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
@@ -32,19 +30,14 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
     if (_data.status === 200) {
 
       const services: ServiceType[] = _data.payload;
-  console.log("ServiceSelect", "servicesLoadedCallback", js(services));
-
       if (isNumber(defaultService)) {
         const value: string = defaultService as string;
 
         const serviceId: number = parseInt(value);
-        console.log("ServiceSelect", "servicesLoadedCallback", "IsNumber", serviceId);
         const service: ServiceType|undefined = services.find((service) => service.id === serviceId);
 
         if (service) {
-          console.log("ServiceSelect", "servicesLoadedCallback", "Service of Number", service.name);
           serviceToDisplay.current = service.name;
-          console.log("ServiceSelect", "servicesLoadedCallback", "Service To Display", service.name);
 
           if (forceAll) {
             setServices(["All", ...services.map((service: ServiceType) => service.name)]);

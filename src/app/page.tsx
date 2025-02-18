@@ -23,7 +23,6 @@ export default function Home() {
 
     setIsClient(true);
 
-    console.log("HOME: DEBUG = " + debug);
     setDebug(debug);
   }, []);
 
