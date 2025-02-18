@@ -138,6 +138,13 @@ type StatementType = {
   policies?: PolicyType[]
 }   
 
+type ExtendedStatementType = {
+  original: StatementType,
+  actions?: {
+    connect?: number[],
+    disconnect?: number[]
+}   
+
 type PolicyType = {
   id: number,
   name: string,

@@ -70,6 +70,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
   const selectedStatementId = useRef<number|undefined>(undefined);
   const setSelectedStatementId = (_statementId : number|undefined): void => {
+    console.log("SD", "setSelectedStatementId", _statementId);
+
     selectedStatementId.current = _statementId;
   }
 
@@ -208,6 +210,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleAction = (action: string, statement: Data) => {
+    console.log("StatementDetails", "handleAction", action);
     if (action === action_delete) {
       console.log("StatementDetails", "Delete?", js(statement));
       if (statement.other?.managed) {
@@ -241,16 +244,20 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
     }
   }
 
-  const closeDialog = () => {
-    console.log("SD: Close Dialog", openDialog);
-
-    console.log("CLOSE DIALOG");
-    setOpenDialog(false);
-  }
-
   const meta: TableMeta<Data[]> = {
     handleAction: handleAction,
   };
+
+  const handleDialogState = (state: boolean): void => {
+    console.log("SD", "handleDialogState", state);
+    setOpenDialog(state);
+  }
+
+  const handleTableAction = () => {
+    console.log("SD", "handleTableAction");
+    setSelectedStatementId(5);
+    handleDialogState(true);
+  }
 
   const renderComponent = () => {
     console.log("SD RENDER", openDialog);
@@ -258,8 +265,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
     if (alert && alert.open) {
         return (<AlertMessage alert={alert}></AlertMessage>)
     }
-
-    logger.debug("StatementDetails", "RENDER", getSelectedServiceName());
 
     return (
       <div>
@@ -270,18 +275,17 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
         </div>
           {!loader && 
             <div className="flex items-center justify-between p-5">
-              <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/>
-              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} openDialog={openDialog} setDialogState={setOpenDialog} statementId={getSelectedStatementId()}/> 
+              <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/> */}
+              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} openDialog={openDialog} setDialogState={handleDialogState} statementId={getSelectedStatementId()} setStatementId={setSelectedStatementId}/> 
             </div>
           }
-        <div className="block space-y-5">
-          {statementData && 
-            <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} />
-            // expandAll={isNumber(getSelectedServiceIdentifier())}/>
-          }
+          <div className="block space-y-5">
+            {statementData && 
+              <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} />
+            }
+          </div>
         </div>
-      </div>
-    )
+      )
     }
 
     return (<>{renderComponent()}</>);

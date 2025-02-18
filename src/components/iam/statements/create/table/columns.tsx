@@ -12,7 +12,18 @@ export const initialTableState = {
 }
 
 export const columns: ColumnDef<Data>[] = [
-    {
+  {
+    accessorKey: 'id',
+
+    header: ({ column, header, table }) => (
+        <>ID</>
+    ),
+
+    cell: ({row, getValue}) => {
+        {row.original.id}
+    },
+  },
+  {
       id: "select",
 
       size: 50,

@@ -29,6 +29,7 @@ import { ApiResponseType } from "@/types/db";
 import { createHistoryType, js, showToast } from "@/lib/utils";
 import StatementForm from "./statement-form";
 import { StatementEntity } from "./data/model";
+import { Button } from "@/components/ui/button";
 
 const StatementCreateDialog = (
   {
@@ -38,6 +39,7 @@ const StatementCreateDialog = (
     openDialog = false,
     statementId = undefined,
     setDialogState,
+    setStatementId 
   }
   :
   {
@@ -47,11 +49,13 @@ const StatementCreateDialog = (
     openDialog?: boolean;
     statementId?: number|undefined,
     setDialogState: (b: boolean) => void,
+    setStatementId: (_statementId : number|undefined) => void 
+
   }) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  logger.debug("SCD", "IN", openDialog);
+  console.log("SCD", "IN", openDialog, statementId);
   
   const loadedServices = useRef<ServiceType[]>([]);
   const setLoadedServices = (services: ServiceType[]): void => {
@@ -107,7 +111,7 @@ const StatementCreateDialog = (
   }
 
   const resetAll = () => {
-    console.log("RESET ALL");
+    console.log("CSD", "RESET ALL");
     access.current = defaultAccess;
 
     setActiveStatement({
@@ -155,17 +159,23 @@ const StatementCreateDialog = (
   }
 
   const getStatementActionsId = (): number[] => {
+    console.log("CSD", "XXXXX");
+    console.log("CSD", "getStatementActionsId", js(selectedStatement));
     let actionIds: number[] = [];
     if (selectedStatement && selectedStatement.actions) {
-      actionIds = selectedStatement.actions.map((action: StatementActionType) => action.id)
+      actionIds = selectedStatement.actions.map((action: StatementActionType) => action.actionId??0)
     }
+
+    console.log("CSD", "getStatementActionsId", "ACTIONS ID", js(actionIds));
 
     return actionIds;
   }
 
   useEffect(() => {
-    logger.debug("SCD", "useEffect[openDialog]");
+    console.log("SCD", "useEffect[openDialog]");
     if (openDialog) {
+      resetAll();
+
       logger.debug("SCD", "UseEffect[openDialog]", statementId);
 
       if (statementId) {
@@ -173,8 +183,7 @@ const StatementCreateDialog = (
         handleLoadStatementById(statementId, statementLoadedCallback);
       }
 
-      logger.debug("SCD", "useEffect[openDialog]", "Resetting");
-      resetAll();
+      console.log("SCD", "useEffect[openDialog]", "Resetting");
     }
   }, [openDialog]);
 
@@ -226,15 +235,17 @@ const StatementCreateDialog = (
   };
 
   const onSubmit = (entity: StatementEntity) => {
-    logger.debug("CreateStatementDialog", `Statement ${entity.sid} create?`, JSON.stringify(entity));
+    console.log("CSD", "SUBMIT(entity)", JSON.stringify(entity));
+    console.log("CSD", "SUBMIT(selectedActions)", JSON.stringify(selectedActions));
 
-    const statement: StatementType|undefined = provisionStatement(entity);
+    // const statement: StatementType|undefined = provisionStatement(entity);
 
-    if  (statement) {
-      logger.debug("CreateStatementDialog", `Statement ${statement.sid} created`, JSON.stringify(entity));
-      handleCreateStatement(statement, statementCreatedCallback);
-      setDialogState(false);
-    }
+    // if  (statement) {
+    //   logger.debug("CreateStatementDialog", `Statement ${statement.sid} created`, JSON.stringify(entity));
+    //   handleCreateStatement(statement, statementCreatedCallback);
+    // }
+
+    // setDialogState(false);
   }
 
   const handleChangeSelection = (selection: Row<Data>[]) => {
@@ -259,17 +270,24 @@ const StatementCreateDialog = (
     handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
   }
 
-  const startCreation = (openDialog: boolean) => {
-    resetAll();
-    setDialogState(openDialog);
+  const handleCreateButton = (value: boolean) => {
+    console.log("CDS", "handle create");
+
+    console.log("CDS", "set defaults");
+    setStatementId(undefined);
+
+    console.log("CDS", "open dialog");
+    setDialogState(true);
   }
 
   const renderDialog = () => {
+    console.log("CSD: RENDER");
+
     if (selectedService) {
         return (
           <Dialog open={openDialog}>
             <DialogTrigger asChild>
-              <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={startCreation} clickValue={true} />
+              <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={handleCreateButton} clickValue={true} />
             </DialogTrigger>
               <DialogContent className="min-w-[75%]" aria-describedby="">
                 <DialogHeader>

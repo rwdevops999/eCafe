@@ -130,11 +130,15 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   const calculateRowSelect = () => {
     const idExists: any = table.getAllColumns().find(x => x.id === 'id');
     
+    console.log("DTABLE", "idExists", js(table.getAllColumns()));
+    console.log("DTABLE", "idExists", js(idExists));
     let state: MyObject = {}
 
     table.getRowModel().rows.map((row) => {
+      console.log("DTABLE", "ROW", js(row));
       if (idExists) {
         const itemId: number = row.getValue('id');
+        console.log("DTABLE", "itemId", itemId);
         if (selectedItems.includes(itemId)) {
           state[String(row.id)] = true;          
         }
