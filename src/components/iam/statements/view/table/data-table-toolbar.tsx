@@ -26,7 +26,7 @@ export function DataTableToolbar<TData>({
         />
         {table.getColumn("name") && (
           <DataTableFacetedFilter
-            column={table.getColumn("name")}
+            column={table.getColumn("access")}
             title="Access"
             options={access}
           />

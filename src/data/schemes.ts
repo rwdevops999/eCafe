@@ -16,6 +16,7 @@ const additionalScheme = z.object({
     access: z.string().optional(),
     serviceId: z.number().optional(),
     serviceName: z.string().optional(),
+    parent: z.string().optional()
 });
 
 export const dataScheme = z.object({

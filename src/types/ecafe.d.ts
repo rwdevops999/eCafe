@@ -121,7 +121,7 @@ type ServiceType = {
   createDate: Date,
   updateDate: Date,
   actions?: ActionType[],
-  statements?: StatementType[],
+  statements?: StatementType[] | null,
 }  
 
 type StatementType = {
@@ -133,7 +133,7 @@ type StatementType = {
   managed: boolean,
   createDate: Date,
   updateDate: Date,
-  service?: ServiceType,
+  service?: ServiceType | null,
   actions?: StatementActionType[],
   policies?: PolicyType[]
 }   

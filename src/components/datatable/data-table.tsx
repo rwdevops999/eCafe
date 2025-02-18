@@ -9,6 +9,7 @@ import {
   ColumnFiltersState,
   DataTableToolbarProps,
   ExpandedState,
+  FilterFn,
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
@@ -19,15 +20,17 @@ import {
   getSortedRowModel,
   InitialTableState,
   Row,
+  RowData,
   RowSelectionState,
   SortingState,
   TableMeta,
   useReactTable,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ComponentType, Fragment, useEffect, useState } from "react"
+import { ComponentType, Fragment, useEffect, useMemo, useState } from "react"
 import { DataTablePagination } from "@/components/datatable/data-table-pagination"
 import { action_update } from "@/data/constants"
+import { js } from "@/lib/utils"
 
 export interface IDataSubRows<TData> {
   children?: any[]
@@ -69,6 +72,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   const [columnVisibility, setColumnVisibility] = useState({
     "id": false,
   });
+
   /**
    * TABLE INSTANCE
    */
@@ -151,6 +155,8 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
   const handleRowClick = (row: Row<TData>, event?: React.MouseEvent): { row: Row<TData>; event?: React.MouseEvent } => {
         event?.stopPropagation();
 
+        console.log("ROW CLICK", js(row.subRows));
+        
         if (rowSelecting && row.getCanSelect()) {
           row.toggleSelected();
         } else {
@@ -170,7 +176,9 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
           {Toolbar && <Toolbar table={table} />}
         </div>
         <div>
-          <Table>
+          <Table {...{style: {
+            width: table.getCenterTotalSize()
+          }}}>
             <TableHeader>
               {table.getHeaderGroups().map(group => (
                 <TableRow key={group.id}>
@@ -192,7 +200,7 @@ export function DataTable<TData extends IDataSubRows<TData>, TValue>({
                         onClick={(e) => handleRowClick(row, e)}
                       >
                         {row.getVisibleCells().map(cell => {
-                          return (<TableCell key={cell.id}>
+                          return (<TableCell key={cell.id} style={{width: cell.column.getSize()}}>
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>);
                         })}

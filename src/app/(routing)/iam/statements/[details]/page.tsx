@@ -10,30 +10,27 @@ import { isNumber } from "@/lib/utils";
 const Statement = async ({ params }: { params: { details: string } }) => {
   const {details} = await(params);
 
-  let selectedService: string | number = "*";
-  let selectedSid: string = "*";
+    let statementId: number|undefined = undefined;
 
-    const getURLDetails = (urlParam: string) => {
-      const  urlDetails: string[] = urlParam.split(separator_ampersand);
-      const  serviceDetails: string[] = urlDetails[0].split(separator_equals);
+    const getURLDetails = (details: string) => {
+      const  serviceDetails: string[] = details.split(separator_equals);
 
-      selectedService = serviceDetails[1];
+      const sid: string = serviceDetails[1];
       
-      if (isNumber(selectedService)) {
-        selectedService = parseInt(selectedService);
+      if (isNumber(sid)) {
+        statementId = parseInt(sid);
+        if (statementId === 0) {
+          statementId = undefined;
+        }
       }
 
-      if (urlDetails[1]) {
-        const sidDetails: string[] = urlDetails[1].split(separator_equals);
-  
-        selectedSid = sidDetails[1];
-      }
+      console.log("SELECTED statementId = ", statementId);
     }
 
     getURLDetails(details);
 
     return (
-      <StatementDetails _service={selectedService} _sid={selectedSid} />
+      <StatementDetails _statementId={statementId} />
   )
 }
 

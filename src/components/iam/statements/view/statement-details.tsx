@@ -15,50 +15,44 @@ import { action_delete, allItems } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData, mapStatementToDataArray } from "@/lib/mapping";
 import { createHistoryType, isNumber, js, showToast } from "@/lib/utils";
-import { createHistory, handleDeleteStatement, handleLoadServices, handleLoadStatements } from "@/lib/db";
+import { createHistory, handleDeleteStatement, handleLoadServices, handleLoadStatementById, handleLoadStatements, handleLoadStatementsByServiceId } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
 
-const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: string;}) => {
+const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
+  const loadedStatements = useRef<StatementType[]>([]);
+  const setLoadedStatements = (_statements: StatementType[]): void => {
+    loadedStatements.current = _statements;
+  }
+
+  const getLoadedStatements = (): StatementType[] => {
+    return loadedStatements.current;
+  }
+
+  const [statementData, setStatementData] = useState<Data[]>();
+
+  const serviceName = useRef<string>('All');
+  const setSelectedServiceName = (service: string): void => {
+    serviceName.current = service;
+  }
+
+  const getSelectedServiceName = (): string => {
+    return serviceName.current;
+  }
+
   const [loader, setLoader] = useState<boolean>(false);
-  const [reload, setReload] = useState<boolean>(false);
 
-  const reloadAllowed = useRef<boolean>(false);
-  const isReloadAllowed = (): boolean => {
-    return reloadAllowed.current;
+  const statementsLoaded = useRef<boolean>(false);
+  const setStatementsAreLoaded = (loaded: boolean): void => {
+    statementsLoaded.current = loaded;
   }
 
-  const setReloadAllowed = (b: boolean): void => {
-    reloadAllowed.current = b;
-  }
-
-  const changeReload = () => {
-    reloadAllowed.current = ! reloadAllowed.current;
-    setReload((b: boolean) => !b);
-  }
-
-  const selectedServiceIdentifier = useRef<number | string>(allItems);
-  const setSelectedServiceIdentifier = (ident: number | string): void => {
-    selectedServiceIdentifier.current = ident;
-  }
-
-  const getSelectedServiceIdentifier = (): number|string => {
-    return selectedServiceIdentifier.current;
-  }
-
-  const selectedSidIdentifier = useRef<string>(allItems);
-  const setSelectedSidIdentifier = (ident: string): void => {
-    selectedSidIdentifier.current = ident;
-  }
-
-  const getSelectedSidIdentifier = (): string => {
-    return selectedSidIdentifier.current;
-  }
+  const [reload, setReload] = useState<number>(0);
 
   const services = useRef<ServiceType[]>([]);
   const setLoadedServices = (_services: ServiceType[]): void => {
@@ -69,88 +63,25 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     return services.current;
   }
 
-  const serviceName = useRef<string>('All');
-  const setSelectedServiceName = (service: string): void => {
-    serviceName.current = service;
-  }
-
-  const getSelectedServiceName = (): string => {
-    return serviceName.current;
-  }
-  const loadedStatements = useRef<StatementType[]>([]);
-  const setLoadedStatements = (_statements: StatementType[]): void => {
-    loadedStatements.current = _statements;
-  }
-
-  const getLoadedStatements = (_statements: StatementType[]): void => {
-    loadedStatements.current = _statements;
-  }
-
-  const [statementData, setStatementData] = useState<Data[]>();
-
-  const statementsLoaded = useRef<boolean>(false);
-  const setStatementsAreLoaded = (loaded: boolean): void => {
-    statementsLoaded.current = loaded;
-  }
-
-  const areStatementsLoaded = (): boolean => {
-    return statementsLoaded.current;
-  }
-
   const [alert, setAlert] = useState<AlertType>();
 
-  const prepareStatementsLoad = (_service: number | string, _sid: string): number => {
-    let serviceId: number = 0;
+  const servicesLoadedCallback = (_data: ApiResponseType) => {
+    if (_data.status === 200) {
+      logger.debug("StatementDetails", "Services loaded", JSON.stringify(_data));
 
-    logger.debug("StatementDetails", "prepareStatementsLoad", "Services loaded?", js(services.current));
-
-    if (typeof _service === 'number') {
-      serviceId = _service;
-      const service = services.current.find((service) => service.id === _service);
-      if (service) {
-        serviceId = service.id;
-        setSelectedServiceName(service.name);
-      }
-  } else {
-      if (_service !== allItems) {
-        const service = services.current.find((service) => service.name === _service);
-        if (service) {
-          serviceId = service.id;
-          setSelectedServiceName(service.name);
-        }
-      } else {
-        setSelectedServiceName('All');
-      }
+      setLoadedServices(_data.payload);
     }
-
-    return serviceId;
   }
 
-  const statementsLoadedCallback = (data: ApiResponseType) => {
-    logger.debug("StatementDetails", "statementsLoadedCallback", "Statements loaded", js(data));
+  const statementLoadedCallback = (_data: ApiResponseType): void => {
+    if (_data.status === 200) {
+      const statement: StatementType = _data.payload;
 
-    if (data.status === 200) {
-      if (Array.isArray(data.payload)) {
-        logger.debug("StatementDetails", "Loaded statements ...", js(data.payload));
+      setSelectedServiceName(statement.service!.name);
 
-        const statements: StatementType[] = data.payload;
-  
-        setLoadedStatements(statements);
-
-        logger.debug("StatementDetails", "Mapping => services?", js(getLoadedServices()));
-        logger.debug("StatementDetails", "Mapped Statements", js(mapStatementsToData(statements, getLoadedServices())));
-
-        setStatementData(mapStatementsToData(statements, services.current));
-        showToast("info", "Statements loaded");
-      } else {
-  //       logger.debug("StatementDetails", "Statement loaded", js(data.payload));
-
-  //       const statement: StatementType = data.payload;
-  
-  //       setStatements([statement]);
-  //       setStatementData(mapStatementToDataArray(statement, services.current));
-  //       showToast("info", "Statement loaded");
-      }
+      setLoadedStatements([statement]);
+      setStatementData(mapStatementToDataArray(statement));
+      showToast("info", "Statement loaded");
 
       setStatementsAreLoaded(true);
     }
@@ -158,94 +89,112 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
     setLoader(false);
   }
 
-  const servicesLoadedCallback = (_data: ApiResponseType) => {
+  const statementsLoadedCallback = (_data: ApiResponseType, _serviceName: string|undefined): void => {
+    logger.debug("StatementDetails", "statementsLoadedCallback", js(_data), _serviceName);
     if (_data.status === 200) {
-      logger.debug("StatementDetails", "Services loaded", JSON.stringify(_data));
+      const statements: StatementType[] = _data.payload;
+      logger.debug("StatementDetails", "statementsLoadedCallback", js(statements));
 
-      setLoadedServices(_data.payload);
+      logger.debug("StatementDetails", "statementsLoadedCallback", "serviceName", _serviceName);
+      if (_serviceName) {
+        setSelectedServiceName(_serviceName);
+      } else {
+        setSelectedServiceName('All');
+      }
 
-      const serviceId: number = prepareStatementsLoad(_service, _sid);
-      logger.debug("StatementDetails", "Current Service", getSelectedServiceName());
-      logger.debug("StatementDetails", "selected service id", serviceId);
-      handleLoadStatements(serviceId, _sid, statementsLoadedCallback);
+      setLoadedStatements(statements);
+      logger.debug("StatementDetails", "statementsLoadedCallback", "PRE MAPPING", js(statements));
+      setStatementData(mapStatementsToData(statements));
+      showToast("info", "Statements loaded");
+
+      setStatementsAreLoaded(true);
     }
+
+    setLoader(false);
   }
 
   useEffect(() => {
     logger.debug("StatementDetails", "UseEffect[]", Date.now());
-    if (_service && _sid) {
-      logger.debug("StatementDetails", "UseEffect[]", "Selected service", _service);
-      setSelectedServiceIdentifier(_service);
-      logger.debug("StatementDetails", "UseEffect[]", "Selected sid", _sid);
-      setSelectedSidIdentifier(_sid);
-
-      logger.debug("StatementDetails", "UseEffect[]", _service, _sid);
+    if (_statementId) {
+      logger.debug("StatementDetails", "UseEffect[]", "Selected statement id", _statementId);
       setLoader(true);
-      handleLoadServices(servicesLoadedCallback);
+      handleLoadStatementById(_statementId, statementLoadedCallback)
+    } else {
+      setLoader(true);
+      handleLoadStatements(statementsLoadedCallback)
     }
+
+    handleLoadServices(servicesLoadedCallback);
   }, []);
 
   useEffect(() => {
-    if (isReloadAllowed()) {
-      setReloadAllowed(false);
+    logger.debug("StatementDetails", "UseEffect[reload]", Date.now());
       logger.debug("StatementDetails", "UseEffect[reload]", Date.now());
-    // setLoader(true);
-    // const serviceId: number = prepareStatementsLoad(selectedService, selectedSid);
-    // handleLoadStatements(serviceId, selectedSid, statementsLoadedCallback);
-    }
-  }, [reload]);
+
+      logger.debug("StatementDetails", "UseEffect[selectedServiceName]", getSelectedServiceName());
+      logger.debug("StatementDetails", "UseEffect[loadedServices]", js(getLoadedServices()));
+     const service: ServiceType|undefined = getLoadedServices().find((_service) => _service.name === getSelectedServiceName());
+      logger.debug("StatementDetails", "UseEffect(service)]", service);
+      if (service) {
+        setLoader(true);
+        handleLoadStatementsByServiceId(service.id, statementsLoadedCallback);
+      } else {
+        handleLoadStatements(statementsLoadedCallback);
+      }
+  }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
     logger.debug("StatementDetails", "Service changed", _service);
+
     setLoader(true);
-    const serviceId: number = prepareStatementsLoad(_service, '*');
-    handleLoadStatements(serviceId, '*', statementsLoadedCallback);
 
-    setSelectedServiceIdentifier(_service);
-
-    setSelectedServiceName(_service === allItems ? 'All' : _service);
+    const service: ServiceType|undefined = getLoadedServices().find((service) => service.name === _service);
+    if (service) {
+      handleLoadStatementsByServiceId(service.id, statementsLoadedCallback, service.name);
+    } else {
+      handleLoadStatements(statementsLoadedCallback);
+    }
   }
 
-  // const statementDeletedCallback = (data: ApiResponseType) => {
-  //   if (data.status === 200) {
-  //     setReload((x:any) => x+1);
-  //   }
-  // }
+  const statementDeletedCallback = (data: ApiResponseType, statementName: string) => {
+    if (data.status === 200) {
+      createHistory(createHistoryType("info", "Delete", `Deleted managed statement ${statementName}`, "Statement"));
+      setReload((x:any) => x+1);
+    }
+  }
 
-  // const statementInPolicy = (_statement: Data): AlertType => {
-  //     let alert = {
-  //       open: false,
-  //       error: false,
-  //       title: "",
-  //       message: "",
-  //       child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
-  //     };
+  const isStatementInPolicy = (_statement: Data): AlertType => {
+      let alert = {
+        open: false,
+        error: false,
+        title: "",
+        message: "",
+        child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+      };
 
-  //     let result: boolean = false;
+      const statement = getLoadedStatements().find(s => s.id === _statement.id);
+      if (statement && statement.policies) {
+        logger.debug("StatementDetails", "Statement is in a policy", _statement.name);
+        if (statement.policies.length > 0) {
+          alert.open = true;
+          alert.error = true;
+          alert.title = "Unable to delete statement";
+          alert.message = `Statement is in policy '${statement.policies[0].name}'`;
+        }
+      }
 
-  //     const statement = statements.find(s => s.id === _statement.id);
-  //     if (statement && statement.policies) {
-  //       logger.debug("StatementDetails", "Statement is in a policy", _statement.name);
-  //       if (statement.policies.length > 0) {
-  //         alert.open = true;
-  //         alert.error = true;
-  //         alert.title = "Unable to delete statement";
-  //         alert.message = `Statement is in policy '${statement.policies[0].name}'`;
-  //       }
-  //     }
+      return alert;
+  }
 
-  //     return alert;
-  // }
-
-  // /** for admin only later on */
+  // // /** for admin only later on */
   const handleDeleteManagedStatement = (statement: Data) => {
-    // logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
-    // createHistory(createHistoryType("info", "Statement delete", "Managed statement ${statement.name} is forced deleted", "Statement"));
-    // handleDeleteStatement(statement.id, statementDeletedCallback);
+    logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
+    handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
     setAlert(undefined);
   }
 
   const handleAction = (action: string, statement: Data) => {
+    console.log("StatementDetails", "Delete?", js(statement));
     if (action === action_delete) {
       if (statement.other?.managed) {
         const alert = {
@@ -261,14 +210,16 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
 
         setAlert(alert);
       } else {
-        // let alert = statementInPolicy(statement);
-        // if (alert.error) {
-        //   setAlert(alert);
-        // } else {
-        //   createHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
-        //   handleDeleteStatement(statement.id, statementDeletedCallback);
-        // }
+        let alert = isStatementInPolicy(statement);
+        if (alert.error) {
+          setAlert(alert);
+        } else {
+          createHistory(createHistoryType("info", "Statement delete", "Deleting statement ${statement.name}", "Statement"));
+          handleDeleteStatement(statement.id, statementDeletedCallback);
+        }
       }
+    } else {
+      console.log(`UPDATE ${statement.id}`);
     }
   }
 
@@ -281,11 +232,10 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
         return (<AlertMessage alert={alert}></AlertMessage>)
     }
 
-    logger.debug("StatementDetails", "RENDER");
+    logger.debug("StatementDetails", "RENDER", getSelectedServiceName());
 
     return (
       <div>
-          {/* <Button onClick={changeReload}>RELOAD</Button> */}
         <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "statements", url: "/iam/statements/service=*"}]} />
         <div className="flex space-x-2 items-center">
           <PageTitle className="m-2" title={`Overview service statements for ${getSelectedServiceName() === 'All' ? 'All Services' : getSelectedServiceName()}`} />
@@ -299,7 +249,8 @@ const StatementDetails = ({_service, _sid}:{_service: number | string; _sid: str
           }
         <div className="block space-y-5">
           {statementData && 
-            <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} expandAll={isNumber(getSelectedServiceIdentifier())}/>
+            <DataTable data={statementData} columns={columns} tablemeta={meta} Toolbar={DataTableToolbar} />
+            // expandAll={isNumber(getSelectedServiceIdentifier())}/>
           }
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementActionType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
-import { convertDatabseDateToString, padZero } from "./utils";
+import { convertDatabseDateToString, js, padZero } from "./utils";
 import moment from "moment";
 
 /* ============ NEW VERSION ================= */
@@ -41,7 +41,7 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
     return result;
   }
 
-  const mapActionsToData = (_actions: StatementActionType[], _permission: string, _serviceId: number): Data[] => {
+  const mapActionsToData = (_actions: StatementActionType[], _permission: string, _serviceId: number, _parent: string): Data[] => {
     let result: Data[] = [];
 
     result = _actions.map((_action) => {
@@ -51,6 +51,7 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
         description: "",
         children: [],
         other: {
+          parent: _parent,
           access: _permission,
           serviceId: _serviceId
         }
@@ -187,8 +188,9 @@ export const mapStatementsToData = (statements: any[] | undefined, services?: an
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions, statement.permission, statement.serviceId),
+        children: mapActionsToData(statement.actions, statement.permission, statement.serviceId, statement.sid),
         other: {
+          parent: undefined,
           serviceId: statement.serviceId,
           serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
           managed: statement.managed,
@@ -201,7 +203,7 @@ export const mapStatementsToData = (statements: any[] | undefined, services?: an
   return result;
 };
 
-export const mapStatementToDataArray = (statement: StatementType | undefined, services?: any[]): Data[] => {
+export const mapStatementToDataArray = (statement: StatementType | undefined): Data[] => {
   let result: Data[] = [];
 
   if (statement) {
@@ -209,10 +211,10 @@ export const mapStatementToDataArray = (statement: StatementType | undefined, se
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions!, statement.permission, statement.serviceId),
+        children: mapActionsToData(statement.actions!, statement.permission, statement.serviceId, statement.sid),
         other: {
           serviceId: statement.serviceId,
-          serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
+          // serviceName: (services ? getServiceName(statement.serviceId, services) : ""),
           managed: statement.managed,
           access: statement.permission
           }
@@ -310,7 +312,10 @@ export const mapServiceToDataArray = (_service: ServiceType): Data[] => {
 export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
   let result: Data[] = [];
   
+  console.log("XXX1", js(services));
+  
   result = services.flatMap(service => {
+    console.log("XXX1 => SERVICE", js(service));
     if (service.actions) {
       return (service.actions?.map(action => {
         let data: Data = {
@@ -320,13 +325,16 @@ export const mapServiceActionsToData = (services: ServiceType[]): Data[] => {
               children: []
         }
 
+        console.log("XXX2");
         return data;
       }));
     }
 
+    console.log("XXX3");
     return [];
   });
 
+  console.log("XXX4");
   return result;
 }
 

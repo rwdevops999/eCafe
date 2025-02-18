@@ -15,6 +15,8 @@ export const columns: ColumnDef<Data>[] = [
     {
       id: "select",
 
+      size: 50,
+
       header: ({ header, table }) => {
         return (
           <div className="w-1">
@@ -45,6 +47,8 @@ export const columns: ColumnDef<Data>[] = [
       },
     {
       accessorKey: "name",
+
+      size: 1024,
 
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Actions" />

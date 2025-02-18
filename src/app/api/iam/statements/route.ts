@@ -1,6 +1,6 @@
 import { allItems } from "@/data/constants";
 import prisma from "@/lib/prisma";
-import { createApiResponse, createEmptyApiReponse } from "@/lib/utils";
+import { createApiResponse, createEmptyApiReponse, js } from "@/lib/utils";
 import { ApiResponseType } from "@/types/db";
 import { StatementType } from "@/types/ecafe";
 import { Prisma } from "@prisma/client";
@@ -52,38 +52,41 @@ const findAllStatements = async () => {
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    const serviceId = searchParams.get('serviceId');  // passed as ...?service=Stock => service = "Stock"
-    const sid = searchParams.get('sid');  // passed as ...?service=Stock => service = "Stock"
+    const _serviceId = searchParams.get('serviceId');  // passed as ...?service=Stock => service = "Stock"
 
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
-    if  (serviceId && parseInt(serviceId) !== 0) {
-      if (sid === allItems) {
-        const statements: StatementType[] = await findAllStatementsByServiceId(parseInt(serviceId));
+    if (_serviceId) {
+      console.log("[API] STATEMENTS", "loading statements with service id", _serviceId);
+      const statements: StatementType[] = await prisma.serviceStatement.findMany({
+        where: {
+          serviceId: parseInt(_serviceId!)
+        },
+        include: {
+          actions: true
+        }
+      });
 
-        apiResponse.info = "Payload: StatementType[]";
-        apiResponse.payload = statements;
+      apiResponse.info = "Payload: StatementType[]";
+      apiResponse.payload = statements;
 
-        return Response.json(apiResponse);
-      } else if (sid) {
-        const statement: StatementType|null = await findStatementByServiceIdAndSidName(parseInt(serviceId), sid);
-
-        apiResponse.info = "Payload: StatementType";
-        apiResponse.payload = statement;
-
-        return Response.json(apiResponse);
-      }
+      return Response.json(apiResponse);
     }
-
+    
     console.log("[API] STATEMENTS", "loading all statements");
+    const statements: StatementType[] = await prisma.serviceStatement.findMany({
+      include: {
+        actions: true
+      }
+    });
 
-    const statements: StatementType[] = await findAllStatements();
+    console.log("[API] STATEMENTS", "loaded all statements", js(statements));
 
     apiResponse.info = "Payload: StatementType[]";
     apiResponse.payload = statements;
 
     return Response.json(apiResponse);
-  }
+}
 
 const provisionStatementActions = (statement: StatementType): Prisma.StatementActionCreateWithoutStatementInput[] => {
   let actions: Prisma.StatementActionCreateWithoutStatementInput[] = [];

@@ -21,12 +21,12 @@ import { Row } from "@tanstack/react-table"
 import { Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
-import { handleCreateStatement, handleLoadServiceByIdentifier } from "@/lib/db";
+import { createHistory, handleCreateStatement, handleLoadServiceByIdentifier } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
-import { js } from "@/lib/utils";
+import { createHistoryType, js, showToast } from "@/lib/utils";
 
 const FormSchema = z.object({
   sid: z.string().min(3).max(25),
@@ -34,88 +34,93 @@ const FormSchema = z.object({
 });
 type FormSchemaType = z.infer<typeof FormSchema>;
 
-const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x:any): void;}) => {
+const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service: string; _enabled?:boolean; setReload(x: any): void;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  const [loader, setLoader] = useState<boolean>(false);
+  const loadedServices = useRef<ServiceType[]>([]);
+  const setLoadedServices = (services: ServiceType[]): void => {
+    loadedServices.current = services;
+  }
 
-  /**
-   * state of the dialog
-   */
-  const [open, setOpen] = useState<boolean>(false);
+  const setLoadedService = (service: ServiceType): void => {
+    loadedServices.current = [service];
+  }
 
-  /**
-   * the selected service for creating the statement for
-   */
-  const [selectedService, setSelectedService] = useState<string>();
+  const getLoadedServices = (): ServiceType[] => {
+    return loadedServices.current;
+  }
 
-  /**
-   * access level (allow or deny)
-   */
-  const access = useRef<string>(defaultAccess);
-
-  /**
-   * managed (true or false)
-   */
-  const managed = useRef<boolean>(false);
-
-  /**
-   * the services (and their actions, dempth = 1)
-   */
-  const services = useRef<ServiceType[]>([]);
   const [actionsData, setActionsData] = useState<Data[]>([]);
 
-  /**
-   * selected rows in format
-   * [{"id":"3","data":{"id":13,"name":"CreateOrder","createDate":"2025-01-08T13:09:23.744Z","updateDate":"2025-01-08T13:09:23.744Z","serviceId":6,"statementActionId":null}}]
-   */
+  const [loader, setLoader] = useState<boolean>(false);
+
+  const [selectedService, setSelectedService] = useState<string>();
+
+  const [open, setOpen] = useState<boolean>(false);
+  const handleDialogState = (state: boolean) => {
+      setOpen(state);
+  }
+
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
-  const servicesLoadedCallback = (data: ApiResponseType) => {
+  const access = useRef<string>(defaultAccess);
+  const setAccess = (_access: string): void => {
+    access.current = _access;
+  }
+  const getAccess = (): string => {
+    return access.current;
+  }
+
+  const managed = useRef<boolean>(false);
+  const setManaged = (_managed: boolean): void => {
+    managed.current = _managed;
+  }
+
+  const getManaged = (): boolean => {
+    return managed.current;
+  }
+
+  const serviceLoadedCallback = (data: ApiResponseType) => {
     if (data.status === 200) {
       const service: ServiceType = data.payload;
 
       logger.debug("CreateStatementDialog", "Services Loaded", js(service));
-      services.current = [service];
-      setActionsData(mapServiceActionsToData(services.current));
+      setLoadedService(service);
+
+      logger.debug("CreateStatementDialog", "Mapped Services", js(mapServiceActionsToData([service])));
+      setActionsData(mapServiceActionsToData([service]));
+      showToast("info", "Actions loaded");
     }
+
+    setLoader(false);
   }
 
   const resetAll = () => {
     access.current = defaultAccess;
     reset();
-    handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
+    setLoader(true);
+    handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, serviceLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }
 
   useEffect(() => {
-    resetAll();
+    if (open) {
+      logger.debug("SCD", "UseEffect[open]");
+
+      resetAll();
+    }
   }, [open]);
 
   useEffect(() => {
-    handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, servicesLoadedCallback);
-    setSelectedService(_service === 'All' ? defaultService.name : _service);
-  }, []);
+    logger.debug("SCD", "UseEffect[_service]");
 
-  useEffect(() => {
     setSelectedService(_service === 'All' ? defaultService.name : _service);
   }, [_service]);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
-
-  const handleDialogState = (state: boolean) => {
-      setOpen(state);
-  }
-
   const prepareCreateStatement = (data: any): StatementType | undefined => {
     if (selectedActions && selectedActions.length > 0) {
-      const _service = services.current.find(service => service.name === selectedService)!;
+      const _service = getLoadedServices().find(service => service.name === selectedService)!;
       const _actions = selectedActions.map(action => {return {id: action.id, name: action.name}});
 
       return {
@@ -124,7 +129,7 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
         sid: data.sid,
         description: data.description,
         permission: access.current,
-        managed: managed.current,
+        managed: getManaged(),
         actions: _actions,
         createDate: new Date(),
         updateDate: new Date(),
@@ -144,8 +149,13 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
   }
 
   const statementCreatedCallback = (data: ApiResponseType) => {
+    console.log("STATEMENT CREATED CALLBACK");
     if (data.status === 201) {
-      setReload((x:any) => x+1);
+      console.log("STATEMENT CREATED");
+      createHistory(createHistoryType("info", "Create", `Sattement created`, "Statement Details"));
+      // setReload((x: any) => x+1);
+      console.log("DO RELOAD");
+      setReload((x: any) => x+1);
     }
   };
 
@@ -165,98 +175,105 @@ const StatementCreateDialog = ({_service, _enabled = true, setReload}:{_service:
 
   const changeAccessValue = (value: string) => {
     logger.debug("CreateStatementDialog", `Access value changed`, value);
-    access.current = value;
+    setAccess(value);
   }
 
   const changeManaged = (checked: CheckedState) => {
     if (typeof checked === 'boolean') {
       logger.debug("CreateStatementDialog", `managed changed`, checked);
-      managed.current = checked;
+      setManaged(checked);
     }
   }
 
   const handleChangeService = (_service: string) => {
     logger.debug("CreateStatementDialog", `service changed`, _service);
     setSelectedService(_service);
-    handleLoadServiceByIdentifier(_service, servicesLoadedCallback);
+    handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
   }
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
   const renderDialog = () => {
     if (selectedService) {
-      return (
-        <Dialog open={open}>
-          <DialogTrigger asChild>
-            <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={handleDialogState} clickValue={true} />
-          </DialogTrigger>
-          <DialogContent className="min-w-[75%]" aria-describedby="">
-            <DialogHeader>
-              <DialogTitle>
-                <div className="flex space-x-2 items-center">
-                  <PageTitle title={`Create service statement for ${selectedService}`} className="m-2 -ml-[2px]"/>
-                  <EcafeLoader className={loader ? "" : "hidden"}/>
-                </div>
-                <Separator className="bg-red-500"/>
-              </DialogTitle>
-            </DialogHeader>
-            {!loader && 
-              <form onSubmit={handleSubmit(onSubmit)} className="form">
-                <div className="flex justify-between">
-                  <div>
-                    <div className="grid gap-2">
-                      <div className="grid grid-cols-6 items-center gap-2">
-                        <Label>Service</Label>
-                        <div className="ml-2">
-                          <ServiceSelect label="" defaultService={selectedService} handleChangeService={handleChangeService}/>
+        return (
+          <Dialog open={open}>
+            <DialogTrigger asChild>
+              <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={handleDialogState} clickValue={true} />
+            </DialogTrigger>
+              <DialogContent className="min-w-[75%]" aria-describedby="">
+                <DialogHeader>
+                  <DialogTitle>
+                    <div className="flex space-x-2 items-center">
+                      <PageTitle title={`Create service statement for ${selectedService}`} className="m-2 -ml-[2px]"/>
+                      <EcafeLoader className={loader ? "" : "hidden"}/>
+                    </div>
+                    <Separator className="bg-red-500"/>
+                  </DialogTitle>
+                </DialogHeader>
+                {!loader &&
+                  <form onSubmit={handleSubmit(onSubmit)} className="form">
+                    <div className="flex justify-between">
+                      <div>
+                        <div className="grid gap-2">
+                          <div className="grid grid-cols-6 items-center gap-2">
+                            <Label>Service</Label>
+                            <div className="ml-2">
+                              <ServiceSelect label="" defaultService={selectedService} handleChangeService={handleChangeService}/>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-6 items-center gap-2">
+                            <Label htmlFor="sid">SID</Label>
+                            <Input
+                              id="sid"
+                              placeholder="sid..."
+                              className="col-span-2 h-8"
+                              {...register("sid")}
+                            />
+                          </div>
+                          {errors.sid && 
+                            <span className="text-red-500">{errors.sid.message}</span>
+                          }
+
+                          <div className="grid grid-cols-6 items-center gap-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Input
+                              id="description"
+                              placeholder="description..."
+                              className="col-span-3 h-8"
+                              {...register("description")}
+                            />
+                          </div>
+                          {errors.description && 
+                            <span className="text-red-500">{errors.description.message}</span>
+                          }
+
+                          <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
+                            <Label>Access Level</Label>
+                            <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
+                            <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
+                            <Label className="ml-4" htmlFor="managed">Managed</Label>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-6 items-center gap-2">
-                        <Label htmlFor="sid">SID</Label>
-                        <Input
-                          id="sid"
-                          placeholder="sid..."
-                          className="col-span-2 h-8"
-                          {...register("sid")}
-                        />
-                      </div>
-                      {errors.sid && 
-                        <span className="text-red-500">{errors.sid.message}</span>
-                      }
-
-                      <div className="grid grid-cols-6 items-center gap-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Input
-                          id="description"
-                          placeholder="description..."
-                          className="col-span-3 h-8"
-                          {...register("description")}
-                        />
-                      </div>
-                      {errors.description && 
-                        <span className="text-red-500">{errors.description.message}</span>
-                      }
-
-                      <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
-                        <Label>Access Level</Label>
-                        <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
-                        <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
-                        <Label className="ml-4" htmlFor="managed">Managed</Label>
+                      <div className="space-y-1">
+                        <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && selectedActions.length > 0} type={"submit"}/>
+                        <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && selectedActions.length > 0} type={"submit"}/>
-                    <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={handleDialogState} clickValue={false}/>
-                  </div>
-                </div>
-              </form>
-            }
-            {actionsData &&
-              <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
-            }
-          </DialogContent>
-        </Dialog>
-      );
+                  </form>
+                }
+                {actionsData &&
+                  <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
+                }
+              </DialogContent>
+            </Dialog>
+        );
     } else {
       return null;
     }

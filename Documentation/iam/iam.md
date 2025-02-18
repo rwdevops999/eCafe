@@ -14,7 +14,7 @@
 ### overview
 1. [x] a list of statements is shown
 2. [x] for each statement we can view which actions are linked to it
-3. [ ] clicking on an action shows the services screen with the service selected
+3. [x] clicking on an action shows the services screen with the service selected
 4. [x] statements can be shown depending on their action (allowed or denied)
 5. [x] statements can be filtered
 6. [x] there should be an indication that the statement is managed

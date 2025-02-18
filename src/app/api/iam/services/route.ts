@@ -61,8 +61,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const paramService = searchParams.get('service');
     const paramDepth = searchParams.get('depth');
-    
-    console.log("[API] SERVICE", paramService, paramDepth);
+
     const apiResponse = createEmptyApiReponse();
 
     let depth = -1;

@@ -1,8 +1,8 @@
 "use client"
 
 import { Row, Table } from "@tanstack/react-table"
-import { Trash2 } from "lucide-react"
-import { action_delete } from "@/data/constants"
+import { PencilLine, Trash2 } from "lucide-react"
+import { action_delete, action_update } from "@/data/constants"
 import { Data } from "@/types/ecafe"
 
 interface DataTableRowActionsProps<TData> {
@@ -16,6 +16,7 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
 
   const handleDelete = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    console.log("HANDLE DELETE");
     const statement: Data = row.original as Data;
     const meta = table.options.meta;
     (meta && meta.handleAction ? meta.handleAction(action_delete, statement) : () => {});
@@ -23,7 +24,19 @@ export function DataTableRowActions<TData>({
     event.stopPropagation();
   }
 
+  const handleUpdate = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    console.log("HANDLE UPDATE");
+    const statement: Data = row.original as Data;
+    const meta = table.options.meta;
+    (meta && meta.handleAction ? meta.handleAction(action_update, statement) : () => {});
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   return (
-    <Trash2 className="cursor-pointer w-[16px] h-[16px]" onClick={(e) => handleDelete(e)}/>
+    <div className="flex space-x-2">
+      <Trash2 width={16} height={16} className="cursor-pointer" onClick={(e) => handleDelete(e)}/>
+        <PencilLine width={16} height={16} className="cursor-pointer" onClick={(e) => handleUpdate(e)}/>
+    </div>
   )
 }

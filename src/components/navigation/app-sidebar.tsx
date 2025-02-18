@@ -246,7 +246,7 @@ data.Resources.push(
             {
                 tkey: 'statements',
                 icon: Album,
-                url: "/iam/statements/service=*&sid=*",
+                url: "/iam/statements/sid=0",
             },
             {
                 tkey: 'services',

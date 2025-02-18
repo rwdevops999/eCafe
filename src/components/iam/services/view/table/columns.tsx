@@ -7,6 +7,8 @@ export const columns: ColumnDef<Data>[] = [
     {
       accessorKey: "name",
 
+      size: 1280,
+
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Actions" />
       ),

@@ -1,7 +1,7 @@
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, filterFns } from "@tanstack/react-table";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Data } from "@/types/ecafe";
 import { js } from "@/lib/utils";
@@ -11,8 +11,10 @@ export const columns: ColumnDef<Data>[] = [
     {
         accessorKey: 'name',
 
+        size: 300,
+
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Statements" />
+            <DataTableColumnHeader column={column} title="Statements"/>
         ),
 
         cell: ({row, getValue}) => {
@@ -33,11 +35,6 @@ export const columns: ColumnDef<Data>[] = [
                                     <ProgressLink className="text-blue-400 underline" href={`http://localhost:3000/iam/services/service=${row.original.other?.serviceId}`}>
                                         {row.original.name}
                                     </ProgressLink>
-                                    <Badge 
-                                            className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`}
-                                            variant="outline">
-                                                {row.original.other?.access}
-                                    </Badge>
                                 </>
                             ) : row.original.name}&nbsp;
                             {row.original.other?.managed ? 'Ⓜ️' : ''}
@@ -48,13 +45,53 @@ export const columns: ColumnDef<Data>[] = [
 
         filterFn: (row, id, value) => {
             console.log("FILTER", value, js(row));
-            return (value.includes(row.original.other?.access) || row.original.name.includes(value));
+            let included: boolean = true;
+            console.log("FILTER", "INCLUDED1", included);
+
+            if (row) {
+                included = row.original.name.includes(value);
+                console.log("FILTER", "INCLUDED2", included);
+
+                if (row.original.other && row.original.other.parent) {
+                    included = included || row.original.other.parent.includes(value);
+                    console.log("FILTER", "INCLUDED3", included);
+                }
+            }
+
+            return included;
+        },
+
+        footer: props => props.column.id,
+    },
+    {
+        accessorKey: 'access',
+
+        size: 200,
+
+        header: ({ column }) => (
+            <>Access Type</>
+        ),
+
+        cell: ({row, getValue}) => {
+            return ((row.depth === 0 ? 
+                <div>
+                    <Badge variant="outline" className={`ml-2 text-foreground/50 ${row.original.other?.access === 'Allow' ? 'text-green-500' : 'text-red-500'}`}>
+                        {row.original.other?.access}
+                    </Badge>
+                </div>
+            : null));
+        },
+
+        filterFn: (row, id, value) => {
+            return value.includes(row.original.other?.access);
         },
 
         footer: props => props.column.id,
     },
     {
         accessorKey: 'description',
+
+        size: 600,
 
         header: ({ column }) => (
             <>Description</>
@@ -72,14 +109,17 @@ export const columns: ColumnDef<Data>[] = [
             : null));
         },
 
-        filterFn: (row, id, value) => {
-            return value.includes(row.original.other?.access);
-        },
-
         footer: props => props.column.id,
     },
     {
         id: "actions",
+
+        size: 100,
+
+        header: ({ column }) => (
+            <>Action</>
+        ),
+
 
         cell: ({ table, row }) => {
             return (
