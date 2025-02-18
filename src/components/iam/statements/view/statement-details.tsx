@@ -11,15 +11,16 @@ import { TableMeta } from "@tanstack/react-table";
 import { DataTableToolbar } from "./table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
 import AlertMessage from "@/components/ecafe/alert-message";
-import { action_delete, allItems } from "@/data/constants";
+import { action_delete } from "@/data/constants";
 import { AlertType, Data, ServiceType, StatementType } from "@/types/ecafe";
 import { mapStatementsToData, mapStatementToDataArray } from "@/lib/mapping";
-import { createHistoryType, isNumber, js, showToast } from "@/lib/utils";
+import { createHistoryType, js, showToast } from "@/lib/utils";
 import { createHistory, handleDeleteStatement, handleLoadServices, handleLoadStatementById, handleLoadStatements, handleLoadStatementsByServiceId } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
 import { ApiResponseType } from "@/types/db";
+import { boolean } from "zod";
 
 const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
@@ -64,6 +65,15 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   }
 
   const [alert, setAlert] = useState<AlertType>();
+
+  const selectedStatementId = useRef<number|undefined>(undefined);
+  const setSelectedStatementId = (_statementId : number|undefined): void => {
+    selectedStatementId.current = _statementId;
+  }
+
+  const getSelectedStatementId = (): number|undefined => {
+    return selectedStatementId.current;
+  }
 
   const servicesLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
@@ -193,6 +203,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
     setAlert(undefined);
   }
 
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+
   const handleAction = (action: string, statement: Data) => {
     console.log("StatementDetails", "Delete?", js(statement));
     if (action === action_delete) {
@@ -220,6 +232,9 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
       }
     } else {
       console.log(`UPDATE ${statement.id}`);
+      setSelectedStatementId(statement.id);
+
+      setOpenDialog(true);
     }
   }
 
@@ -244,7 +259,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
           {!loader && 
             <div className="flex items-center justify-between p-5">
               <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/>
-              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} /> 
+              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} openDialog={openDialog} statementId={getSelectedStatementId()}/> 
             </div>
           }
         <div className="block space-y-5">
