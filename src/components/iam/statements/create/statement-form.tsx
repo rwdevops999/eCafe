@@ -37,7 +37,7 @@ const StatementForm = (props: FormProps) => {
   const {reset, handleSubmit, register, formState: {errors}, setValue} = formMethods;
 
   useEffect(() => {
-    logger.debug("StatementForm", "useEffect[props.statement]", "Reset");
+    logger.debug("StatementForm", "useEffect[props.statement]", "Reset", js(props.statement));
     reset(props.statement);
 
   }, [props.statement]);

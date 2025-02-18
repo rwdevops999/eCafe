@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Row } from "@tanstack/react-table"
-import { Data, ServiceType, StatementType } from "@/types/ecafe";
+import { Data, ServiceType, StatementActionType, StatementType } from "@/types/ecafe";
 import { mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
 import { createHistory, handleCreateStatement, handleLoadServiceByIdentifier, handleLoadStatementById } from "@/lib/db";
@@ -36,7 +36,8 @@ const StatementCreateDialog = (
     _enabled = true, 
     setReload,
     openDialog = false,
-    statementId = undefined
+    statementId = undefined,
+    setDialogState,
   }
   :
   {
@@ -44,11 +45,14 @@ const StatementCreateDialog = (
     _enabled?:boolean; 
     setReload(x: any): void;
     openDialog?: boolean;
-    statementId?: number|undefined
+    statementId?: number|undefined,
+    setDialogState: (b: boolean) => void,
   }) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
+  logger.debug("SCD", "IN", openDialog);
+  
   const loadedServices = useRef<ServiceType[]>([]);
   const setLoadedServices = (services: ServiceType[]): void => {
     loadedServices.current = services;
@@ -67,11 +71,6 @@ const StatementCreateDialog = (
   const [loader, setLoader] = useState<boolean>(false);
 
   const [selectedService, setSelectedService] = useState<string>(defaultService.name);
-
-  const [open, setOpen] = useState<boolean>(false);
-  const handleDialogState = (state: boolean) => {
-      setOpen(state);
-  }
 
   const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
@@ -108,8 +107,18 @@ const StatementCreateDialog = (
   }
 
   const resetAll = () => {
+    console.log("RESET ALL");
     access.current = defaultAccess;
-    // reset();
+
+    setActiveStatement({
+      sid: "",
+      access: defaultAccess,
+      managed: false,
+      description: "",
+      statementId: undefined,
+      serviceName: selectedService,
+    });
+
     setLoader(true);
     handleLoadServiceByIdentifier(_service === 'All' ? defaultService.name : _service, serviceLoadedCallback);
     setSelectedService(_service === 'All' ? defaultService.name : _service);
@@ -121,13 +130,19 @@ const StatementCreateDialog = (
     managed: false,
     description: "",
     statementId: undefined,
-    serviceName: selectedService
+    serviceName: selectedService,
   });
 
+  const [selectedStatement, setSelectedStatement] = useState<StatementType|undefined>(undefined);
+
   const statementLoadedCallback = (_data: ApiResponseType): void => {
+    logger.debug("SCD", "statementLoadedCallback", js(_data));
     if (_data.status === 200) {
       const statement: StatementType = _data.payload;
 
+      setSelectedStatement(statement);
+
+      logger.debug("SCD", "setActiveStatement", js(_data));
       setActiveStatement({
         statementId: statement.id,
         sid: statement.sid,
@@ -139,21 +154,27 @@ const StatementCreateDialog = (
     }
   }
 
+  const getStatementActionsId = (): number[] => {
+    let actionIds: number[] = [];
+    if (selectedStatement && selectedStatement.actions) {
+      actionIds = selectedStatement.actions.map((action: StatementActionType) => action.id)
+    }
+
+    return actionIds;
+  }
+
   useEffect(() => {
-    if (open) {
-      logger.debug("SCD", "UseEffect[open]");
+    logger.debug("SCD", "useEffect[openDialog]");
+    if (openDialog) {
+      logger.debug("SCD", "UseEffect[openDialog]", statementId);
 
       if (statementId) {
+        logger.debug("SCD", "LoadStatementById", statementId);
         handleLoadStatementById(statementId, statementLoadedCallback);
       }
 
+      logger.debug("SCD", "useEffect[openDialog]", "Resetting");
       resetAll();
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (openDialog) {
-      setOpen(true);
     }
   }, [openDialog]);
 
@@ -212,7 +233,7 @@ const StatementCreateDialog = (
     if  (statement) {
       logger.debug("CreateStatementDialog", `Statement ${statement.sid} created`, JSON.stringify(entity));
       handleCreateStatement(statement, statementCreatedCallback);
-      handleDialogState(false);
+      setDialogState(false);
     }
   }
 
@@ -238,12 +259,17 @@ const StatementCreateDialog = (
     handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
   }
 
+  const startCreation = (openDialog: boolean) => {
+    resetAll();
+    setDialogState(openDialog);
+  }
+
   const renderDialog = () => {
     if (selectedService) {
         return (
-          <Dialog open={open}>
+          <Dialog open={openDialog}>
             <DialogTrigger asChild>
-              <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={handleDialogState} clickValue={true} />
+              <EcafeButton id="trigger" caption="Create statement" enabled={_enabled} clickHandler={startCreation} clickValue={true} />
             </DialogTrigger>
               <DialogContent className="min-w-[75%]" aria-describedby="">
                 <DialogHeader>
@@ -256,10 +282,10 @@ const StatementCreateDialog = (
                   </DialogTitle>
                 </DialogHeader>
                 {!loader &&
-                  <StatementForm statement={activeStatement} cancelFn={handleDialogState} submitFn={onSubmit} serviceChangeFn={handleChangeService} enabledOkButton={selectedActions.length > 0}/>
+                  <StatementForm statement={activeStatement} cancelFn={setDialogState} submitFn={onSubmit} serviceChangeFn={handleChangeService} enabledOkButton={selectedActions.length > 0}/>
                 }
                 {actionsData &&
-                  <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar}/>
+                  <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar} selectedItems={getStatementActionsId()}/>
                 }
               </DialogContent>
             </Dialog>

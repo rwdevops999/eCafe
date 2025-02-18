@@ -26,6 +26,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
+  console.log("SD IN");
+
   const loadedStatements = useRef<StatementType[]>([]);
   const setLoadedStatements = (_statements: StatementType[]): void => {
     loadedStatements.current = _statements;
@@ -206,8 +208,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleAction = (action: string, statement: Data) => {
-    console.log("StatementDetails", "Delete?", js(statement));
     if (action === action_delete) {
+      console.log("StatementDetails", "Delete?", js(statement));
       if (statement.other?.managed) {
         const alert = {
           open: true,
@@ -234,8 +236,16 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
       console.log(`UPDATE ${statement.id}`);
       setSelectedStatementId(statement.id);
 
+      console.log("OPEN DIALOG");
       setOpenDialog(true);
     }
+  }
+
+  const closeDialog = () => {
+    console.log("SD: Close Dialog", openDialog);
+
+    console.log("CLOSE DIALOG");
+    setOpenDialog(false);
   }
 
   const meta: TableMeta<Data[]> = {
@@ -243,6 +253,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   };
 
   const renderComponent = () => {
+    console.log("SD RENDER", openDialog);
+
     if (alert && alert.open) {
         return (<AlertMessage alert={alert}></AlertMessage>)
     }
@@ -259,7 +271,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
           {!loader && 
             <div className="flex items-center justify-between p-5">
               <ServiceSelect defaultService={getSelectedServiceName()} forceAll={true} handleChangeService={handleChangeService}/>
-              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} openDialog={openDialog} statementId={getSelectedStatementId()}/> 
+              <StatementCreateDialog _service={getSelectedServiceName()} _enabled={statementsLoaded.current} setReload={setReload} openDialog={openDialog} setDialogState={setOpenDialog} statementId={getSelectedStatementId()}/> 
             </div>
           }
         <div className="block space-y-5">

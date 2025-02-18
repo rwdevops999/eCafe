@@ -112,7 +112,7 @@ export const handleLoadStatements = async (_callback: CallbackFunctionWithParam)
 }
 
 const loadStatementsById = async (_sid: number|undefined, _callback: CallbackFunctionWithParam): Promise<void> => {
-  await fetch("http://localhost:3000/api/iam/statements/id/id=" + _sid)
+  await fetch("http://localhost:3000/api/iam/statements/id?id=" + _sid)
     .then((response: Response) => response.json())
     .then((response: ApiResponseType) => {_callback(response);})
     .catch((error: any) => console.log("loadStatements", `ERROR loading the statement`, js(error)));
