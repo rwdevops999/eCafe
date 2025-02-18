@@ -26,22 +26,17 @@ const History = () => {
     const [mappedHistory, setMappedHistory] = useState<HistoryData[]>([]);
 
     const historyLoadedCallback = (_data: ApiResponseType): void => {
-        logger.debug("History", "historyLoadedCallback", js(_data));
         if (_data.status === 200) {
-            logger.debug("History", "historyLoadedCallback", "History Loaded");
             const history: HistoryType[] = _data.payload;
 
             setMappedHistory(mapHistoryToData(history));
             showToast("info", "History loaded");
-        } else {
-             logger.debug("History", "tasksLoadedCallback", "Error", _data.payload);
         }
 
         setLoader(false);
     }
 
     useEffect(() => {
-        logger.debug("History", "UserEffect[]", Date.now());
         setLoader(true);
         handleLoadHistory(historyLoadedCallback);
     }, []);

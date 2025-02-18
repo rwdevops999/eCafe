@@ -33,18 +33,13 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
       checked = checked.toLowerCase() === "true";
     }
 
-    logger.debug("LogonSection", "CHECKBOX = " + checked);
-
     if (checked) {
-      logger.debug("LogonSection", "UNREGISTER");
-
       passwordRef.current = getValues("password");
 
       setValue("password", "--------");
       // unregister(["password"]);
       setSelectedTrigger("passwordless");
     } else {
-      logger.debug("LogonSection", "REGISTER");
       if (passwordRef.current !== "") {
         setValue("password", passwordRef.current);
       }
@@ -59,13 +54,10 @@ const LogonSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>}
   useEffect(() => {
     register("password");
 
-    logger.debug("LogonSection", "LOGON SECTION UE[]", getValues("passwordless"));
     handlePasswordless(getValues("passwordless"));
   }, [])
 
   const renderComponent = () => {
-
-    logger.debug("LogonSection", "RENDER", getValues("email"), getValues("password"));
 
     return (
       <Card className="border-stone-500">

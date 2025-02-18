@@ -38,8 +38,6 @@ import { js } from "@/lib/utils";
     
     const policyLoadedCallback = (data: ApiResponseType) => {
         if (data.status === 200) {
-            logger.debug("PolicyDetails", "policyLoadedCallback", js(data));
-            
             const policy: PolicyType = data.payload;
 
             setPolicy(policy);

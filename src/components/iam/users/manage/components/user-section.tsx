@@ -21,19 +21,15 @@ const UserSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType>})
   const [reload, setReload] = useState<number>(0);
 
   const handleChangeBlocked = (checked: boolean|string) => {
-    logger.debug("UserSection", "BLOCKED = " + checked);
     if (typeof checked === "string") {
       checked = checked.toLowerCase() === "true";
     }
-
-    logger.debug("UserSection", "SET BLOCKED = " + checked);
 
     setValue("blocked", checked);
     setReload((x: number) => x+1);
   }
 
   const renderComponent = () => {
-    logger.debug("UserSection", "RENDER", getValues("password"));
     
     return (
       <Card className="border-stone-500">

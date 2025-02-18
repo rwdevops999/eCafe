@@ -23,7 +23,6 @@ const DbcTasks = ({className = ""}:{className?:string}) => {
 
   const [tasksData, setTasksData] = useState<TaskData[]>([]);
   const tasksLoadedCallback = (_data: ApiResponseType) => {
-    logger.debug("DbcTask", "tasks loaded", JSON.stringify(_data));
     if (_data.status === 200) {
       const tasks: TaskType[] = _data.payload;
       

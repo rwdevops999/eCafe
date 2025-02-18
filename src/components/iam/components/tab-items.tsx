@@ -28,14 +28,11 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
     const getNrOfItemsToValidate = () => {
         if (_meta) {
             const itemsToValidate: number = _meta.control.calculateValidationItems();
-            logger.debug("TabItems", "ItemsToValidate", itemsToValidate);
             setNrOfItemsToValidate(itemsToValidate);
         }
     }
 
     useEffect(() => {
-        logger.debug("TabItems", "UseEffect[]");
-
         if (_meta) {
             const _dependencies: CombinedType[] = _meta.subject.getAllDependencies();
             dependencies.current = _dependencies;
@@ -50,24 +47,19 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
     };
 
     const handleChangeSelection = (selection: Row<Data>[]) => {
-        logger.debug("TabItems", "handleChangeSelection", JSON.stringify(selection));
-
         if (_meta) {
             const selectedItemIds: number[] = selection.map((row) => row.original.id);
-            logger.debug("TabItems", "handleChangeSelection: selectedItemIds", JSON.stringify(selectedItemIds));
 
             const selectedItems: CombinedType[] = selectedItemIds.map((id) => {
                 return dependencies.current.find((d) => d.id === id)!;
             })
 
-            logger.debug("TabItems", "handleChangeSelection: selectedItems", JSON.stringify(selectedItems));
             _meta.control.setSelection(_meta.subject.dependency, selectedItems);
             getNrOfItemsToValidate();
         }
     }
 
     const getSelectedItemIds = (): number[] => {
-        logger.debug("TabItems", "handleGetSelection -> IDS");
         let result: number[] = [];
 
         if (_meta) {
@@ -77,14 +69,10 @@ const TabItems = ({_meta, _buttonConfig}:{_meta: MetaBase|undefined; _buttonConf
             }
         }
 
-        logger.debug("TabItems", "handleGetSelection: IDS", result, true);
-
         return result;
     }
 
     const renderComponent = () => {
-        logger.debug("TabItems", "RENDER");
-        
         return (
             <>
                 <PageTitle className="m-2" title={_meta ? _meta.subject.name : ""} />

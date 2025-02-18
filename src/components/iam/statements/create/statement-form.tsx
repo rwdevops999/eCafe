@@ -29,7 +29,6 @@ const StatementForm = (props: FormProps) => {
 
   const formMethods = useForm({
     defaultValues: useMemo(() => {
-      logger.debug("SF", "statement has changed");
       return props.statement;
     }, [props])
   });

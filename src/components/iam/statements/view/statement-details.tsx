@@ -98,12 +98,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   }
 
   const statementsLoadedCallback = (_data: ApiResponseType, _serviceName: string|undefined): void => {
-    logger.debug("StatementDetails", "statementsLoadedCallback", js(_data), _serviceName);
     if (_data.status === 200) {
       const statements: StatementType[] = _data.payload;
-      logger.debug("StatementDetails", "statementsLoadedCallback", js(statements));
-
-      logger.debug("StatementDetails", "statementsLoadedCallback", "serviceName", _serviceName);
       if (_serviceName) {
         setSelectedServiceName(_serviceName);
       } else {
@@ -111,7 +107,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
       }
 
       setLoadedStatements(statements);
-      logger.debug("StatementDetails", "statementsLoadedCallback", "PRE MAPPING", js(statements));
       setStatementData(mapStatementsToData(statements));
       showToast("info", "Statements loaded");
 
@@ -122,9 +117,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   }
 
   useEffect(() => {
-    logger.debug("StatementDetails", "UseEffect[]", Date.now());
     if (_statementId) {
-      logger.debug("StatementDetails", "UseEffect[]", "Selected statement id", _statementId);
       setLoader(true);
       handleLoadStatementById(_statementId, statementLoadedCallback)
     } else {
@@ -136,13 +129,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   }, []);
 
   useEffect(() => {
-    logger.debug("StatementDetails", "UseEffect[reload]", Date.now());
-      logger.debug("StatementDetails", "UseEffect[reload]", Date.now());
-
-      logger.debug("StatementDetails", "UseEffect[selectedServiceName]", getSelectedServiceName());
-      logger.debug("StatementDetails", "UseEffect[loadedServices]", js(getLoadedServices()));
      const service: ServiceType|undefined = getLoadedServices().find((_service) => _service.name === getSelectedServiceName());
-      logger.debug("StatementDetails", "UseEffect(service)]", service);
       if (service) {
         setLoader(true);
         handleLoadStatementsByServiceId(service.id, statementsLoadedCallback);
@@ -152,8 +139,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   }, [reload, setReload]);
 
   const handleChangeService = (_service: string) => {
-    logger.debug("StatementDetails", "Service changed", _service);
-
     setLoader(true);
 
     const service: ServiceType|undefined = getLoadedServices().find((service) => service.name === _service);
@@ -182,7 +167,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
       const statement = getLoadedStatements().find(s => s.id === _statement.id);
       if (statement && statement.policies) {
-        logger.debug("StatementDetails", "Statement is in a policy", _statement.name);
         if (statement.policies.length > 0) {
           alert.open = true;
           alert.error = true;
@@ -196,7 +180,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
   // // /** for admin only later on */
   const handleDeleteManagedStatement = (statement: Data) => {
-    logger.debug("StatementDetails", `Forcing deleting managed statement ${statement.name}`);
     handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
     setAlert(undefined);
   }

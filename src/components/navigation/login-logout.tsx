@@ -20,7 +20,6 @@ const LoginLogout = ({className}:{className?:string}) => {
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
     
     const doLogin = () => {
-        logger.debug("LoginLogout", "Logging In");
         router.push("/login/main");
     }
 

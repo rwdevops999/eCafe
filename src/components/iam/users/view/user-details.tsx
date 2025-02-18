@@ -26,8 +26,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
 
     const [loader, setLoader] = useState<boolean>(false);
 
-  logger.debug("UserDetails", "IN(_selectedUser)", _selectedUser);
-
   const [reloadState, setReloadState] = useState<number>(0);
   const [rerender, setRerender] = useState<number>(0);
 
@@ -39,14 +37,12 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   const metaUserDetails = useRef<Meta>(initUserMeta);
 
   const setSelectedUser = (_user: UserType|undefined) => {
-    logger.debug("UserDetails", "setSelectedUser => META currentSubject", JSON.stringify(_user));
     metaUserDetails.current.currentSubject = _user;
   }
 
   const usersLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
       const users: UserType[] = _data.payload;
-      logger.debug("UserDetails", "usersLoadedCallback", js(users));
 
       usersRef.current = users;
 
@@ -61,10 +57,7 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleDialogState = (open: boolean) => {
-    logger.debug("UserDetails", "handleDialogState(open)", open);
     if (! open) {
-      logger.debug("UserDetails", "handleDialogState", "Set user to undefined");
-
       setSelectedUser(undefined);
     }    
 
@@ -72,7 +65,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   useEffect(() => {
-    logger.debug("UserDetails", "USE EFFECT[] => META handleDialogState");
     metaUserDetails.current.control.handleDialogState = handleDialogState;
 
     setLoader(true);
@@ -80,8 +72,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }, []);
 
   useEffect(() => {
-    logger.debug("UserDetails", "LOAD USERS AFTER RELOAD");
-
     setLoader(true);
     handleLoadUsers(usersLoadedCallback);
   }, [reloadState, setReloadState]);
@@ -95,15 +85,11 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
   }
 
   const handleAction = (_action: string, _user: Data) => {
-    logger.debug("UserDetails", "handleAction", _action);
     if (_action === action_delete) {
-      logger.debug("UserDetails", "handleAction", "see VSCODE terminal for API messages");
       handleDeleteUser(_user.id, userDeletedCallback);
     } else {
-      logger.debug("UserDetails", "handleAction", _user);
       const selectedUser: UserType = usersRef.current.find((user) => user.id === _user.id)!;
       setSelectedUser(selectedUser);
-      logger.debug("UserDetails", "changeDialogState => true");
       setDialogState(true);
     }
   }
@@ -114,9 +100,6 @@ const UserDetails = ({_selectedUser}:{_selectedUser: string | undefined}) => {
 
   const renderComponent = () => {
     if  (usersDataRef && metaUserDetails) {
-      logger.debug("UserDetails", "RENDER");
-      logger.debug("UserDetails", ">>> dialogState", dialogState);
-
       return (
         <div>
           <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "users", url: "/iam/users"}]} />

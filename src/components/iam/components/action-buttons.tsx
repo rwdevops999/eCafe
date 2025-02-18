@@ -12,9 +12,6 @@ const ActionButtons = ({buttonConfig, meta, nrOfItemsToValidate}:{buttonConfig:B
   
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-    logger.debug("ActionButtons", "IN", nrOfItemsToValidate);
-    logger.debug("ActionButtons", "IN", "HIDDEN", (nrOfItemsToValidate <= 1));
-
     const [valid, setValid] = useState<boolean>(false);
 
     const closeDialog = (_dummy: boolean) => {

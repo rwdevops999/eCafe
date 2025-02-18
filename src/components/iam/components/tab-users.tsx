@@ -24,8 +24,6 @@ const TabUsers = ({_meta}:{_meta: MetaBase}) => {
 
   const usersLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
-      logger.debug("TabUsers", "usersLoadedCallback", JSON.stringify(_data));
-
       const users: UserType[] = _data.payload;
 
       allUsers.current = users;
@@ -43,14 +41,10 @@ const TabUsers = ({_meta}:{_meta: MetaBase}) => {
   }
   
    const getAllUsers = (): UserType[] => {
-     logger.debug("TabUsers", "getAllUsers", JSON.stringify(allUsers.current));
- 
      return allUsers.current;
    }
  
    useEffect(() => {
-     logger.debug("TabUsers", "useEffect[]", "Loading Users");
- 
      handleLoadUsers(usersLoadedCallback);
    }, [])
  

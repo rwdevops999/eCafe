@@ -43,10 +43,6 @@ const LoginPassword = () => {
 
   const userId = searchParams.get("userId");
 
-  if (userId) {
-    logger.debug("LoginPassword", "userId", userId);
-  }
-
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const setDialogState = (state: boolean): void => {
       setOpenDialog(state);
@@ -75,7 +71,6 @@ const LoginPassword = () => {
   const dialogDataRef = useRef<any>(undefined);
   
   const handleAttempsExceeded = () => {
-    logger.debug("LoginPassword", "Password login attemps exceed", "Show notification");
     dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
     dialogMessageRef.current = "Too many retries. User blocked. Contact your administrator.";
     dialogButtonsRef.current = {leftButton: "Cancel"};
@@ -84,7 +79,6 @@ const LoginPassword = () => {
   }
 
   const handleInvalidPassword = (attemps: number) => {
-    logger.debug("LoginPassword", "Password invalid", "Show notification");
     dialogTitleRef.current = `Invalid password (attemp ${attemps+1}/${MaxLoginAttemps})`;
     dialogMessageRef.current = "Password incorrect. Retry Login again?";
     dialogButtonsRef.current = {leftButton: "Cancel", rightButton: "Retry"};
@@ -100,7 +94,6 @@ const LoginPassword = () => {
 }
 
   useEffect(() => {
-      logger.debug("LoginPassword", "useEffect[]", userId);
       focusToPasswordInput();
   }, []);
 
@@ -108,13 +101,11 @@ const LoginPassword = () => {
 
   const userLoadedOnEntryCallback = (data: ApiResponseType) => {
     if (data.status === 200) {
-      logger.debug("LoginPassword", "User loaded on entry", userId);
       user.current = data.payload; 
     }
   }
 
   useEffect(() => {
-    logger.debug("LoginPassword", "useEffect[userId]", userId);
     if (userId) {
       handleLoadUserById(parseInt(userId), userLoadedOnEntryCallback);
     }      
@@ -125,7 +116,6 @@ const LoginPassword = () => {
   const [retry, setRetry] = useState<number>(0);
 
   useEffect(() => {
-    logger.debug("LoginPassword", "useEffect[retry]", retry);
     setValue("password", "");
     focusToPasswordInput();
   }, [retry]);
@@ -134,15 +124,11 @@ const LoginPassword = () => {
     if (data.status === 200) {
       const user: UserType = data.payload;
 
-      logger.debug("LoadPassword", "User found", js(user));
-
       if (user.password === getValues("password")) {
-        logger.debug("LoadPassword", "Password correct => user is OK");
         createHistory(createHistoryType("info", "Valid login", `${user.email} logged in as authorized`, "Login[Password]"));
         login(user);
         redirect("/dashboard")
       } else {
-        logger.debug("LoadPassword", "Password incorrect => user is NOK");
         const attemps: number = user.attemps + 1;
 
         const _user: ExtendedUserType = {
@@ -161,11 +147,8 @@ const LoginPassword = () => {
           groups: {}
         }
 
-        logger.debug("LoadPassword", "Attemps = ", attemps);
-
         if (attemps >= MaxLoginAttemps) {
           _user.blocked = true;
-          logger.debug("LoadPassword", "Too many login tries => block user", attemps);
           createHistory(createHistoryType("action", "Invalid login", `${user.email} will be blocked (too many attemps)`, "Login[Password]"));
           handleUpdateUser(_user, ()=>{});
 
@@ -177,47 +160,37 @@ const LoginPassword = () => {
               status: "open"
           }
           
-          logger.debug("LoginPassword", "userLoadedCallback", "Create Task", JSON.stringify(task));
           createHistory(createHistoryType("action", "Task created", `Unblock ${user.email}`, "Login[Password]"));
           createTask(task, () => {});
           
           handleAttempsExceeded();          
         } else {
-          logger.debug("LoadPassword", "Login failed => updating attemps", attemps);
           handleUpdateUser(_user, ()=>{});
           createHistory(createHistoryType("action", "User updated", `Attemps adjusted`, "Login[Password]"));
           handleInvalidPassword(user.attemps);
         }
       }
-    } else {
-      logger.debug("LoadPassword", "User not found", "Status code 404");
     }
   }
 
   const cancelDialogAndRedirect = (url: string) => {
-    logger.debug("LoginPassword", "Close dialog and redirect", url);
     setDialogState(false);
     redirect(url);
   }
   
   const handleCancelLogin = () => {
-    logger.debug("LoginPassword", "handleCancelLogin");
     cancelDialogAndRedirect("/");
   }
 
   const handleRetryLogin = () => {
-    logger.debug("LoginPassword", "handleRetryLogin");
     setRetry((x: number) => x+1);
     cancelDialogAndRedirect("/login/password?userId="+userId);
   }
 
   const onSubmit = (data: any) => {
-    logger.debug("LoginPassword", "onSubmit Login Form: ");
     if (user.current) {
-      logger.debug("LoginPassword", "user already loaded continue working with it");
       userLoadedCallback({status: 200, payload: user.current});
     } else if (userId) {
-      logger.debug("LoginPassword", "user not yet loaded -> load user with userId", userId);
       handleLoadUserById(parseInt(userId), userLoadedCallback);
     }
   }

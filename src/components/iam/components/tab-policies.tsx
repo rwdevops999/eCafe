@@ -26,7 +26,6 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
  
   const policiesLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
-       logger.debug("TabPolicies", "policiesLoadedCallback", js(_data));
  
      allPolicies.current = _data.payload;
  
@@ -43,21 +42,14 @@ const TabPolicies = ({_meta}:{_meta: MetaBase}) => {
   }
  
    const getAllPolicies = (): PolicyType[] => {
-     logger.debug("TabPolicies", "getAllPolicies", JSON.stringify(allPolicies.current));
- 
      return allPolicies.current;
    }
  
    useEffect(() => {
-     logger.debug("TabPolicies", "useEffect[]", "Loading Policies");
- 
      handleLoadPolicies(policiesLoadedCallback);
    }, [])
  
    const renderComponent = () => {
-      logger.debug("TabPolicies", "RENDER")
-      logger.debug("TabPolicies", "RENDER", "because meta is set");
-
       return (
         <TabItems _meta={metaOfTabPolicies} _buttonConfig={actionButtons.current}/>
       );

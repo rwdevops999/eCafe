@@ -33,9 +33,6 @@ const LoginOTP = () => {
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
   const otpId = searchParams.get("otpId");
-  if (otpId) {
-    logger.debug("LoginOTP", "OTP Login", otpId);
-  }
 
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
@@ -61,7 +58,6 @@ const LoginOTP = () => {
   const dialogDataRef = useRef<any>(undefined);
   
   const handleInvalidOtpCode = (attemps: number) => {
-    logger.debug("LoginOTP", "OTP code invalid", "Show notification");
     dialogTitleRef.current = `Invalid OTP code (attemp ${attemps+1}/${MaxLoginAttemps})`;
     dialogMessageRef.current = "OTP code incorrect. Retry Login or OTP again?";
     dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Back to Login", rightButton: "Retry OTP"};
@@ -70,7 +66,6 @@ const LoginOTP = () => {
   }
 
   const handleAttempsExceeded = () => {
-    logger.debug("LoginOTP", "OTP login attemps exceed", "Show notification");
     dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
     dialogMessageRef.current = "Too many retries. Retry Login ?";
     dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry Login"};
@@ -79,7 +74,6 @@ const LoginOTP = () => {
   }
 
   const handleAccountBlocked = () => {
-    logger.debug("LoginOTP", "OTP Account is blocked", "Show notification");
     dialogTitleRef.current = `Attemps exceeded ${MaxLoginAttemps}`;
     dialogMessageRef.current = "Your cccount is blocked. Contact your admin.";
     dialogButtonsRef.current = {leftButton: "Cancel"};
@@ -108,14 +102,12 @@ const LoginOTP = () => {
   const userLoadedOnEntryCallback = (data: ApiResponseType) => {
     if (data.status === 200) {
       user.current = data.payload; 
-      logger.debug("LoginPassword", "User loaded on entry", data.payload.id);
     }
   }
 
   const otpLoadedOnEntryCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
       const otpData: OtpType = _data.payload;
-      logger.debug("LoginPassword", "Otp loaded on entry", otpData.id);
 
       otp.current = otpData;
       handleLoadUserById(otpData.userId!, userLoadedOnEntryCallback)
@@ -135,15 +127,10 @@ const LoginOTP = () => {
   }, [retry]);
 
   const userLoadedCallback = (data: any) => {
-    logger.debug("LoginOTP", "OTP login login success", "data", JSON.stringify(data));
-
     if (data.status === 200) {
-      logger.debug("LoginOTP", "userLoadedCallback", "user found -> set user", JSON.stringify(data.payload));
       createHistory(createHistoryType("info", "Valid login", `${data.email} logged in as authorised.`, "Login[OTP]"));
       login(data.payload);
       redirect("/dashboard")
-    } else {
-      logger.debug("LoginOTP", "userLoadedCallback", "user not found -> ERROR");
     }
   }
 
@@ -157,7 +144,6 @@ const LoginOTP = () => {
       attemps: 0,
       blocked: false
     }
-    logger.debug("LoginOTP", "OTP login as guest", "set user", JSON.stringify(user));
 
     createHistory(createHistoryType("info", "Valid login", `${_email} logged in as guest.`, "Login[OTP]"));
     login(user);
@@ -165,15 +151,10 @@ const LoginOTP = () => {
   }
 
   const otpLoadedCallback = (_data: ApiResponseType) => {
-    logger.debug("LoginOTP", "otpLoadedCallback", js(_data));
     if (_data.status === 200) {
       const otp: OtpType = _data.payload;
 
-      logger.debug("LoginOTP", "otpLoadedCallback", "entered value = ", js(getValues("otpcode")));
-      logger.debug("LoginOTP", "otpLoadedCallback", "stored OTP = ", js(otp));
-
       if (otp.OTP !== getValues("otpcode")) {
-        logger.debug("LoginOTP", "otpLoadedCallback", "OTP invalid");
         createHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
 
         otp.attemps++;
@@ -210,7 +191,6 @@ const LoginOTP = () => {
                 status: "open"
             }
                     
-            logger.debug("LoginPassword", "userLoadedCallback", "Create Task", js(task));
             createHistory(createHistoryType("action", "Task created", `Unblock ${user.current.email}`, "Login[Password]"));
             createTask(task, () => {});
           
@@ -219,15 +199,12 @@ const LoginOTP = () => {
             handleAttempsExceeded();
           }
         } else {
-          logger.debug("LoginOTP", "otpLoadedCallback", "Update attemps");
-
           createHistory(createHistoryType("info", "Invalid login", `${getValues("otpcode")} doesn't match ${otp.OTP}.`, "Login[OTP]"));
           handleInvalidOtpCode(otp.attemps);
         }
       } else {
         if (otp.used) {
           createHistory(createHistoryType("info", "Invalid login", `${otp.OTP} was already used for ${otp.email}.`, "Login[OTP]"));
-          logger.debug("LoginOTP", "otpLoadedCallback", "OTP code already used", "Show notification");
           dialogTitleRef.current = `OTP code invalid`;
           dialogMessageRef.current = "OTP code already used. Retry Login?";
           dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry"};
@@ -237,64 +214,47 @@ const LoginOTP = () => {
           otp.used = true;
           handleUpdateOtp(otp, ()=>{});
 
-          logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid");
           if (user.current) {
-            logger.debug("LoginOTP", "otpLoadedCallback", "user already loaded: use it", user.current.id);
             userLoadedCallback({status: 200, payload: user.current});
           } else if (otp.userId && otp.userId > 0) {
-            logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "Load User", otp.userId);
             handleLoadUserById(otp.userId, userLoadedCallback);
           } else {
-            logger.debug("LoginOTP", "otpLoadedCallback", "OTP valid", "No User => Guest", otp.email);
             setGuest(otp.email);
           }
         }
       }
-    } else {
-      logger.debug("LoginOTP", "otpLoadedCallback", "OTP not found (404)");
     }
   };
 
   const handleOTPLogin = () => {
-    logger.debug("LoginOTP", "handleOTPLogin");
-
     if (otpId) {
-      logger.debug("LoginOTP", "Load OTP with id", otpId);
       handleLoadOTP(otpId, otpLoadedCallback);
     }
   }
 
   const cancelDialogAndRedirect = (url: string) => {
-    logger.debug("LoginOTP", "Close dialog and redirect", url);
     setDialogState(false);
     redirect(url);
   }
   
   const handleCancelLogin = () => {
-    logger.debug("LoginOTP", "handleCancelLogin");
     cancelDialogAndRedirect("/");
   }
 
   const handleRetryLogin = () => {
-    logger.debug("LoginOTP", "handleRetryLogin");
     cancelDialogAndRedirect("/login/main");
   }
 
   const handleRetryOTP = () => {
-    logger.debug("LoginOTP", "handleRetryOTP");
     // setRetry((x: number) => x+1);
     cancelDialogAndRedirect("/login/OTP?otpId="+otpId);
   }
 
   const onSubmit = (data: any) => {
-    logger.debug("LoginOTP", "onSubmit Login Form: ", otpId);
     if (otpId) {
       if (otp.current) {
-        logger.debug("LoginOTP", "OTP with id already loaded", otp.current.id);
-
         otpLoadedCallback({status: 200, payload: otp.current});
       } else if (otpId) {
-        logger.debug("LoginOTP", "Load OTP with id", otpId);
         handleLoadOTP(otpId, otpLoadedCallback);
       }
     }

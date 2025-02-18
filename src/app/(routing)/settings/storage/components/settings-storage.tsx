@@ -29,7 +29,6 @@ const SettingsStorage = () => {
 
     const databaseCleared = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
-            logger.debug("Settings", _response.info);
             toast.success("Database cleared.", {duration: 1000})
             createHistory(createHistoryType("info", "Clear", "Database fully cleared", "Settings[Storage]"), () => {})
 
@@ -39,31 +38,23 @@ const SettingsStorage = () => {
     }
 
     const handleClearFullDatabase = (_dummy: boolean): void => {
-        logger.debug("Storage", "handleClearDatabase");
-
-        console.log("Clear DB");
         handleClearDB(true, databaseCleared);
     }
 
     const dataCleared = (_response: ApiResponseType): void => {
         if (_response.status === 200) {
-            logger.debug("Settings", _response.info);
             toast.success("Working data removed.", {duration: 1000})
             createHistory(createHistoryType("info", "Clear", "Work tables cleared", "Settings[Storage]"), () => {})
         }
     }
 
     const handleClearWorkingData = (_dummy: boolean): void => {
-        logger.debug("Storage", "handleClearWorkingData");
-
         initDB(workingItems, dataCleared);
     }
 
     const countriesLoadedCallback = (_data: ApiResponseType) => {
-        console.log("countriesLoadedCallback", js(_data))
         if (_data.status === 200) {
             const countries: CountryType[] = _data.payload;
-            console.log("SIZE COUNTRIES", countries.length);
 
             setNumCountries(countries.length);
         }
@@ -89,7 +80,6 @@ const SettingsStorage = () => {
 
     const servicesLoaded = async (_response: ApiResponseType, _includeCountries: boolean): Promise<void> => {
         if (_response.status === 200) {
-            logger.debug("Settings", _response.info);
             if (_includeCountries) {
                 toast.info(`Services and countries loaded.`, {duration: 1000});
                 createHistory(createHistoryType("info", "Provisioning", "Loaded all startup tables (and countries)", "Settings[Storage]"), () => {})
@@ -104,14 +94,10 @@ const SettingsStorage = () => {
     }
 
     const handleProvisionServices = (_dummy: boolean): void => {
-        logger.debug("Storage", "handleProvisionServices");
-
         handleLoadServicesDB(includeCountries, servicesLoaded);
     }
 
     const handleProvisionCountries = (_dummy: boolean): void => {
-        logger.debug("Storage", "handleProvisionCountries");
-
         initDB('country', countriesLoaded);
     }
 

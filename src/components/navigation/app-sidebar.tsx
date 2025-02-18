@@ -324,8 +324,6 @@ const AppSidebar = () => {
     };
 
     const renderComponent = () => {
-        logger.debug("SideBar", "RENDER");
-        
         return (
             <Sidebar collapsible="icon">
                 <SidebarHeader>

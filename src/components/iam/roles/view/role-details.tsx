@@ -36,8 +36,6 @@ const RoleDetails = ({_selectedRole}:{_selectedRole: string | undefined}) => {
 
     const rolesLoadedCallback = (data: ApiResponseType) => {
         if (data.status === 200) {
-            logger.debug(" RoleDetails", "rolesLadedCallback", js(data));
-
             const roles: RoleType[] = data.payload;
 
             setRoles(roles);

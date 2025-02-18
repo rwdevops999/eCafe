@@ -24,8 +24,6 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
 
   const rolesLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
-      logger.debug("TabRoles", "rolesLoadedCallback", js(_data));
-
       allRoles.current = _data.payload;
 
       actionButtons.current = defineActionButtons(_meta.currentSubject as UserType|GroupType);
@@ -41,20 +39,14 @@ const TabRoles = ({_meta}:{_meta: MetaBase}) => {
   }
 
   const getAllRoles = (): RoleType[] => {
-    logger.debug("TabRoles", "getAllRoles", JSON.stringify(allRoles.current));
-
     return allRoles.current;
   }
 
   useEffect(() => {
-    logger.debug("TabRoles", "useEffect[]", "Loading Roles");
-
     handleLoadRoles(rolesLoadedCallback);
   }, [])
 
   const renderComponent = () => {
-    logger.debug("TabRoles", "RENDER")
-
     return (
       <TabItems _meta={metaOfTabRoles} _buttonConfig={actionButtons.current}/>
     );

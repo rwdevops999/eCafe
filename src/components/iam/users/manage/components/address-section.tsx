@@ -18,7 +18,6 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
 
   const changeCountry = (event: any) => {
     const countryname = event.target.value;
-    logger.debug("AddressSection", "changeCountry = " + countryname);
     setValue("country", countryname);
     const country: CountryType = countries.find((country) => country.name === countryname)!;
     setValue("dialcode", `${country.dialCode}`)
@@ -28,7 +27,6 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
 
   const countriesLoadedCallback = (data: ApiResponseType): void => {
     if (data.status === 200) {
-      logger.debug("AddressSection", "ADRESS LOADED COUNTRIES");
       setCountries(data.payload);
     }
   }
@@ -38,8 +36,6 @@ const AddressSection = ({formMethods}:{formMethods: UseFormReturn<FormSchemaType
   }, []);
 
   const renderComponent =() => {
-    logger.debug("AddressSection", "RENDER", JSON.stringify(countries));
-
     return (
       <Card className="border-stone-500">
         <CardHeader>

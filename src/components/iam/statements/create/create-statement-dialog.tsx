@@ -97,10 +97,8 @@ const StatementCreateDialog = (
     if (data.status === 200) {
       const service: ServiceType = data.payload;
 
-      logger.debug("CreateStatementDialog", "Service Loaded", js(service));
       setLoadedService(service);
 
-      logger.debug("CreateStatementDialog", "Mapped Services", js(mapServiceActionsToData([service])));
       setActionsData(mapServiceActionsToData([service]));
       showToast("info", "Actions loaded");
     }
@@ -137,13 +135,11 @@ const StatementCreateDialog = (
   const [selectedStatement, setSelectedStatement] = useState<StatementType|undefined>(undefined);
 
   const statementLoadedCallback = (_data: ApiResponseType): void => {
-    logger.debug("SCD", "statementLoadedCallback", js(_data));
     if (_data.status === 200) {
       const statement: StatementType = _data.payload;
 
       setSelectedStatement(statement);
 
-      logger.debug("SCD", "setActiveStatement", js(_data));
       setActiveStatement({
         statementId: statement.id,
         sid: statement.sid,
@@ -219,7 +215,6 @@ const StatementCreateDialog = (
     // const statement: StatementType|undefined = provisionStatement(entity);
 
     // if  (statement) {
-    //   logger.debug("CreateStatementDialog", `Statement ${statement.sid} created`, JSON.stringify(entity));
     //   handleCreateStatement(statement, statementCreatedCallback);
     // }
 
@@ -231,19 +226,16 @@ const StatementCreateDialog = (
   }
 
   const changeAccessValue = (value: string) => {
-    logger.debug("CreateStatementDialog", `Access value changed`, value);
     setAccess(value);
   }
 
   const changeManaged = (checked: CheckedState) => {
     if (typeof checked === 'boolean') {
-      logger.debug("CreateStatementDialog", `managed changed`, checked);
       setManaged(checked);
     }
   }
 
   const handleChangeService = (_service: string) => {
-    logger.debug("CreateStatementDialog", `service changed`, _service);
     setSelectedService(_service);
     handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
   }

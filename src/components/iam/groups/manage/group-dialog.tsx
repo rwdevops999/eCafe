@@ -54,10 +54,6 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  logger.debug("GroupDialog", "IN(_open)", _open);
-  logger.debug("GroupDialog", "IN(_meta)", JSON.stringify(_meta));
-  logger.debug("GroupDialog", "IN(_meta.currentSubject)", JSON.stringify(_meta.currentSubject));
-
   // const [metaOfUserDialog, setMetaOfUserDialog] = useState<Meta>(_meta);
   const [metaOfGroupDialogState, setMetaOfGroupDialogState] = useState<Meta>(initMetaBase);
 
@@ -80,7 +76,6 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }
 
   const clearDependencies = () => {
-    logger.debug("GroupDialog", "clearDependencies");
     setTab("group");
     resetDependencies();
   }
@@ -92,13 +87,8 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
       selected: []
     }
 
-    logger.debug("GroupDialog", "calculateDependencies", type);
-
     if (type === dependency_roles) {
-      logger.debug("GroupDialog", "calculateDependencies FOR ROLES");
       result.selected = [];
-      logger.debug("GroupDialog", "calculateDependencies FOR ROLES1", JSON.stringify(group));
-      logger.debug("UserDialog", "calculateDependencies FOR ROLES2", JSON.stringify(group?.roles));
       if (group && group.roles) {
         result.original = group.roles;
         result.selected = group.roles;
@@ -121,13 +111,10 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
       }
     }
 
-    logger.debug("GroupDialog", "Dependencies", JSON.stringify(result));
-
     return result;
   }
 
   const setSelectedDependencies = (type: string, data: CombinedType[]) => {
-    logger.debug("GroupDialog", "setSelectedDependencies", type, JSON.stringify(data));
     if (type === dependency_roles) {
       roleDependenciesRef.current.selected = data;
     }
@@ -142,19 +129,15 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }
   
   const getSelectedDependencies = (type: string): CombinedType[]|undefined => {
-    logger.debug("GroupDialog", "getSelectedDependencies", type);
     if (type === dependency_roles) {
-      logger.debug("GroupDialog", "getSelectedDependencies", JSON.stringify(roleDependenciesRef.current.selected));
       return roleDependenciesRef.current.selected;
     }
 
     if (type === dependency_policies) {
-      logger.debug("GroupDialog", "getSelectedDependencies", JSON.stringify(policyDependenciesRef.current.selected));
       return policyDependenciesRef.current.selected;
     }
 
     if (type === dependency_users) {
-      logger.debug("GroupDialog", "getSelectedDependencies", JSON.stringify(userDependenciesRef.current.selected));
       return userDependenciesRef.current.selected;
     }
   }
@@ -242,30 +225,20 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }
 
   useEffect(() => {
-    logger.debug("GroupDialog", "UseEffect[metaOfGroupDialogRef.current]", JSON.stringify(_meta.currentSubject));
-
     if (_open) {
-      logger.debug("GroupDialog", "UseEffect[_meta]", "set role dependencies", JSON.stringify(roleDependenciesRef.current));
       if (!roleDependenciesRef.current.initialised) {
         roleDependenciesRef.current = calculateDependencies(dependency_roles, _meta.currentSubject as GroupType);
       }
 
-      logger.debug("GroupDialog", "UseEffect[_meta]", "set policy dependencies");
       if (!policyDependenciesRef.current.initialised) {
         policyDependenciesRef.current = calculateDependencies(dependency_policies, _meta.currentSubject as GroupType);
       }
 
-      logger.debug("GroupDialog", "UseEffect[_meta]", "set user dependencies");
       if (!userDependenciesRef.current.initialised) {
         userDependenciesRef.current = calculateDependencies(dependency_users, _meta.currentSubject as GroupType);
       }
 
-      logger.debug("GroupDialog", "ROLE DEPENDENCIES", JSON.stringify(roleDependenciesRef.current));
-      logger.debug("GroupDialog", "POLICY DEPENDENCIES", JSON.stringify(policyDependenciesRef.current));
-      logger.debug("GroupDialog", "USER DEPENDENCIES", JSON.stringify(userDependenciesRef.current));
     }
-
-    logger.debug("GroupDialog", "UseEffect", "setMetaOfGroupDialog => TR");
 
     _meta.control.clearDependencies = clearDependencies;
     _meta.control.setSelection = setSelectedDependencies;
@@ -278,18 +251,12 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }, [_meta]);
 
   const onTabChange = (newtab: string) => {
-    logger.debug("GroupDialog", "onTabChange", newtab);
     if (tab === "group") {
-      logger.debug("GroupDialog", "onTabChange", "OLDTAB is GROUP");
-      logger.debug("GroupDialog", "onTabChange", "seGroupTabLeave(true) => TR");
       setGroupTabLeaveState(true);
     } else {
-      logger.debug("GroupDialog", "onTabChange", "OLDTAB is not GROUP");
-      logger.debug("GroupDialog", "onTabChange", "setGroupTabLeave(false) => TR");
       setGroupTabLeaveState(false);
     }
 
-    logger.debug("GroupDialog", "onTabChange", "NEW TABBIE", newtab);
     setTab(newtab);
   }
 
@@ -310,16 +277,12 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     let roles: ItemType = {}
 
     const originalRoles: ApiType[] = roleDependenciesRef.current.original?.map((_role) => {return {id: _role.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Original Roles)", JSON.stringify(originalRoles));
 
     const selectedRoles: ApiType[] = roleDependenciesRef.current.selected?.map((_role) => {return {id: _role.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Selected Roles)", JSON.stringify(selectedRoles));
 
     const diffRoles: number[] = difference(roleDependenciesRef.current.original, roleDependenciesRef.current.selected);
-    logger.debug("GroupDialog", "PrepareGroup(diffRoles)", JSON.stringify(diffRoles));
 
     const removedRoles: ApiType[] = diffRoles.map(_id => {return {id: _id}});
-    logger.debug("GroupDialog", "PrepareGroup(removedRoles)", JSON.stringify(removedRoles));
 
     if (selectedRoles.length > 0) {
       roles.selected = selectedRoles;
@@ -334,16 +297,12 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     let policies: ItemType = {}
 
     const originalPolicies: ApiType[] = policyDependenciesRef.current.original?.map((_policy) => {return {id: _policy.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Original Policies)", JSON.stringify(originalPolicies));
 
     const selectedPolicies: ApiType[] = policyDependenciesRef.current.selected?.map((_policy) => {return {id: _policy.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Selected Policies)", JSON.stringify(selectedPolicies));
 
     const diffPolicies: number[] = difference(policyDependenciesRef.current.original, policyDependenciesRef.current.selected);
-    logger.debug("GroupDialog", "PrepareGroup(diffPolicies)", JSON.stringify(diffPolicies));
 
     const removedPolicies: ApiType[] = diffPolicies.map(_id => {return {id: _id}});
-    logger.debug("GroupDialog", "PrepareGroup(removedPolicies)", JSON.stringify(removedPolicies));
 
     if (selectedPolicies.length > 0) {
       policies.selected = selectedPolicies;
@@ -358,16 +317,12 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     let users: ItemType = {}
 
     const originalUsers: ApiType[] = userDependenciesRef.current.original?.map((_user) => {return {id: _user.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Original Users)", JSON.stringify(originalUsers));
 
     const selectedUsers: ApiType[] = userDependenciesRef.current.selected?.map((_user) => {return {id: _user.id}});
-    logger.debug("GroupDialog", "PrepareGroup(Selected Users)", JSON.stringify(selectedUsers));
 
     const diffUsers: number[] = difference(userDependenciesRef.current.original, userDependenciesRef.current.selected);
-    logger.debug("GroupDialog", "PrepareGroup(diffUsers)", JSON.stringify(diffUsers));
 
     const removedUsers: ApiType[] = diffUsers.map(_id => {return {id: _id}});
-    logger.debug("GroupDialog", "PrepareGroup(removedUSers)", JSON.stringify(removedUsers));
 
     if (selectedUsers.length > 0) {
       users.selected = selectedUsers;
@@ -386,31 +341,22 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
     if (_data.status === 200 || _data.status === 201) {
       clearDependencies();
       metaOfGroupDialogState.control.handleDialogState(false);
-      logger.debug("GroupDetails", "CALL RELOAD");
       _setReload((x: any) => x+1);
     }
   }
 
   const onSubmitForm = (data: any) => {
-    logger.debug("GroupDialog", "OnSubmitForm", JSON.stringify(data));
-
     if (metaOfGroupDialogState.currentSubject) {
-      logger.debug("GroupDialog", "OnSubmitForm", "UPDATE?");
       const group: ExtendedGroupType = prepareGroup(data, metaOfGroupDialogState.currentSubject as GroupType);
-      logger.debug("GroupDialog", "OnSubmitForm(prepareGroup)", JSON.stringify(group));
       handleUpdateGroup(group, groupUpsetCallback);
     } else {
-      logger.debug("GroupDialog", "OnSubmitForm", "CREATE?");
       const group: ExtendedGroupType = prepareGroup(data);
-      logger.debug("GroupDialog", "OnSubmitForm(prepareGroup)", JSON.stringify(group));
       handleCreateGroup(group, groupUpsetCallback);
     }
   }
 
   const handleValidForm = () => {
-    logger.debug("GroupDialog", "handleValidForm");
     if (formMethods.current) {
-      logger.debug("GroupDialog", "Submitting form");
       const {getValues} = formMethods.current;
 
       onSubmitForm(getValues());
@@ -418,12 +364,10 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }
 
   const validate = async () => {
-    logger.debug("GroupDialog", "VALIDATE");
     if (formMethods.current) {
       const {trigger} = formMethods.current;
 
       await trigger().then((valid: boolean) => {
-        logger.debug("GroupDialog", "form validatation(valid)", valid);
         if (!valid) {
           handleInvalidForm();
         } else {
@@ -447,9 +391,6 @@ const GroupDialog = ({_open, _meta, _setReload}:{_open: boolean; _meta: Meta; _s
   }
 
   const renderComponent = () => {
-    logger.debug("UserGroup", "renderComponent(_open)", _open);
-    logger.debug("UserGroup", "renderComponent(groupTabLeaveState)", groupTabLeaveState);
-
     if (alert && alert.open) {
       return (<AlertTable alert={alert}></AlertTable>)
     }

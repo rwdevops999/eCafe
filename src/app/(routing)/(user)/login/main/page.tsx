@@ -60,9 +60,7 @@ const LoginMain = () => {
     const {handleSubmit, setValue, register, formState: {errors}} = formMethods;
 
     const focusToEmailInput = () => {
-        logger.debug("MainLogin", "Focus On Email Input");
         const element: HTMLInputElement|null = document.getElementById("emailinput") as HTMLInputElement;
-        logger.debug("MainLogin", "Focus On Email Input(element)", element);
         if (element) {
             element.focus();
         }
@@ -80,7 +78,6 @@ const LoginMain = () => {
 
     const taskCreatedCallback = (_data: ApiResponseType) => {
         if (_data.status === 200) {
-            logger.debug("LoginMain", "Task Created");
             createHistory(createHistoryType("action", "Task created", `Task created to remove the OTP code`, "Login[Email]"));
         }
     }
@@ -89,7 +86,6 @@ const LoginMain = () => {
         if (_data.status === 201) {
             const otp: OtpType = _data.payload;
 
-            logger.debug("LoginMain", "otpCreatedCallback", "OTP Created", js(otp));
             createHistory(createHistoryType("action", "OTP Created", `OTP ${otp.OTP} created for ${otp.email}`, "Login[Email]"));
 
             const task: TaskType = {
@@ -105,15 +101,12 @@ const LoginMain = () => {
 
             createTask(task, taskCreatedCallback);
 
-            logger.debug("LoginMain", "otpCreatedCallback", "Close Dialog and Redirect to LoginOTP with OtpId", otp.id);
             setDialogState(false);
             redirect("/login/OTP?otpId="+otp.id);
         }
     }
 
     const sendEmailCallback = (_data: ApiResponseType) => {
-        logger.debug("LoginMain", "sendEmailCallback", JSON.stringify(_data));
-
         if (_data.status === 200) {
             const emailInfo: EmailType = _data.payload;
 
@@ -129,33 +122,22 @@ const LoginMain = () => {
             }
 
             createOTP(info, otpCreatedCallback);
-        } else {
-            logger.debug("LoginMain", "sendEmailCallback", "Send error", JSON.stringify(_data.payload));
         }
     }
 
     const handleRetryLogin = () => {
-        logger.debug("LoginMain", "handleRetryLogin", "Close Dialog and Redirect to LoginMain");
         setDialogState(false);
         setValue("email", "");
         setRefocus((old: boolean) => !old);
         redirect("/login/main");
     }
 
-    const sendByEmail = (_emailInfo: EmailType) => {
-        logger.debug("LoginMain", "... send email", js(_emailInfo));
-    }
-
     const closeDialogAndRedirect = (url: string) => {
-        logger.debug("LoginMain", "Close Dialog and redirect to URL", url);
-
         setDialogState(false);
         redirect(url);
     }
 
     const handleOTP = (name: string, data: OtpType) => {
-        logger.debug("LoginMain", "handleOTP");
-
         const emailInfo: EmailType = {
             destination:data.email,
             OTPcode: generateOTP(),
@@ -163,19 +145,15 @@ const LoginMain = () => {
             data: data.userId
         }
 
-        logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
         createHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
         handleSendEmail(emailInfo, sendEmailCallback);
     }
 
     const handleCancelLogin = (name: string) => {
-        logger.debug("LoginMain", "handleCancelLogin");
-    
         closeDialogAndRedirect("/");
     }
     
     const handleUserBlocked = () => {
-        logger.debug("LoginMain", "handleUserBlocked", "User is blocked => Show notification");
         dialogTitleRef.current = "Your account is blocked";
         dialogMessageRef.current = "Your account is blocked. Please contact the admin?"
         dialogButtonsRef.current = {leftButton: "Cancel"};
@@ -184,17 +162,12 @@ const LoginMain = () => {
     }
 
     const userByEmailLoadedCallback = (_data: ApiResponseType, _email: string) => {
-        logger.debug("LoginMain", "userByEmailLoadedCallback(data, email)", "user loaded using the email?", js(_data), _email);
-
         if (_data.status === 200) {
             const user: UserType = _data.payload;
-            logger.debug("LoginMain", "userByEmailLoadedCallback(user)", "user is in DB", js(user));
-
             if (user.blocked) {
                 createHistory(createHistoryType("info", "Invalid login", `Blocked user ${_email} tried to log in.`, "Login[Email]"));
                 handleUserBlocked();
             } else if (user.passwordless) {
-                logger.debug("LoginMain", "userByEmailLoadedCallback", "PASSWORDLESS");
                 const emailInfo: EmailType = {
                     destination:user.email,
                     OTPcode: generateOTP(),
@@ -202,15 +175,12 @@ const LoginMain = () => {
                     data: user.id
                 }
 
-                logger.debug("LoginMain", "userByEmailLoadedCallback", "send email", js(emailInfo));
                 createHistory(createHistoryType("info", "Email", `Sending OTP code ${emailInfo.OTPcode} to ${emailInfo.destination}.`, "Login[Email]"));
                 handleSendEmail(emailInfo, sendEmailCallback);
             } else {
-                logger.debug("LoginMain", "userByEmailLoadedCallback", "User wants to login with password => Redirect to LoginPassword", user.id);
                 redirect("/login/password?userId="+user.id);
             }
         } else {
-            logger.debug("LoginMain", "userByEmailLoadedCallback", "User not in DB treat as guest => Show notification");
             dialogTitleRef.current = "User not found";
             dialogMessageRef.current = "No user found with this email. Do you want to retry or use OTP?"
             dialogButtonsRef.current = {leftButton: "Cancel", centerButton: "Retry", rightButton: "Use OTP"};
@@ -233,7 +203,6 @@ const LoginMain = () => {
     }
 
     const onSubmit = (data: FormSchemaType) => {
-        logger.debug("LoginMain", "SUBMITTING");
         createHistory(createHistoryType("info", "Login try", `${data.email} tries to login`, "Login[Email]"));
         handleLoadUserByEmail(data.email, userByEmailLoadedCallback)
     }

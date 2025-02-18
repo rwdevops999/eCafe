@@ -16,10 +16,7 @@ const Dashboard = () => {
 
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  const databaseCleared = () => {
-    logger.debug("Dashboard", "Database cleared");
-  }
-
+  
   const setTestUser = () => {
     login(testUser);
   }

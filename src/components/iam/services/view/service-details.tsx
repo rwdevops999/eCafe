@@ -27,9 +27,6 @@ const ServiceDetails = ({selectedService}:{selectedService: string | number;}  )
     if (data.status === 200) {
         let service: ServiceType = data.payload;
 
-        logger.debug("ServiceDetails", "Service loaded", js(service));
-        logger.debug("ServiceDetails", "Mapped Service", js(mapServiceToDataArray(service)));
-
         setServicesData(mapServiceToDataArray(service));
         showToast("info", "Service loaded")
       }
@@ -41,8 +38,6 @@ const ServiceDetails = ({selectedService}:{selectedService: string | number;}  )
     if (data.status === 200) {
       let services: ServiceType[] = data.payload;
 
-      logger.debug("ServiceDetails", "Services loaded", js(services));
-      logger.debug("ServiceDetails", "Mapped Services", js(mapServicesToData(services)));
       setServicesData(mapServicesToData(services));
       showToast("info", "Services loaded")
     }
@@ -60,7 +55,6 @@ const ServiceDetails = ({selectedService}:{selectedService: string | number;}  )
   }, []);
 
   const handleChangeService = (_service: string) =>  {
-    logger.debug("ServiceDetails", "handleChangeService", _service);
     setLoader(true);
     if (_service !== allItems) {
       handleLoadServiceByIdentifier(_service, serviceLoadedCallback);

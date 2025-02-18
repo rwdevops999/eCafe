@@ -16,14 +16,11 @@ const SettingsHistory = () => {
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none') });
 
     const historyCleared = (data: any) => {
-        logger.debug("History", "handleClearHistory", js(data));
         createHistory(createHistoryType("info", "History Cleared", "Cleared the history data", "Settings[History]"), () => {})
         toast.success("History cleared.", {duration: 1000})
     }
     
     const handleClearHistory = (_dummy: boolean): void => {
-        logger.debug("History", "handleClearHistory");
-    
         initDB('History', historyCleared);
     }
     

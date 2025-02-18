@@ -26,8 +26,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
   const [loader, setLoader] = useState<boolean>(false);
 
-  logger.debug("GroupDetails", "IN(_selectedGroup)", _selectedGroup);
-
   const [reloadState, setReloadState] = useState<number>(0);
   const [rerender, setRerender] = useState<number>(0);
 
@@ -39,15 +37,12 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   const metaGroupDetails = useRef<Meta>(initGroupMeta);
 
   const setSelectedGroup = (_group: GroupType|undefined) => {
-    logger.debug("GroupDetails", "setSelectedGroup => META currentSubject", JSON.stringify(_group));
     metaGroupDetails.current.currentSubject = _group;
   }
 
   const groupsLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
       const groups: GroupType[] = _data.payload;
-
-      logger.debug("GroupDetails", "groupsLoadedCallback", js(groups));
 
       groupsRef.current = groups
 
@@ -61,10 +56,7 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   }
 
   const handleDialogState = (open: boolean) => {
-    logger.debug("GroupDetails", "handleDialogState(open)", open);
     if (! open) {
-      logger.debug("GroupDetails", "handleDialogState", "Set group to undefined");
-
       setSelectedGroup(undefined);
     }    
 
@@ -72,7 +64,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   }
 
   useEffect(() => {
-    logger.debug("GroupDetails", "USE EFFECT[] => META handleDialogState");
     metaGroupDetails.current.control.handleDialogState = handleDialogState;
 
     setLoader(true);
@@ -80,8 +71,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   }, []);
 
   useEffect(() => {
-    logger.debug("GroupDetails", "LOAD GROUPS AFTER RELOAD");
-
     setLoader(true);
     handleLoadGroups(groupsLoadedCallback);
   }, [reloadState, setReloadState]);
@@ -95,15 +84,11 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
   }
 
   const handleAction = (_action: string, _group: Data) => {
-    logger.debug("GroupDetails", "handleAction", _action);
     if (_action === action_delete) {
-      logger.debug("GroupDetails", "handleAction", "see VSCODE terminal for API messages");
       handleDeleteGroup(_group.id, groupDeletedCallback);
     } else {
-      logger.debug("GroupDetails", "handleAction", _group);
       const selectedGroup: GroupType = groupsRef.current.find((group) => group.id === _group.id)!;
       setSelectedGroup(selectedGroup);
-      logger.debug("GroupsDetails", "changeDialogState => true");
       setDialogState(true);
     }
   }
@@ -115,9 +100,6 @@ const GroupDetails = ({_selectedGroup}:{_selectedGroup: string | undefined}) => 
 
   const renderComponent = () => {
     if  (groupsDataRef && metaGroupDetails) {
-      logger.debug("GroupDetails", "RENDER");
-      logger.debug("GroupDetails", ">>> dialogState", dialogState);
-
       return (
         <div>
           <PageBreadCrumbs crumbs={[{name: "ecafé", url: "/"}, {name: "iam"}, {name: "groups", url: "/iam/groups"}]} />

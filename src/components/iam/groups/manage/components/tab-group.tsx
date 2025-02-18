@@ -20,19 +20,13 @@ const TabGroup = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
-  logger.debug("TabGroups", "IN(onTabLeave)", onTabLeave);
-
   const storedGroupRef = useRef<GroupType|undefined>(undefined);
 
   let group: GroupType|undefined = _meta.currentSubject as GroupType;
   
   if (storedGroupRef.current) {
-    logger.debug("TabGroups", "IN(storedGroupRef)", "Using Stored Values");
     group = storedGroupRef.current;
   }
-
-  logger.debug("TabGroups", "IN(group)", JSON.stringify(group));
 
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
@@ -55,13 +49,10 @@ const TabGroup = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   const [nrOfItemsToValidate, setNrOfItemsToValidate] = useState<number>(0);
 
   useEffect(() => {
-    logger.debug("TabGroup", "useEffect[]", JSON.stringify(_meta.currentSubject));
-
     actionButtons.current = defineActionButtons(_meta.currentSubject as GroupType)
     setFormMethods(formMethods);
 
     const itemsToValidate: number = _meta.control.calculateValidationItems();
-    logger.debug("TabGroups", "ItemsToValidate", itemsToValidate);
     setNrOfItemsToValidate(itemsToValidate);
   }, []);
 
@@ -70,18 +61,15 @@ const TabGroup = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: 
   useEffect(() => {
     if (onTabLeave) {
       const _group: GroupType = storeGroupFormValues(_meta.currentSubject as GroupType, getValues);
-      logger.debug("TabGroup", "LeavingTab => STORE GROUP", JSON.stringify(_group));
 
       storedGroupRef.current = _group;
     }
   }, [onTabLeave]);
 
   const onSubmit = async (data: any) => {
-    logger.debug("TabGroups", "onSubmit", "SUBMITTING...");
   };
 
   const renderComponent = () => {
-    logger.debug("TabGroups", "RENDER");
     return (
       <>
         <PageTitle className="m-2" title={`Group Details`} />

@@ -25,8 +25,6 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
 
   const groupsLoadedCallback = (_data: ApiResponseType) => {
     if (_data.status === 200) {
-      logger.debug("TabGroups", "groupsLoadedCallback", JSON.stringify(_data));
-    
       allGroups.current = _data.payload;
     
       actionButtons.current = defineActionButtons(_meta.currentSubject as UserType);
@@ -42,14 +40,10 @@ const TabGroups = ({_meta}:{_meta: MetaBase}) => {
   }
   
    const getAllGroups = (): GroupType[] => {
-     logger.debug("TabGroups", "getAllGroups", JSON.stringify(allGroups.current));
- 
      return allGroups.current;
    }
  
    useEffect(() => {
-     logger.debug("TabGroups", "useEffect[]", "Loading Groups");
- 
      handleLoadGroups(groupsLoadedCallback);
    }, [])
  

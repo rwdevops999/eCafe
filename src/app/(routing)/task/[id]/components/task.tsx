@@ -36,19 +36,14 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   const taskToExecute = useRef<string|undefined>(undefined);
 
   const taskLoadedCallback = (_response: ApiResponseType) => {
-    // logger.debug("Task", "taskLoadedCallback", "Reponse received", JSON.stringify(_response));
-
     if (_response.status === 200) {
       const task: TaskType = _response.payload;
       
-      logger.debug("Task", "taskLoadedCallback(task)", JSON.stringify(task));
       setSelectedTask(task);
 
       const actionFunction: ActionFunction|undefined = actionFunctions.find((action) => action.action === task.name)
-      logger.debug("Task", "taskLoadedCallback(actionFunction)", JSON.stringify(actionFunction));
 
       if (actionFunction) {
-        logger.debug("Task", "taskLoadedCallback", "SetInfo");
         setSelectedTaskAction(actionFunction);
         taskToExecute.current = actionFunction.id.toString();
       }
@@ -56,7 +51,6 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   useEffect(() => {
-    logger.debug("Task", "UseEffect[taskId]", taskId);
     handleLoadTaskById(taskId, taskLoadedCallback);
   }, [taskId]);
 
@@ -93,8 +87,6 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   const handleChangeTaskAction = (taskActionId: string): void => {
-    logger.debug("Task", "handleChangeTaskAction", taskActionId);
-
     const id: number = parseInt(taskActionId);
 
     const taskAction: ActionFunction|undefined = actionFunctions.find(action => action.id === id);
@@ -109,12 +101,8 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   const handleExecute = () => {
-    logger.debug("Task", "Execute(selectedTask, related) ...", JSON.stringify(selectedTaskAction), related);
-
     // execute function of selectedTaskAction (with related flag)
     // using selectedTask.subjectId and selectedTask.used flag and related flag
-
-    logger.debug("Task", "... on", JSON.stringify(selectedTask));
 
     if (selectedTask && (selectedTaskAction?.type === selectedTask.subject) && (selectedTaskAction?.action === selectedTask.name)) {
       const actionExection: ActionExecutionType = {
@@ -125,12 +113,8 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
 
       if (selectedTaskAction) {
         selectedTaskAction.func(actionExection);
-      } else {
-        logger.debug("Task", "NO TASK SELECTED");
       }
 
-    } else {
-      logger.debug("Task", "EXECUTION NOT ALLOWED");
     }
 
     handleClose();
@@ -141,7 +125,6 @@ const Task = ({taskId = 0, handleDialogClose}:{taskId?: number; handleDialogClos
   }
 
   const handleTaskSelect = (value: string) => {
-    logger.debug("Task", "handleTaskSelect(value)", value);
     handleChangeTaskAction(value);
     taskToExecute.current = value;
   };

@@ -24,19 +24,13 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
     const {debug} = useDebug();
     const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  // logger.debug("TabUsers", "IN(_meta)", JSON.stringify(_meta))
-  logger.debug("TabUsers", "IN(onTabLeave)", onTabLeave);
-
   const storedUserRef = useRef<UserType|undefined>(undefined);
 
   let user: UserType|undefined = _meta.currentSubject as UserType;
   
   if (storedUserRef.current) {
-    logger.debug("TabUsers", "IN(storedUserRef)", "Using Stored Values");
     user = storedUserRef.current;
   }
-
-  logger.debug("TabUsers", ">>> IN(user)", user?.passwordless);
 
   const formMethods = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
@@ -95,13 +89,10 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
   }
 
   useEffect(() => {
-    logger.debug("TabUser", "useEffect[]", JSON.stringify(_meta.currentSubject));
-
     actionButtons.current = defineActionButtons(_meta.currentSubject as UserType)
     setFormMethods(formMethods);
 
     const itemsToValidate: number = _meta.control.calculateValidationItems();
-    logger.debug("TabUsers", "ItemsToValidate", itemsToValidate);
     setNrOfItemsToValidate(itemsToValidate);
 
     handleLoadCountries(countriesLoadedCallback);
@@ -112,18 +103,15 @@ const TabUser = ({_meta, onTabLeave, setFormMethods}:{_meta: Meta; onTabLeave: b
   useEffect(() => {
     if (onTabLeave) {
       const _user: UserType = storeUserFormValues(_meta.currentSubject as UserType, getValues, countries.current);
-      logger.debug("TabUser", "LeavingTab => STORE USER", JSON.stringify(_user));
 
       storedUserRef.current = _user;
     }
   }, [onTabLeave]);
 
   const onSubmit = async (data: any) => {
-    logger.debug("TabUsers", "onSubmit", "SUBMITTING...");
   };
 
   const renderComponent = () => {
-    logger.debug("TabUsers", "RENDER");
     return (
       <>
         <PageTitle className="m-2" title={`User Details`} />
