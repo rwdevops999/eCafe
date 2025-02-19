@@ -68,12 +68,14 @@ const StatementDialog = (
       const serviceId: UseStateValue = dialogServiceId;
       console.log("SDLG", "useEffect[dialogServiceId](serviceId)", js(serviceId));
 
-      if (serviceId.value && serviceId.action) {
-        console.log("SDLG", "useEffect[dialogServiceId]", `Load action of service id ${serviceId.value}`);
-        handleLoadActionsByServiceId(serviceId.value, actionsLoadedCallback);
-      } else {
-        console.log("SDLG", "useEffect[dialogServiceId]", "Load ALL actions ");
-        handleLoadActions(actionsLoadedCallback);
+      if (openDialog) {
+        if (serviceId.value && serviceId.action) {
+          console.log("SDLG", "useEffect[dialogServiceId]", `Load action of service id ${serviceId.value}`);
+          handleLoadActionsByServiceId(serviceId.value, actionsLoadedCallback);
+        } else {
+          console.log("SDLG", "useEffect[dialogServiceId]", "Load ALL actions ");
+          handleLoadActions(actionsLoadedCallback);
+        }
       }
 
     }, [dialogServiceId]);

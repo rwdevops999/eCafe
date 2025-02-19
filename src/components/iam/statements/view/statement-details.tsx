@@ -215,8 +215,8 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
       loadedAllStatements.current = false;
 
 
-      // setSelectedServiceId(cuv(undefined, false));
-      // setCurrentStatementId(cuv(undefined));
+      setSelectedServiceId(cuv(undefined, false));
+      setCurrentStatementId(cuv(undefined, false));
     }
 
     setOpenDialog(cuv(state, false));
@@ -315,10 +315,12 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
       loadedAllStatements.current = false;
     } else {
       if (! loadedAllStatements.current) {
-        console.log("SD: UseEffect[currentStatementId]", "Loading...");
-        setLoader(true);
-        handleLoadStatements(statementsLoadedCallback);
-        loadedAllStatements.current = true;
+        if (currentStatementId.action) {
+          console.log("SD: UseEffect[currentStatementId]", "Loading...");
+          setLoader(true);
+          handleLoadStatements(statementsLoadedCallback);
+          loadedAllStatements.current = true;
+        }
       }
     }
   }, [currentStatementId]);
