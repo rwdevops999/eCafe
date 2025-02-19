@@ -2,6 +2,11 @@ import { z } from "zod";
 import { dataScheme, historyDataScheme, taskDataScheme } from "@/data/schemes";
 import { apiResponseType } from "./db";
 
+type UseStateValue = {
+    value: any,
+    action: boolean
+};
+
 type CallbackFunctionNoParam = () => void;
 type CallbackFunctionWithParam = (data: apiResponseType, additional?: any) => void;
 
@@ -15,6 +20,7 @@ type ActionType = {
   name: string,
   createDate?: Date,
   updateDate?: Date,
+  serviceId?: number | null
   service?: ServiceType
 }  
 

@@ -25,7 +25,7 @@ const ProgressLink = ({ href, children, className, ...rest }:{href: string, chil
   };
 
   return (
-    <Link href="" onClick={navigateToDestination} {...rest} className={className}>
+    <Link prefetch={true} href="" onClick={navigateToDestination} {...rest} className={className}>
       {children}
     </Link>
   );

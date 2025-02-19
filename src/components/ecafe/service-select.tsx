@@ -20,55 +20,111 @@ import { ApiResponseType } from "@/types/db";
  * @param service: the default selected service
  */
 
-const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = false, handleChangeService}:{label?: string; defaultService: string|number; forceAll?:boolean, handleChangeService?(service: string):void;}) => {
+const ServiceSelect = (
+  {
+    label = "Select service : ", 
+    defaultService = undefined, 
+    forceAll = false, 
+    handleChangeService, 
+  }:{
+    label?: string; 
+    defaultService?: string|number|undefined; 
+    forceAll?:boolean, 
+    handleChangeService?(service: ServiceType|undefined):void; 
+  }) => {
   const serviceToDisplay = useRef<string>("");
 
-  const [services, setServices] = useState<string[]>([]);
+  console.log ("SS IN", defaultService);
+
+  const [services, setServices] = useState<ServiceType[]>([]);
+  const [serviceNames, setServiceNames] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
 
-  const servicesLoadedCallback = (_data: ApiResponseType): void => {
+  const [selectedServiceName, setSelectedServiceName] = useState<string>('All');
+
+  const servicesLoadedCallback = (_data: ApiResponseType, _service: any): void => {
+    let services: ServiceType[] = [];
+
     if (_data.status === 200) {
+      console.log("SS: Services Loaded ...");
+      services = _data.payload;
+      setServices(services);
+    }
 
-      const services: ServiceType[] = _data.payload;
-      if (isNumber(defaultService)) {
-        const value: string = defaultService as string;
+    console.log("SS", "servicesLoadedCallback", defaultService);
+    console.log("SS", "servicesLoadedCallback", "setService", defaultService);
 
-        const serviceId: number = parseInt(value);
-        const service: ServiceType|undefined = services.find((service) => service.id === serviceId);
+    setService(defaultService, services);
+  }
 
+  const changeService = (service: ServiceType|undefined): void => {
+    handleChangeService ? handleChangeService(service) : () => {}
+  }
+
+  const setService = (_service: number|string|undefined, _services?: ServiceType[]): void => {
+    console.log("Change Service Setting", _service??"undefined");
+
+    if (_services === undefined) {
+      _services = services;
+    }
+    
+    let serviceName: string = 'All';
+
+    if (_service) {
+      if (isNumber(_service)) {
+        // defaultService is a service Id
+        const id: number = parseInt(defaultService as string);
+        console.log("SS", "defaultService is an ID : ", id);
+        const service: ServiceType|undefined = _services.find((service) => service.id === id);
+        console.log("SS", "defaultService is an ID : services are ", js(services));
         if (service) {
-          serviceToDisplay.current = service.name;
-
-          if (forceAll) {
-            setServices(["All", ...services.map((service: ServiceType) => service.name)]);
-          } else {
-            setServices(services.map((service: ServiceType) => service.name));
-          }
+          console.log("SS", "defaultService is an ID : ", "service found");
+          serviceName = service.name;
+          changeService(service);
         }
       } else {
-        let service: string = "";
-  
-        service = (defaultService === allItems ? 'All' : defaultService) as string;
-        serviceToDisplay.current = service;
-
-        if (defaultService === allItems || forceAll) {
-          setServices(["All", ...services.map((service: ServiceType) => service.name)]);
-        } else {
-          setServices(services.map((service: ServiceType) => service.name));
+        // defaultService is a service Name
+        const name: string = defaultService as string;
+        console.log("SS", "defaultService is a NAME : ", name);
+        const service: ServiceType|undefined = _services.find((service) => service.name === name);
+        if (service) {
+          serviceName = service.name;
+          changeService(service);
         }
       }
+    } else {
+      changeService(undefined);
     }
+
+    console.log("SS", "set ServiceNames", js(services));
+
+    if (! defaultService || forceAll) {
+      setServiceNames(["All", ..._services.map((service: ServiceType) => service.name)]);
+    } else {
+      setServiceNames(_services.map((service: ServiceType) => service.name));
+    }
+
+    console.log("SS", "Change display service to : ", serviceName);
+    setSelectedServiceName(serviceName);
   }
 
   useEffect(() => {
+    console.log("SS", "MOUNT UseEffect[]");
     handleLoadServices(servicesLoadedCallback); 
+    
+    return (() => {
+      console.log("SS UNMOUNTED");
+    });
   }, []);
 
   useEffect(() => {
-    handleLoadServices(servicesLoadedCallback); 
+    console.log("SS", "UseEffect[defaultService]", defaultService);
+    setService(defaultService);
   }, [defaultService]);
 
   const renderComponent = () => {
+    console.log("SS", "RENDER", js(services));
+
     return (
       <div className="flex -ml-3 items-center z-10">
         <Label className="mr-1">{label}</Label>
@@ -81,7 +137,7 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
                   aria-expanded={open}
                   className="w-[200px] justify-between"
                 >
-                  {services.find((s) => s === serviceToDisplay.current)}
+                  {serviceNames.find((s) => s === selectedServiceName)}
                   <ChevronsUpDown className="opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -91,20 +147,20 @@ const ServiceSelect = ({label = "Select service : ", defaultService, forceAll = 
                 <CommandList>
                   <CommandEmpty>No service found.</CommandEmpty>
                   <CommandGroup>
-                    {services.map((service) => (
+                    {serviceNames.map((_serviceName) => (
                       <CommandItem
-                        key={service}
-                        value={service}
+                        key={_serviceName}
+                        value={_serviceName}
                         onSelect={(currentValue) => {
-                          serviceToDisplay.current = currentValue;
+                          setSelectedServiceName(currentValue);
                           setOpen(false);
-                          (handleChangeService ? handleChangeService(currentValue === 'All' ? allItems : currentValue) : null)
+                          changeService(services.find((service) => service.name === currentValue)); 
                         }}
                       >
-                        {service}
+                        {_serviceName}
                         <Check
-                          key={service}
-                          className={cn("ml-auto", serviceToDisplay.current === service ? "opacity-100" : "opacity-0")}
+                          key={_serviceName}
+                          className={cn("ml-auto", selectedServiceName === _serviceName ? "opacity-100" : "opacity-0")}
                         />
                       </CommandItem>
                     ))}

@@ -1,4 +1,4 @@
-import { Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementActionType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
+import { ActionType, Data, GroupType, HistoryData, HistoryType, PolicyType, ServiceType, StatementActionType, StatementType, TaskData, TaskType, UserType } from "@/types/ecafe";
 import { z } from "zod";
 import { convertDatabseDateToString, js, padZero } from "./utils";
 import moment from "moment";
@@ -41,7 +41,7 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
     return result;
   }
 
-  const mapActionsToData = (_actions: StatementActionType[], _permission: string, _serviceId: number, _parent: string): Data[] => {
+  const mapStatementActionsToData = (_actions: StatementActionType[], _permission: string, _serviceId: number, _parent: string): Data[] => {
     let result: Data[] = [];
 
     result = _actions.map((_action) => {
@@ -57,6 +57,21 @@ export const mapConflictsToData = (conflicts: any[]): Data[] => {
         }
       }
     })
+    return result;
+  }
+
+export const mapActionsToData = (_actions: ActionType[]): Data[] => {
+    let result: Data[] = [];
+
+    result = _actions.map((_action) => {
+      return {
+        id: _action.id,
+        name: _action.name,
+        description: "",
+        children: [],
+      }
+    })
+
     return result;
   }
 
@@ -188,7 +203,7 @@ export const mapStatementsToData = (statements: any[] | undefined, services?: an
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions, statement.permission, statement.serviceId, statement.sid),
+        children: mapStatementActionsToData(statement.actions, statement.permission, statement.serviceId, statement.sid),
         other: {
           parent: undefined,
           serviceId: statement.serviceId,
@@ -211,7 +226,7 @@ export const mapStatementToDataArray = (statement: StatementType | undefined): D
         id: statement.id,
         name: statement.sid,
         description: statement.description,
-        children: mapActionsToData(statement.actions!, statement.permission, statement.serviceId, statement.sid),
+        children: mapStatementActionsToData(statement.actions!, statement.permission, statement.serviceId, statement.sid),
         other: {
           serviceId: statement.serviceId,
           // serviceName: (services ? getServiceName(statement.serviceId, services) : ""),

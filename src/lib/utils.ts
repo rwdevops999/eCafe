@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 import * as  fs from 'fs';
 import * as path from 'path';
-import { Country, Data, HistoryType, typeType } from "@/types/ecafe";
+import { Country, Data, HistoryType, typeType, UseStateValue } from "@/types/ecafe";
 import { AccessResultType, AccessType } from "./validate";
 import { ApiResponseType } from "@/types/db";
 import { toast } from "sonner";
@@ -264,4 +264,12 @@ export const showToast = (type: string, message: string = "", duration: number =
       toastId = 0;
     });
   }
+}
+
+export const cuv = (_value: any, _action: boolean = true): UseStateValue => {
+  return {value: _value, action: _action}
+}
+
+export const guv = (_value: UseStateValue): any => {
+  return _value.value;
 }

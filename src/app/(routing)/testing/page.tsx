@@ -1,55 +1,63 @@
 'use client'
 
+import ServiceSelect from "@/components/ecafe/service-select";
 import { Button } from "@/components/ui/button";
-import { hideLoaderToast, js, showLoaderToast } from "@/lib/utils";
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { cuv, js, showToast } from "@/lib/utils";
+import { ServiceType, UseStateValue } from "@/types/ecafe";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Test = () => {
+  const {push} = useRouter();
+  
   const ftest = () => {
+    let x: UseStateValue = cuv(undefined);
+
+    console.log("X = ", x);
+    console.log("X(2) = ", js(x));
   }
 
   useEffect(() => {
+    console.log("MOUNT TEST");
     ftest();
+    return (() => console.log("UNMOUNT TEST"));
   }, [])
 
-  let toastId: number|string = 0;
-
-  const showToast = () => {
-    if (toastId === 0) {
-      const myPromise = new Promise<{ name: string }>((resolve) => {
-            if (toastId === 0) {
-              toastId = toast.loading("loading ...")
-            }
-            setTimeout(() => {
-              resolve({ name: 'close toast' });
-            }, 3000);
-        });
-
-        myPromise
-        .then((value) => {
-          toast.dismiss(toastId);
-          toastId = 0;
-        });
-    }
-    // toast.promise(myPromise, {
-    //       loading: 'Loading...',
-    //       success: (data: { name: string }) => {
-    //         return `${data.name} toast has been added`;
-    //       },
-    //       error: 'Error',
-    //     });
-    //   }}
+  const handleButtonClick = () => {
+    push("/iam/statements/sid=25");
   }
 
-  const hideToast = () => {
+  const [service, setService] = useState<number|string|undefined>(undefined);
+
+  const handleServiceUndefined = () => {
+    setService(undefined);
+  }
+
+  const handleServiceId = () => {
+    setService(1);
+  }
+
+  const handleServiceName = () => {
+    setService('Settings');
+  }
+
+  const handleChangeService = (service: ServiceType|undefined) => {
+    showToast("info", `Service = ${js(service)}`);
+  }
+
+  const handleGetSelectedService = (service: ServiceType|undefined) => {
+    showToast("info", `Selected Service = ${js(service)}`);
   }
 
   const renderComponent = () => {
     return (
     <>
-      <Button onClick={showToast}>Show</Button>
-      <Button onClick={hideToast}>Hide</Button>
+      <Button onClick={handleButtonClick}>TEST</Button>
+      <Button onClick={handleServiceUndefined}>Service (undefined)</Button>
+      <Button onClick={handleServiceId}>Service (id)</Button>
+      <Button onClick={handleServiceName}>Service (name)</Button>
+
+      <ServiceSelect defaultService={service} handleChangeService={handleChangeService} onInit={handleGetSelectedService}/>
     </>);
     };
 

@@ -71,17 +71,42 @@ export const handleLoadCountries = async (_callback: CallbackFunctionWithParam):
 }
 
 /**
- * SERVICES
+ * ACTIONS
  */
-const loadServices = async (_callback: CallbackFunctionWithParam): Promise<void> => {
-  await fetch("http://localhost:3000/api/iam/services")
+const loadActions = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch("http://localhost:3000/api/iam/actions")
     .then((response: Response) => response.json())
     .then((response: ApiResponseType) => {_callback(response)})
+    .catch((error: any) => console.log("loadServices", `ERROR loading the actions`, js(error)));
+}
+
+export const handleLoadActions = async (_callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadActions(_callback);
+}
+
+const loadActionsByServiceId = async (_serviceId: number, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch("http://localhost:3000/api/iam/actions?serviceId="+_serviceId)
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response)})
+    .catch((error: any) => console.log("loadServices", `ERROR loading the actions by service id`, js(error)));
+}
+
+export const handleLoadActionsByServiceId = async (_serviceId: number, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadActionsByServiceId(_serviceId, _callback);
+}
+
+/**
+ * SERVICES
+ */
+const loadServices = async (_callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await fetch("http://localhost:3000/api/iam/services")
+    .then((response: Response) => response.json())
+    .then((response: ApiResponseType) => {_callback(response, additional)})
     .catch((error: any) => console.log("loadServices", `ERROR loading the services`, js(error)));
 }
 
-export const handleLoadServices = async (_callback: CallbackFunctionWithParam): Promise<void> => {
-  await loadServices(_callback);
+export const handleLoadServices = async (_callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {
+  await loadServices(_callback, additional);
 }
 
 const loadServiceByIdentifier = async (_service: string|number, _callback: CallbackFunctionWithParam): Promise<void> => {
@@ -109,15 +134,15 @@ export const handleLoadStatements = async (_callback: CallbackFunctionWithParam)
   await loadStatements(_callback);
 }
 
-const loadStatementsById = async (_sid: number|undefined, _callback: CallbackFunctionWithParam): Promise<void> => {
-  await fetch("http://localhost:3000/api/iam/statements/id?id=" + _sid)
+const loadStatementsById = async (_id: number|undefined, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await fetch("http://localhost:3000/api/iam/statements/id?id=" + _id)
     .then((response: Response) => response.json())
     .then((response: ApiResponseType) => {_callback(response);})
     .catch((error: any) => console.log("loadStatements", `ERROR loading the statement`, js(error)));
 }
 
-export const handleLoadStatementById = async (_sid: number|undefined, _callback: CallbackFunctionWithParam): Promise<void> => {
-  await loadStatementsById(_sid, _callback);
+export const handleLoadStatementById = async (_id: number|undefined, _callback: CallbackFunctionWithParam): Promise<void> => {
+  await loadStatementsById(_id, _callback);
 }
 
 const loadStatementsByServiceId = async (_serviceId: number, _callback: CallbackFunctionWithParam, additional?: any): Promise<void> => {

@@ -74,7 +74,8 @@ export async function GET(request: NextRequest) {
     
     const statements: StatementType[] = await prisma.serviceStatement.findMany({
       include: {
-        actions: true
+        actions: true,
+        service: true,
       }
     });
 
