@@ -19,7 +19,7 @@ import { defaultAccess } from '@/data/constants';
 export interface FormProps {
   statement: StatementEntity;
 
-  cancelFn: (b: boolean) => void
+  cancelFn: (b: boolean, resetService: boolean) => void
   submitFn: (e: StatementEntity) => void
   serviceFn: (service: ServiceType|undefined) => void
   enabledButton: boolean,
@@ -35,7 +35,7 @@ const StatementForm = (props: FormProps) => {
     }, [props])
   });
 
-  console.log("[SDLG]", "IN(statement)", js(props.statement));
+  console.log("[SF]", "IN(statement)", js(props.statement));
 
   const {reset, handleSubmit, register, formState: {errors}, setValue, getValues} = formMethods;
 
@@ -82,6 +82,10 @@ const StatementForm = (props: FormProps) => {
 
   const onSubmit: SubmitHandler<StatementEntity> = (formData: StatementEntity) => {
     props.submitFn(formData);
+  }
+
+  const cancelForm = (_dummy: boolean): void => {
+    props.cancelFn(false, false);
   }
 
   const renderComponent = () => {
@@ -147,8 +151,9 @@ const StatementForm = (props: FormProps) => {
             </div>
           </div> 
           <div className="space-y-1">
-            <EcafeButton id={"createButton"} caption="Create" type={"submit"} enabled={props.enabledButton} />
-            <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={props.cancelFn} clickValue={false}/>
+            {(props.statement.sid === "") && <EcafeButton id={"createButton"} caption="Create" type={"submit"} enabled={props.enabledButton} />}
+            {(! (props.statement.sid === "")) && <EcafeButton id={"updateButton"} caption="Update" type={"submit"} enabled={props.enabledButton} />}
+            <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={cancelForm} clickValue={false}/>
             {/* <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && props.enabledOkButton} type={"submit"}/>
             <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={props.cancelFn} clickValue={false}/> */}
           </div>

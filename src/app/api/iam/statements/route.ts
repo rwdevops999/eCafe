@@ -5,6 +5,7 @@ import { ApiResponseType } from "@/types/db";
 import { StatementType } from "@/types/ecafe";
 import { Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
+import { disconnect } from "process";
 
 const findAllStatementsByServiceId = async (_serviceId: number) => {
   const statements = await prisma.serviceStatement.findMany(
@@ -101,8 +102,24 @@ const provisionStatementActions = (statement: StatementType): Prisma.StatementAc
   return actions;
 }
 
+const provisionStatementActionsForUpdate = (statement: StatementType): Prisma.StatementActionCreateOrConnectWithoutStatementInput[] => {
+  let actions: Prisma.StatementActionCreateOrConnectWithoutStatementInput[] = [];
+
+  // statement.actions?.map(async (action) => {
+  //   let _action: Prisma.StatementActionWhereUniqueInput = {
+  //     id: action.id
+  //   }
+
+  //   actions.push(_action);
+  // });
+
+  return actions;
+}
+
 export async function POST(req: NextRequest) {
     const data: StatementType = await req.json();
+
+    console.log("[API]", "CREATE DATA", js(data));
 
     let statement: Prisma.ServiceStatementCreateInput;
 
@@ -123,6 +140,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
+
+    console.log("[API]", "CREATE STMT", js(statement));
+
     let apiResponse: ApiResponseType = createEmptyApiReponse();
 
     const created: StatementType = await prisma.serviceStatement.create({data: statement});
@@ -130,7 +150,9 @@ export async function POST(req: NextRequest) {
     apiResponse.status = 201;
     apiResponse.info = "PAYLOAD: ";
     apiResponse.payload = created;
-    
+   
+    console.log("CREATE API", js(apiResponse));
+
     return Response.json(apiResponse);
 }
 
@@ -158,3 +180,56 @@ export async function DELETE(request: NextRequest) {
   
   return Response.json(apiResponse);
 }
+
+export async function PUT(req: NextRequest) {
+  const data: StatementType = await req.json();
+
+  console.log("[API]", "UPDATE DATA", js(data));
+
+  let statement: any;
+
+  // HARDCODE
+  statement = {
+    sid:"TEstXXX",
+    description:"test",
+    managed:true,
+    permission:"Deny",
+    updateDate:"2025-02-20T15:11:15.650Z",
+    actions: {
+      disconnect: [{id: 40}]
+    }
+  }
+ 
+  // let actions:Prisma.StatementActionUpdateManyWithoutStatementNestedInput[] = provisionStatementActions(data);
+
+  // statement = {
+  //   sid: data.sid,
+  //   description: data.description,
+  //   managed: data.managed,
+  //   permission: data.permission,
+  //   updateDate: data.updateDate,
+  //   actions: {
+  //     connectOrCreate: provisionStatementActionsForUpdate(data)
+  //   }
+  // }
+
+  console.log("[API]", "UPDATE STMT", js(statement));
+
+  let apiResponse: ApiResponseType = createEmptyApiReponse();
+
+  const created: StatementType = await prisma.serviceStatement.update({
+    where: {
+      id: data.id
+    },
+    data: statement
+  });
+
+  apiResponse.status = 201;
+  apiResponse.info = "PAYLOAD: ";
+  apiResponse.payload = created;
+ 
+  console.log("CREATE API", js(apiResponse));
+
+  return Response.json(apiResponse);
+}
+

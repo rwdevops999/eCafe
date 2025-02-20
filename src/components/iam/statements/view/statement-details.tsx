@@ -20,7 +20,7 @@ import ServiceSelect from "@/components/ecafe/service-select";
 import Link from "next/link";
 import StatementDialog from "../create/statement-dialog";
 import { createHistoryType, cuv, guv, js } from "@/lib/utils";
-import { action_delete } from "@/data/constants";
+import { action_delete, action_update } from "@/data/constants";
 import AlertMessage from "@/components/ecafe/alert-message";
 
 const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
@@ -162,7 +162,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
           alert.open = true;
           alert.error = true;
           alert.title = "Unable to delete statement";
-          alert.message = `Statement is in policy '${_statement.policies[0].name}'`;
+          alert.message = `Statement is in policy '${statement.policies[0].name}'`;
         }
       }
 
@@ -221,9 +221,12 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
         setCurrentStatementId(cuv(undefined, false));
       } else {
         setSelectedServiceId(cuv(guv(selectedServiceId), true));
+        setCurrentStatementId(cuv(undefined, false));
       }
 
       setOpenDialog(cuv(state, false));
+    } else if (resetService) {
+      setSelectedServiceId(cuv(undefined, true));
     }
 
     setOpenDialog(cuv(state, true));
@@ -379,6 +382,13 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
           handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
         }
       }
+    } else if (action === action_update) {
+      console.log("[SD]", "Update", js(statement));
+
+      setSelectedServiceId(cuv(statement.other?.serviceId));
+      setCurrentStatementId(cuv(statement.id));
+
+      setOpenDialog(cuv(true));
     }
   }
 

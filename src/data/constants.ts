@@ -10,7 +10,7 @@ export const accessDeny: string = "Deny";
 export const access = ["Allow", "Deny"];
 
 export const defaultAccess: string = "Allow";
-export const defaultService: ServiceType = {id: 0, name: "Stock", actions: [], statements: []};
+export const defaultService: ServiceType = {id: 0, name: "Stock", actions: [], statements: [], createDate: new Date(), updateDate: new Date()};
 
 export const action_delete = "DELETE";
 export const action_update = "UPDATE";

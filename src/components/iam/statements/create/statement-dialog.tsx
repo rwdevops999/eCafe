@@ -21,7 +21,7 @@ import { Row } from "@tanstack/react-table"
 import { ActionType, Data, ServiceType, StatementActionType, StatementType, UseStateValue } from "@/types/ecafe";
 import { mapActionsToData, mapServiceActionsToData } from "@/lib/mapping";
 import { defaultAccess, defaultService } from "@/data/constants";
-import { createHistory, handleCreateStatement, handleLoadActions, handleLoadActionsByServiceId, handleLoadServiceByIdentifier, handleLoadStatementById } from "@/lib/db";
+import { createHistory, handleCreateStatement, handleLoadActions, handleLoadActionsByServiceId, handleLoadServiceByIdentifier, handleLoadStatementById, handleUpdateStatement } from "@/lib/db";
 import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
@@ -58,6 +58,8 @@ const StatementDialog = (
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
+  console.log("[SDLG]", "IN", serviceId, statementId, openDialog);
+
   const [dialogServiceId, setDialogServiceId] = useState<UseStateValue>(cuv(undefined, false));
   const [dialogStatementId, setDialogStatementId] = useState<UseStateValue>(cuv(undefined, false));
 
@@ -92,10 +94,10 @@ const StatementDialog = (
         description: "",
         access: defaultAccess,
         managed: false,
-        serviceIdentifier: guv(dialogServiceId),
+        serviceIdentifier: guv(dialogServiceId)?? defaultService.name,
         statementId: undefined
       }
-
+      console.log("[SDLG]", "useEffect[dialogStatementId](1)", "SE = ", js(entity));
       setStatementEntity(entity);
     }
   }, [dialogStatementId]);
@@ -134,6 +136,10 @@ const StatementDialog = (
     selectedStatement.current = cuv(statement);
   }
 
+  const getSelectedStatement = (): StatementType|undefined => {
+    return guv(selectedStatement.current);
+  }
+
   const statementLoadedCallback = (_data: ApiResponseType): void => {
     if (_data.status === 200) {
       const statement: StatementType = _data.payload;
@@ -146,6 +152,7 @@ const StatementDialog = (
         serviceIdentifier: statement.serviceId,
         statementId: statement.id
       }
+      console.log("[SDLG]", "useEffect[dialogStatementId](2)", "SE = ", js(entity));
 
       setSelectedStatement(statement);
       setStatementEntity(entity);
@@ -259,9 +266,11 @@ const StatementDialog = (
 
   const getSelectedActionIds = (): number[] => {
     let actionIds: number[] = [];
-    // if (selectedStatement && selectedStatement.actions) {
-    //   actionIds = selectedStatement.actions.map((action: StatementActionType) => action.actionId??0)
-    // }
+    const statement: StatementType|undefined = getSelectedStatement();
+
+    if (statement && statement.actions) {
+      actionIds =statement.actions.map((action: StatementActionType) => action.actionId??0)
+    }
 
     return actionIds;
   }
@@ -311,12 +320,29 @@ const StatementDialog = (
     }
   };
 
-  const onSubmit = (entity: StatementEntity) => {
-    const statement: StatementType|undefined = prepareStatement(true, entity);
-
-    if  (statement) {
-      handleCreateStatement(statement, statementCreatedCallback);
+  const statementUpdatedCallback = (data: ApiResponseType) => {
+    if (data.status === 200) {
+      createHistory(createHistoryType("info", "Update", `Statement updated`, "Statement Details"));
+      setDialogState(false, false);
     }
+  };
+
+  const onSubmit = (entity: StatementEntity) => {
+    console.log("[SDLG] onSubmit(entity)", js(entity));
+
+    if (entity.statementId) {
+      const statement: StatementType|undefined = prepareStatement(false, entity);
+
+      if (statement) {
+        handleUpdateStatement(statement, statementUpdatedCallback)
+      }
+    } else {
+      const statement: StatementType|undefined = prepareStatement(true, entity);
+
+      if  (statement) {
+        handleCreateStatement(statement, statementCreatedCallback);
+      }
+  }
 }
 
   const handleChangeActionSelection = (selection: Row<Data>[]) => {
@@ -343,7 +369,7 @@ const StatementDialog = (
   }
 
   const handleCreateButton = (value: boolean) => {
-    setDialogState(true);
+    setDialogState(true, true);
   }
 
   useEffect (() => {
@@ -360,7 +386,6 @@ const StatementDialog = (
                <EcafeButton id="trigger" caption="Create statement" enabled={buttonEnabled} clickHandler={handleCreateButton} clickValue={true} />
              </DialogTrigger>
                <DialogContent className="min-w-[75%]" aria-describedby="">
-                STATEMENT DIALOG
                  <DialogHeader>
                    <DialogTitle>
                      <div className="flex space-x-2 items-center">
