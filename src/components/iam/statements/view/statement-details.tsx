@@ -24,8 +24,6 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("SD IN");
-
   // const loadedStatements = useRef<StatementType[]>([]);
   // const setLoadedStatements = (_statements: StatementType[]): void => {
   //   loadedStatements.current = _statements;
@@ -209,17 +207,21 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   //   handleAction: handleAction,
   // };
 
-  const handleDialogState = (state: boolean): void => {
-    console.log("SC", "handleDialogState", state);
+  const handleDialogState = (state: boolean, resetService: boolean = true): void => {
     if (! state) {
       loadedAllStatements.current = false;
 
+      if (resetService) {
+        setSelectedServiceId(cuv(undefined, true));
+        setCurrentStatementId(cuv(undefined, false));
+      } else {
+        setSelectedServiceId(cuv(guv(selectedServiceId), true));
+      }
 
-      setSelectedServiceId(cuv(undefined, false));
-      setCurrentStatementId(cuv(undefined, false));
+      setOpenDialog(cuv(state, false));
     }
 
-    setOpenDialog(cuv(state, false));
+    setOpenDialog(cuv(state, true));
   }
 
   // const handleTableAction = () => {
@@ -231,11 +233,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const [currentStatementId, setCurrentStatementId] = useState<UseStateValue>({value: undefined, action: true});
 
   useEffect(() => {
-    console.log("SD: UseEffect[_statementId]", _statementId);
-
     if (_statementId) {
-      console.log("SD: UseEffect[_statementId]", "Loading...");
-
       setCurrentStatementId(cuv(_statementId));
     }
   }, [_statementId]);
@@ -265,16 +263,12 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
     const mappedStatements: Data[] = mapStatementsToData(getCurrentStatements());
 
     setMappedStatements(mappedStatements);
-    console.log("SD: mapCurrentStatements", js(mappedStatements));
   }
 
   // Get Statement (when id is defined) with actions and service
   const statementLoadedCallback = (_data: ApiResponseType): void => {
     if (_data.status === 200) {
-      console.log("SD: statementLoadedCallback", "Statement loaded");
-
       const statement: StatementType = _data.payload;
-      console.log("SD: statementLoadedCallback", "Loaded statement", js(statement));
 
       setCurrentStatements([statement]);
 
@@ -288,10 +282,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   // Get Statements (when id is undefined) with actions and service
   const statementsLoadedCallback = (_data: ApiResponseType): void => {
     if (_data.status === 200) {
-      console.log("SD: statementsLoadedCallback", "All statements loaded");
-
       const statements: StatementType[] = _data.payload;
-      console.log("SD: statementLoadedCallback", "Loaded statement", js(statements));
 
       setCurrentStatements(statements);
 
@@ -305,18 +296,14 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const loadedAllStatements = useRef<boolean>(false);
 
   useEffect(() => {
-    console.log("SD: UseEffect[currentStatementId]", js(currentStatementId));
 
     if (currentStatementId.value && currentStatementId.action) {
-      console.log("SD: UseEffect[currentStatementId]", "Loading...");
-
       setLoader(true);
       handleLoadStatementById(guv(currentStatementId), statementLoadedCallback)
       loadedAllStatements.current = false;
     } else {
       if (! loadedAllStatements.current) {
         if (currentStatementId.action) {
-          console.log("SD: UseEffect[currentStatementId]", "Loading...");
           setLoader(true);
           handleLoadStatements(statementsLoadedCallback);
           loadedAllStatements.current = true;
@@ -335,24 +322,19 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const [selectedServiceId, setSelectedServiceId] = useState<UseStateValue>({value: undefined, action: true});
 
   useEffect(() => {
-    console.log("SD: UseEffect[selectedServiceId]", js(selectedServiceId));
-
     if (selectedServiceId.value && selectedServiceId.action) {
-      console.log("SD: UseEffect[selectedServiceId]", "Loading(1)...");
       setLoader(true);
       handleLoadStatementsByServiceId(selectedServiceId.value, statementsLoadedCallback);
       loadedAllStatements.current = false;
     } else {
       if (! loadedAllStatements.current) {
         if (selectedServiceId.action) {
-          console.log("SD: UseEffect[selectedServiceId]", "Loading(2)...");
           setLoader(true);
           handleLoadStatements(statementsLoadedCallback);
           loadedAllStatements.current = true;
         }
       }
     }
-
   }, [selectedServiceId]);
   
   const handleFakeServiceSelect = () => {
@@ -376,23 +358,17 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   };
 
   const handleChangeService = (service: ServiceType|undefined) => {
-    console.log("CHANGE SERVICE(1)", js(service))
-    console.log("CHANGE SERVICE(2)", guv(selectedServiceId))
-
+    console.log("[SD]", "handleChangeService IN", js(service));
     const serviceId: any = guv(selectedServiceId);
 
-    console.log("CHANGE SERVICE(equal)", (serviceId != service?.id))
-
     if (serviceId != service?.id) {
+      console.log("[SD]", "handleChangeService", js(service));
       setSelectedServiceName(service ? service.name : undefined);
-      console.log("SET SELECTED SERVICE ID", (service ? service.id : undefined));
       setSelectedServiceId(cuv(service ? service.id : undefined));
     }
   }
 
   const renderComponent = () => {
-    console.log("SD RENDER", guv(selectedServiceId));
-
     // if (alert && alert.open) {
     //     return (<AlertMessage alert={alert}></AlertMessage>)
     // }
@@ -414,6 +390,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
                 serviceId={guv(selectedServiceId)}
                 statementId={guv(currentStatementId)}
                 setDialogState={handleDialogState}
+                changeService={handleChangeService}
               />
             </div>
           <div className="block space-y-5">

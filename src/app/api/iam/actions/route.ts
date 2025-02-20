@@ -12,8 +12,6 @@ export async function GET(request: NextRequest) {
     if (paramServiceId) {
         const _serviceId: number = parseInt(paramServiceId);
 
-        console.log("[API] Load actions by ID = ", _serviceId);
-
         const actions: ActionType[] = await prisma.action.findMany({
             where: {
                 serviceId: _serviceId

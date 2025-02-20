@@ -5,6 +5,6 @@ export interface StatementEntity {
     access: string;
 
     statementId: number|undefined,
-    serviceId: number|undefined;
+    serviceIdentifier: number|string|undefined;
   }
   

@@ -34,8 +34,6 @@ const ServiceSelect = (
   }) => {
   const serviceToDisplay = useRef<string>("");
 
-  console.log ("SS IN", defaultService);
-
   const [services, setServices] = useState<ServiceType[]>([]);
   const [serviceNames, setServiceNames] = useState<string[]>([]);
   const [open, setOpen] = useState(false)
@@ -46,13 +44,9 @@ const ServiceSelect = (
     let services: ServiceType[] = [];
 
     if (_data.status === 200) {
-      console.log("SS: Services Loaded ...");
       services = _data.payload;
       setServices(services);
     }
-
-    console.log("SS", "servicesLoadedCallback", defaultService);
-    console.log("SS", "servicesLoadedCallback", "setService", defaultService);
 
     setService(defaultService, services);
   }
@@ -62,8 +56,6 @@ const ServiceSelect = (
   }
 
   const setService = (_service: number|string|undefined, _services?: ServiceType[]): void => {
-    console.log("Change Service Setting", _service??"undefined");
-
     if (_services === undefined) {
       _services = services;
     }
@@ -74,18 +66,14 @@ const ServiceSelect = (
       if (isNumber(_service)) {
         // defaultService is a service Id
         const id: number = parseInt(defaultService as string);
-        console.log("SS", "defaultService is an ID : ", id);
         const service: ServiceType|undefined = _services.find((service) => service.id === id);
-        console.log("SS", "defaultService is an ID : services are ", js(services));
         if (service) {
-          console.log("SS", "defaultService is an ID : ", "service found");
           serviceName = service.name;
           changeService(service);
         }
       } else {
         // defaultService is a service Name
         const name: string = defaultService as string;
-        console.log("SS", "defaultService is a NAME : ", name);
         const service: ServiceType|undefined = _services.find((service) => service.name === name);
         if (service) {
           serviceName = service.name;
@@ -96,15 +84,12 @@ const ServiceSelect = (
       changeService(undefined);
     }
 
-    console.log("SS", "set ServiceNames", js(services));
-
     if (! defaultService || forceAll) {
       setServiceNames(["All", ..._services.map((service: ServiceType) => service.name)]);
     } else {
       setServiceNames(_services.map((service: ServiceType) => service.name));
     }
 
-    console.log("SS", "Change display service to : ", serviceName);
     setSelectedServiceName(serviceName);
   }
 
@@ -118,13 +103,10 @@ const ServiceSelect = (
   }, []);
 
   useEffect(() => {
-    console.log("SS", "UseEffect[defaultService]", defaultService);
     setService(defaultService);
   }, [defaultService]);
 
   const renderComponent = () => {
-    console.log("SS", "RENDER", js(services));
-
     return (
       <div className="flex -ml-3 items-center z-10">
         <Label className="mr-1">{label}</Label>

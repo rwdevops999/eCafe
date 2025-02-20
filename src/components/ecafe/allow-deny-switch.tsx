@@ -1,21 +1,30 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { accessAllow, accessDeny, defaultAccess } from "@/data/constants";
 
 const access: string = defaultAccess;
 
-const AllowDenySwitch = ({handleChangeAccess}:{handleChangeAccess?(access: string):void}) => {
+export interface SwitchProps {
+  value: string;
+  accessFn: (access: string) => void
+}
+
+const AllowDenySwitch = (props: SwitchProps) => {
   let [checked, setChecked] = useState(access === defaultAccess);
 
   const handleCheckChange = () => {
     const isChecked = checked;
     setChecked(!isChecked);
-    (handleChangeAccess ? handleChangeAccess(isChecked ? accessDeny : accessAllow) : null);
+    props.accessFn(isChecked ? accessDeny : accessAllow);
   };
   
+  useEffect(() => {
+    setChecked(props.value === defaultAccess ? true: false);
+  }, [props]);
+
   return (
     <div className="flex items-center space-x-2">
       <Label className={!checked ? "text-foreground" : "text-green-500"} htmlFor="execute">{accessAllow}</Label>

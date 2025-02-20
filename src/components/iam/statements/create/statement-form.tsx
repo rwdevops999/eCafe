@@ -14,29 +14,30 @@ import EcafeButton from '@/components/ecafe/ecafe-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { ServiceType } from '@/types/ecafe';
+import { defaultAccess } from '@/data/constants';
 
 export interface FormProps {
   statement: StatementEntity;
 
   cancelFn: (b: boolean) => void
-  serviceChangeFn?: (service: ServiceType|undefined) => void
-  // enabledOkButton: boolean,
+  submitFn: (e: StatementEntity) => void
+  serviceFn: (service: ServiceType|undefined) => void
+  enabledButton: boolean,
 }
 
 const StatementForm = (props: FormProps) => {
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("SF IN statement ", js(props.statement));
-
   const formMethods = useForm({
     defaultValues: useMemo(() => {
-      console.log("SET FORM DEFAULT VALUES", js(props.statement));
       return props.statement;
     }, [props])
   });
 
-  const {reset, handleSubmit, register, formState: {errors}, setValue} = formMethods;
+  console.log("[SDLG]", "IN(statement)", js(props.statement));
+
+  const {reset, handleSubmit, register, formState: {errors}, setValue, getValues} = formMethods;
 
   useEffect(() => {
     console.log("SF MOUNTED");
@@ -44,8 +45,10 @@ const StatementForm = (props: FormProps) => {
     return () => console.log("SF UNMOUNTED");
   }, []);
 
+  const [managed, setManaged] = useState<boolean>(false);
+  const [access, setAccess] = useState<string>(defaultAccess);
+
   useEffect(() => {
-    console.log("SF MOUNTED", "UseEffect[props.statement]", "Reset", js(props.statement));
     // let newEntity: StatementEntity = {
     //   sid: "SID",
     //   serviceId: undefined,
@@ -55,33 +58,35 @@ const StatementForm = (props: FormProps) => {
     //   managed: false
     // }
 
+    setManaged(props.statement.managed);
+    setAccess(props.statement.access);
     reset(props.statement);
 
   }, [props]);
 
-  // const changeAccessValue = (value: string) => {
-  //   setValue("access", value);
-  // }
+  const changeAccessValue = (value: string) => {
+    setAccess(value);
+    setValue("access", value);
+  }
 
-  // const changeManaged = (checked: CheckedState) => {
-  //   if (typeof checked === 'boolean') {
-  //     setValue("managed", checked);
-  //   }
-  // }
+  const changeManaged = (checked: CheckedState) => {
+    if (typeof checked === 'boolean') {
+      console.log("[SF]", "changeManaged", checked);
+      setValue("managed", checked);
+      setManaged(checked);
+    }
+  }
 
   const handleChangeService = (_service: ServiceType|undefined) => {
-    console.log("SF", "HandleChangeService", js(_service));
-    props.serviceChangeFn ? props.serviceChangeFn(_service) : () => {};
+    console.log("[SF]", "handleChangeService");
+    props.serviceFn(_service);
   }
 
   const onSubmit: SubmitHandler<StatementEntity> = (formData: StatementEntity) => {
-    console.log("SF", "onSubmit");
-    // props.submitFn(formData);
+    props.submitFn(formData);
   }
 
   const renderComponent = () => {
-    console.log("SF", "RENDER", js(props));
-
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="form">
         <div className="flex justify-between">
@@ -90,7 +95,7 @@ const StatementForm = (props: FormProps) => {
               <div className="grid grid-cols-6 items-center gap-2">
                 <Label>Service</Label>
                 <div className="ml-2">
-                  <ServiceSelect label="" defaultService={props.statement.serviceId} handleChangeService={handleChangeService}/>
+                  <ServiceSelect label="" defaultService={props.statement.serviceIdentifier} handleChangeService={handleChangeService} />
                 </div>
               </div>
   
@@ -100,6 +105,7 @@ const StatementForm = (props: FormProps) => {
                   id="sid"
                   placeholder="sid..."
                   className="col-span-2 h-8"
+                  disabled={! props.enabledButton}
                   {...register("sid", 
                       {
                         required: {value: true, message: "Sid is required"},
@@ -113,36 +119,37 @@ const StatementForm = (props: FormProps) => {
                 <span className="text-red-500">{errors.sid.message}</span>
               }
   
-      {/* //         <div className="grid grid-cols-6 items-center gap-2">
-      //           <Label htmlFor="description">Description</Label>
-      //           <Input
-      //             id="description"
-      //             placeholder="description..."
-      //             className="col-span-3 h-8"
-      //             {...register("description",
-      //               {
-      //                 required: {value: true, message: "Description is required"},
-      //                 minLength: {value: 3, message: "Description must be a least 3 characters"},
-      //                 maxLength: {value: 25, message: "Description may not be longer than 25 characters"}
-      //               }
-      //             )}
-      //           />
-      //         </div>
-      //         {errors.description && 
-      //           <span className="text-red-500">{errors.description.message}</span>
-      //         } */}
+               <div className="grid grid-cols-6 items-center gap-2">
+                 <Label htmlFor="description">Description</Label>
+                 <Input
+                   id="description"
+                   placeholder="description..."
+                   className="col-span-3 h-8"
+                   disabled={! props.enabledButton}
+                   {...register("description",
+                     {
+                       required: {value: true, message: "Description is required"},
+                       minLength: {value: 3, message: "Description must be a least 3 characters"},
+                       maxLength: {value: 25, message: "Description may not be longer than 25 characters"}
+                     }
+                   )}
+                 />
+               </div>
+               {errors.description && 
+                 <span className="text-red-500">{errors.description.message}</span>
+               }
   
-      {/* //         <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
-      //           <Label>Access Level</Label>
-      //           <AllowDenySwitch handleChangeAccess={changeAccessValue}/>
-      //           <Checkbox className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
-      //           <Label className="ml-4" htmlFor="managed">Managed</Label>
-      //         </div> */}
+               <div className="grid grid-cols-6 items-center mb-1 ml-[170px]">
+                 <Label>Access Level</Label>
+                 <AllowDenySwitch accessFn={changeAccessValue} value={access}/>
+                 <Checkbox checked={managed} className="ml-28" id="managed" onCheckedChange={changeManaged}></Checkbox>
+                 <Label className="ml-4" htmlFor="managed">Managed</Label>
+               </div>
   
             </div>
           </div> 
           <div className="space-y-1">
-            <EcafeButton id={"createButton"} caption="Create" type={"submit"}/>
+            <EcafeButton id={"createButton"} caption="Create" type={"submit"} enabled={props.enabledButton} />
             <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={props.cancelFn} clickValue={false}/>
             {/* <EcafeButton id={"createButton"} caption="Create" enabled={Object.keys(errors).length === 0 && props.enabledOkButton} type={"submit"}/>
             <EcafeButton id={"cancelButton"} caption="Cancel" enabled className="bg-gray-400 hover:bg-gray-600" clickHandler={props.cancelFn} clickValue={false}/> */}

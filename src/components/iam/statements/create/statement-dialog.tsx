@@ -30,6 +30,7 @@ import { cloneObject, createHistoryType, cuv, guv, js, showToast } from "@/lib/u
 import StatementForm from "./statement-form";
 import { StatementEntity } from "./data/model";
 import { Button } from "@/components/ui/button";
+import { stat } from "fs";
 
 const StatementDialog = (
   {
@@ -38,6 +39,7 @@ const StatementDialog = (
     serviceId,
     statementId,
     setDialogState,
+    changeService,
     // setReload,
     // setStatementId 
   }
@@ -47,7 +49,8 @@ const StatementDialog = (
     buttonEnabled:boolean; 
     serviceId: number|undefined; 
     statementId: number|undefined,
-    setDialogState: (b: boolean) => void,
+    setDialogState: (b: boolean, resetService: boolean) => void,
+    changeService: (service: ServiceType|undefined) => void
     // setReload(x: any): void;
     // setStatementId: (_statementId : number|undefined) => void 
 
@@ -55,25 +58,27 @@ const StatementDialog = (
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("Statement Dialog", "ServiceId = ", serviceId, " StatementId = ", statementId);
+  console.log("[SDLG]", "IN", serviceId, statementId);
 
   const [dialogServiceId, setDialogServiceId] = useState<UseStateValue>(cuv(undefined, false));
   const [dialogStatementId, setDialogStatementId] = useState<UseStateValue>(cuv(undefined, false));
 
   useEffect(() => {
-    console.log("SDLG", "useEffect[dialogServiceId]", js(dialogServiceId));
-
       setLoader(true);
 
       const serviceId: UseStateValue = dialogServiceId;
-      console.log("SDLG", "useEffect[dialogServiceId](serviceId)", js(serviceId));
 
       if (openDialog) {
         if (serviceId.value && serviceId.action) {
-          console.log("SDLG", "useEffect[dialogServiceId]", `Load action of service id ${serviceId.value}`);
+          console.log("[SDLG]", "UseEffect[dialogServiceId]", "load actions by service ID");
+
+          let entity: StatementEntity = statementEntity.current;
+          entity.serviceIdentifier = serviceId.value;
+          setStatementEntity(entity);
+          
           handleLoadActionsByServiceId(serviceId.value, actionsLoadedCallback);
         } else {
-          console.log("SDLG", "useEffect[dialogServiceId]", "Load ALL actions ");
+          console.log("[SDLG]", "UseEffect[dialogServiceId]", "load all actions");
           handleLoadActions(actionsLoadedCallback);
         }
       }
@@ -81,13 +86,9 @@ const StatementDialog = (
     }, [dialogServiceId]);
 
   useEffect(() => {
-    console.log("SDLG", "useEffect[dialogStatementId]", js(dialogStatementId));
-
     const statementId: UseStateValue = dialogStatementId;
-    console.log("SDLG", "useEffect[dialogStatementId](dialogStatementId)", js(dialogStatementId));
 
     if (statementId.value && statementId.action) {
-      console.log("SDLG", "useEffect[dialogStatementId]", "LOAD STATEMENT");
       setLoader(true);
       handleLoadStatementById(statementId.value, statementLoadedCallback);
     } else {
@@ -96,7 +97,7 @@ const StatementDialog = (
         description: "",
         access: defaultAccess,
         managed: false,
-        serviceId: guv(dialogServiceId),
+        serviceIdentifier: guv(dialogServiceId),
         statementId: undefined
       }
 
@@ -107,11 +108,10 @@ const StatementDialog = (
   const actionsLoadedCallback = (_data: ApiResponseType): void => {
     if (_data.status === 200) {
       const actions: ActionType[] = _data.payload;
-      console.log("SDLG", "Actions", js(actions));
       
       const mappedActions: Data[] = mapActionsToData(actions);
       setActionsData(mappedActions);
-
+      
       showToast("info", "Actions loaded");
     }
 
@@ -123,7 +123,7 @@ const StatementDialog = (
     description: "",
     access: defaultAccess,
     managed: false,
-    serviceId: undefined,
+    serviceIdentifier: defaultService.name,
     statementId: undefined
   });
   const setStatementEntity = (entity: StatementEntity): void => {
@@ -132,6 +132,11 @@ const StatementDialog = (
 
   const getStatementEntity = (): StatementEntity => {
     return cloneObject(statementEntity.current);
+  }
+
+  const selectedStatement = useRef<UseStateValue>(cuv(undefined));
+  const setSelectedStatement = (statement: StatementType|undefined) => {
+    selectedStatement.current = cuv(statement);
   }
 
   const statementLoadedCallback = (_data: ApiResponseType): void => {
@@ -143,21 +148,20 @@ const StatementDialog = (
         description: statement.description,
         access: statement.permission,
         managed: statement.managed,
-        serviceId: statement.serviceId,
+        serviceIdentifier: statement.serviceId,
         statementId: statement.id
       }
 
+      setSelectedStatement(statement);
       setStatementEntity(entity);
+
+      handleLoadActionsByServiceId(statement.serviceId, actionsLoadedCallback);
     }
   }
 
   useEffect(() => {
-    console.log("SDLG", "useEffect[openDialog]", openDialog);
-    console.log("SDLG", "useEffect[openDialog](serviceId)", serviceId);
-    console.log("SDLG", "useEffect[openDialog](statementId)", statementId);
-
+    console.log("[SDLG]", "useEffect[openDialog]", serviceId, statementId);
     if (openDialog) {
-      console.log("SDLG", "useEffect[openDialog] set IDs", serviceId, statementId);
       setDialogServiceId(cuv(serviceId));
       setDialogStatementId(cuv(statementId));
     }
@@ -180,9 +184,9 @@ const StatementDialog = (
 
   const [loader, setLoader] = useState<boolean>(false);
 
-  // const [selectedService, setSelectedService] = useState<string>(defaultService.name);
+  const [selectedService, setSelectedService] = useState<ServiceType>();
 
-  // const [selectedActions, setSelectedActions] = useState<Data[]>([]);
+  const [selectedActions, setSelectedActions] = useState<Data[]>([]);
 
   // const access = useRef<string>(defaultAccess);
   // const setAccess = (_access: string): void => {
@@ -282,55 +286,52 @@ const StatementDialog = (
   //   setSelectedService(_service === 'All' ? defaultService.name : _service);
   // }, [_service]);
 
-  // const provisionStatement = (data: StatementEntity): StatementType | undefined => {
-  //   if (selectedActions && selectedActions.length > 0) {
-  //     const _service = getLoadedServices().find(service => service.name === selectedService)!;
-  //     const _actions = selectedActions.map(action => {return {id: action.id, name: action.name}});
+  const prepareStatement = (onCreate: boolean, data: StatementEntity): StatementType | undefined => {
+    if (selectedActions && selectedActions.length > 0) {
+      const _service = selectedService;
+      const _actions = selectedActions.map(action => {return {id: action.id, name: action.name}});
+      const statement: StatementType|undefined = guv(selectedStatement.current);
 
-  //     return {
-  //       id: 0,
-  //       serviceId: _service.id,
-  //       sid: data.sid,
-  //       description: data.description,
-  //       permission: access.current,
-  //       managed: getManaged(),
-  //       actions: _actions,
-  //       createDate: new Date(),
-  //       updateDate: new Date(),
-  //       service: {
-  //         id: _service.id,
-  //         name: _service.name,
-  //         actions: _service.actions,
-  //         createDate: new Date(),
-  //         updateDate: new Date(),
-  //         statements: []
-  //       },
-  //       policies: []
-  //     }
-  //   }
+      return {
+        id: onCreate ? 0 : data.statementId!,
+        serviceId: _service ? _service.id : 0,
+        sid: data.sid,
+        description: data.description,
+        permission: data.access,
+        managed: data.managed,
+        actions: _actions,
+        createDate: (onCreate ? new Date() : (statement ? statement.createDate : new Date())),
+        updateDate: new Date(),
+        service: _service,
+        policies: []
+      }
+    }
 
-  //   return undefined;
-  // }
+    return undefined;
+  }
 
-  // const statementCreatedCallback = (data: ApiResponseType) => {
-  //   if (data.status === 201) {
-  //     createHistory(createHistoryType("info", "Create", `Sattement created`, "Statement Details"));
-  //     setReload((x: any) => x+1);
-  //   }
-  // };
+  const statementCreatedCallback = (data: ApiResponseType) => {
+    if (data.status === 201) {
+      console.log("Statement created");
+      createHistory(createHistoryType("info", "Create", `Statement created`, "Statement Details"));
+      setDialogState(false, false);
+    }
+  };
 
-  // const onSubmit = (entity: StatementEntity) => {
-  //   // const statement: StatementType|undefined = provisionStatement(entity);
+  const onSubmit = (entity: StatementEntity) => {
+    const statement: StatementType|undefined = prepareStatement(true, entity);
 
-  //   // if  (statement) {
-  //   //   handleCreateStatement(statement, statementCreatedCallback);
-  //   // }
+    if  (statement) {
+      console.log("[SDLG]", "PREPARED STATEMENT", js(statement));
 
-  //   // setDialogState(false);
-  // }
+      handleCreateStatement(statement, statementCreatedCallback);
+    } else {
+      console.log("[SDLG]", "ERROR IN PREPARED STATEMENT", js(statement));
+    }
+}
 
   const handleChangeActionSelection = (selection: Row<Data>[]) => {
-    // setSelectedActions(selection.map((row) => row.original));
+    setSelectedActions(selection.map((row) => row.original));
   }
 
   // const changeAccessValue = (value: string) => {
@@ -344,14 +345,15 @@ const StatementDialog = (
   // }
 
   const handleChangeService = (_service: ServiceType|undefined) => {
-    console.log("SDLG", "handleChangeService", js(_service));
-    // setSelectedService(_service);
-    // handleLoadServiceByIdentifier(_service, serviceLoadedCallback);
+    setSelectedService(_service);
+
+    if (_service) {
+      handleLoadActionsByServiceId(_service.id, actionsLoadedCallback);
+      changeService(_service);
+    }
   }
 
   const handleCreateButton = (value: boolean) => {
-    console.log("SDLG", "Create button clicked");
-    // setStatementId(undefined);
     setDialogState(true);
   }
 
@@ -383,7 +385,7 @@ const StatementDialog = (
           {/* //       {!loader && */}
                   {/* <StatementForm statement={getStatementEntity()} cancelFn={setDialogState} submitFn={onSubmit} serviceChangeFn={handleChangeService} enabledOkButton={selectedActions.length > 0}/> */}
                   {/* <StatementForm statement={getStatementEntity()} cancelFn={setDialogState} serviceChangeFn={handleChangeService}/> */}
-                  <StatementForm statement={getStatementEntity()} cancelFn={setDialogState} />
+                  <StatementForm statement={getStatementEntity()} cancelFn={setDialogState} enabledButton={selectedActions.length > 0} submitFn={onSubmit} serviceFn={handleChangeService}/>
           {/* //       } */}
                 {actionsData &&
                   <DataTable data={actionsData} columns={columns} handleChangeSelection={handleChangeActionSelection} initialTableState={initialTableState} Toolbar={DataTableToolbar} selectedItems={getSelectedActionIds()}/>
