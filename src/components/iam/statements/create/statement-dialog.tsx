@@ -58,8 +58,6 @@ const StatementDialog = (
   const {debug} = useDebug();
   const logger = new ConsoleLogger({ level: (debug ? 'debug' : 'none')});
 
-  console.log("[SDLG]", "IN", serviceId, statementId);
-
   const [dialogServiceId, setDialogServiceId] = useState<UseStateValue>(cuv(undefined, false));
   const [dialogStatementId, setDialogStatementId] = useState<UseStateValue>(cuv(undefined, false));
 
@@ -70,15 +68,12 @@ const StatementDialog = (
 
       if (openDialog) {
         if (serviceId.value && serviceId.action) {
-          console.log("[SDLG]", "UseEffect[dialogServiceId]", "load actions by service ID");
-
           let entity: StatementEntity = statementEntity.current;
           entity.serviceIdentifier = serviceId.value;
           setStatementEntity(entity);
           
           handleLoadActionsByServiceId(serviceId.value, actionsLoadedCallback);
         } else {
-          console.log("[SDLG]", "UseEffect[dialogServiceId]", "load all actions");
           handleLoadActions(actionsLoadedCallback);
         }
       }
@@ -160,7 +155,6 @@ const StatementDialog = (
   }
 
   useEffect(() => {
-    console.log("[SDLG]", "useEffect[openDialog]", serviceId, statementId);
     if (openDialog) {
       setDialogServiceId(cuv(serviceId));
       setDialogStatementId(cuv(statementId));
@@ -312,7 +306,6 @@ const StatementDialog = (
 
   const statementCreatedCallback = (data: ApiResponseType) => {
     if (data.status === 201) {
-      console.log("Statement created");
       createHistory(createHistoryType("info", "Create", `Statement created`, "Statement Details"));
       setDialogState(false, false);
     }
@@ -322,11 +315,7 @@ const StatementDialog = (
     const statement: StatementType|undefined = prepareStatement(true, entity);
 
     if  (statement) {
-      console.log("[SDLG]", "PREPARED STATEMENT", js(statement));
-
       handleCreateStatement(statement, statementCreatedCallback);
-    } else {
-      console.log("[SDLG]", "ERROR IN PREPARED STATEMENT", js(statement));
     }
 }
 

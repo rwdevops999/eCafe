@@ -71,14 +71,12 @@ const StatementForm = (props: FormProps) => {
 
   const changeManaged = (checked: CheckedState) => {
     if (typeof checked === 'boolean') {
-      console.log("[SF]", "changeManaged", checked);
       setValue("managed", checked);
       setManaged(checked);
     }
   }
 
   const handleChangeService = (_service: ServiceType|undefined) => {
-    console.log("[SF]", "handleChangeService");
     props.serviceFn(_service);
   }
 

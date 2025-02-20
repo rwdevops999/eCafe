@@ -1,14 +1,15 @@
 'use client'
 
+
 import { DataTable } from "@/components/datatable/data-table";
 import PageBreadCrumbs from "@/components/ecafe/page-bread-crumbs";
 import { Button } from "@/components/ui/button";
 import { useDebug } from "@/hooks/use-debug";
 import { ConsoleLogger } from "@/lib/console.logger";
-import { handleLoadStatementById, handleLoadStatements, handleLoadStatementsByServiceId } from "@/lib/db";
+import { createHistory, handleDeleteStatement, handleLoadStatementById, handleLoadStatements, handleLoadStatementsByServiceId } from "@/lib/db";
 import { mapStatementsToData } from "@/lib/mapping";
 import { ApiResponseType } from "@/types/db";
-import { Data, ServiceType, StatementType, UseStateValue } from "@/types/ecafe";
+import { AlertType, Data, ServiceType, StatementType, UseStateValue } from "@/types/ecafe";
 import { useEffect, useRef, useState } from "react";
 import { columns } from "./table/colums";
 import { TableMeta } from "@tanstack/react-table";
@@ -18,7 +19,9 @@ import EcafeLoader from "@/components/ecafe/ecafe-loader";
 import ServiceSelect from "@/components/ecafe/service-select";
 import Link from "next/link";
 import StatementDialog from "../create/statement-dialog";
-import { cuv, guv, js } from "@/lib/utils";
+import { createHistoryType, cuv, guv, js } from "@/lib/utils";
+import { action_delete } from "@/data/constants";
+import AlertMessage from "@/components/ecafe/alert-message";
 
 const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   const {debug} = useDebug();
@@ -66,7 +69,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   //   return services.current;
   // }
 
-  // const [alert, setAlert] = useState<AlertType>();
+  const [alert, setAlert] = useState<AlertType>();
 
   // const selectedStatementId = useRef<number|undefined>(undefined);
   // const setSelectedStatementId = (_statementId : number|undefined): void => {
@@ -135,40 +138,42 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   //     }
   // }, [reload, setReload]);
 
-  // const statementDeletedCallback = (data: ApiResponseType, statementName: string) => {
-  //   if (data.status === 200) {
-  //     createHistory(createHistoryType("info", "Delete", `Deleted managed statement ${statementName}`, "Statement"));
-  //     setReload((x:any) => x+1);
-  //   }
-  // }
+  const statementDeletedCallback = (data: ApiResponseType, statementName: string) => {
+    if (data.status === 200) {
+      createHistory(createHistoryType("info", "Delete", `Deleted statement ${statementName}`, "Statement"));
+      console.log("[SD]", "Clear statement info");
+      loadedAllStatements.current = false;
+      setCurrentStatementId(cuv(undefined));
+    }
+  }
 
-  // const isStatementInPolicy = (_statement: Data): AlertType => {
-  //     let alert = {
-  //       open: false,
-  //       error: false,
-  //       title: "",
-  //       message: "",
-  //       child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
-  //     };
+  const isStatementInPolicy = (_statement: Data): AlertType => {
+      let alert = {
+        open: false,
+        error: false,
+        title: "",
+        message: "",
+        child: <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>close</Button>
+      };
 
-  //     const statement = getLoadedStatements().find(s => s.id === _statement.id);
-  //     if (statement && statement.policies) {
-  //       if (statement.policies.length > 0) {
-  //         alert.open = true;
-  //         alert.error = true;
-  //         alert.title = "Unable to delete statement";
-  //         alert.message = `Statement is in policy '${statement.policies[0].name}'`;
-  //       }
-  //     }
+      const statement = currentStatements.current.find((s: StatementType) => s.id === _statement.id)
+      if (statement && statement.policies) {
+        if (statement.policies.length > 0) {
+          alert.open = true;
+          alert.error = true;
+          alert.title = "Unable to delete statement";
+          alert.message = `Statement is in policy '${_statement.policies[0].name}'`;
+        }
+      }
 
-  //     return alert;
-  // }
+      return alert;
+  }
 
   // // // /** for admin only later on */
-  // const handleDeleteManagedStatement = (statement: Data) => {
-  //   handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
-  //   setAlert(undefined);
-  // }
+  const handleDeleteManagedStatement = (statement: Data) => {
+    handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
+    setAlert(undefined);
+  }
 
   const [openDialog, setOpenDialog] = useState<UseStateValue>({value: false, action: true});
 
@@ -297,6 +302,7 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
 
   useEffect(() => {
 
+    console.log("[SD]", "useEffect[currentStatementId");
     if (currentStatementId.value && currentStatementId.action) {
       setLoader(true);
       handleLoadStatementById(guv(currentStatementId), statementLoadedCallback)
@@ -349,8 +355,31 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
     setOpenDialog(cuv(true));
   }
 
-  const handleAction = (action: string, statement: StatementType): void => {
+  const handleAction = (action: string, statement: Data): void => {
     console.log("SD", "Action Selected", "action =" , action, "id = ", js(statement));
+    if (action === action_delete) {
+      if (statement.other && statement.other.managed) {
+        const alert = {
+          open: true,
+          error: true,
+          title: "Unable to delete statement.",
+          message: "Managed statements can not be deleted.",
+          child: (<div className="flex space-x-1">
+                  <Button className="bg-orange-500" size="sm" onClick={() => handleDeleteManagedStatement(statement)}>delete anyway</Button>
+                  <Button className="bg-orange-500" size="sm" onClick={() => setAlert(undefined)}>OK</Button>
+                  </div>)
+        };
+
+        setAlert(alert);
+      } else {
+        let alert = isStatementInPolicy(statement);
+        if (alert.error) {
+          setAlert(alert);
+        } else {
+          handleDeleteStatement(statement.id, statementDeletedCallback, statement.name);
+        }
+      }
+    }
   }
 
   const meta: TableMeta<Data[]> = {
@@ -358,20 +387,18 @@ const StatementDetails = ({_statementId}:{_statementId: number|undefined;}) => {
   };
 
   const handleChangeService = (service: ServiceType|undefined) => {
-    console.log("[SD]", "handleChangeService IN", js(service));
     const serviceId: any = guv(selectedServiceId);
 
     if (serviceId != service?.id) {
-      console.log("[SD]", "handleChangeService", js(service));
       setSelectedServiceName(service ? service.name : undefined);
       setSelectedServiceId(cuv(service ? service.id : undefined));
     }
   }
 
   const renderComponent = () => {
-    // if (alert && alert.open) {
-    //     return (<AlertMessage alert={alert}></AlertMessage>)
-    // }
+    if (alert && alert.open) {
+        return (<AlertMessage alert={alert}></AlertMessage>)
+    }
 
     return (
       <div>
